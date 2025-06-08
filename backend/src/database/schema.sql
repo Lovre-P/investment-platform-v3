@@ -51,10 +51,10 @@ CREATE TABLE IF NOT EXISTS leads (
 );
 
 -- Create indexes for better performance
-CREATE INDEX IF NOT EXISTS idx_investments_status ON investments(status);
-CREATE INDEX IF NOT EXISTS idx_investments_category ON investments(category);
-CREATE INDEX IF NOT EXISTS idx_investments_submission_date ON investments(submission_date);
-CREATE INDEX IF NOT EXISTS idx_leads_status ON leads(status);
-CREATE INDEX IF NOT EXISTS idx_leads_investment_id ON leads(investment_id);
-CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+CREATE INDEX idx_investments_status ON investments(status);
+CREATE INDEX idx_investments_category ON investments(category);
+CREATE INDEX idx_investments_submission_date ON investments(submission_date);
+CREATE INDEX idx_leads_status ON leads(status);
+CREATE INDEX idx_leads_investment_id ON leads(investment_id);
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_username ON users(username);

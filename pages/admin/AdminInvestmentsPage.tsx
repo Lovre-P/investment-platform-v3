@@ -169,13 +169,20 @@ const AdminInvestmentsPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsFormSubmitting(true); 
+    setIsFormSubmitting(true);
 
-    // Prepare data for API: remove id for create, ensure correct types for array fields
-    const investmentDataForApi = { 
+    // Prepare data for API: remove id for create, ensure correct types for array fields and numbers
+    const investmentDataForApi = {
         ...currentInvestment,
+        // Ensure numeric fields are numbers, not strings
+        amountGoal: typeof currentInvestment.amountGoal === 'string' ? parseFloat(currentInvestment.amountGoal) || 0 : currentInvestment.amountGoal,
+        amountRaised: typeof currentInvestment.amountRaised === 'string' ? parseFloat(currentInvestment.amountRaised) || 0 : currentInvestment.amountRaised || 0,
+        minInvestment: typeof currentInvestment.minInvestment === 'string' ? parseFloat(currentInvestment.minInvestment) || 0 : currentInvestment.minInvestment || 0,
+        // Ensure array fields are arrays
         tags: Array.isArray(currentInvestment.tags) ? currentInvestment.tags : (currentInvestment.tags as unknown as string)?.split(',').map(t=>t.trim()).filter(t=>t) || [],
         images: Array.isArray(currentInvestment.images) ? currentInvestment.images : (currentInvestment.images as unknown as string)?.split(',').map(t=>t.trim()).filter(t=>t) || [],
+        // Handle empty email - set to a default if empty for create operations
+        submitterEmail: currentInvestment.submitterEmail?.trim() || (isEditing ? currentInvestment.submitterEmail : 'admin@megainvest.com'),
     };
     if (!isEditing) {
       delete investmentDataForApi.id;

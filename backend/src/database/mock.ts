@@ -1,4 +1,4 @@
-// Mock database for development when PostgreSQL is not available
+// Mock database for development when MySQL is not available
 import { Investment, Lead, User, InvestmentStatus, UserRole } from '../types/index.js';
 import { hashPassword } from '../utils/auth.js';
 import { v4 as uuidv4 } from 'uuid';

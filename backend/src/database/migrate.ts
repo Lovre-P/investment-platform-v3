@@ -36,9 +36,8 @@ async function runMigrations() {
   }
 }
 
-// Run migrations if this file is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  runMigrations();
-}
+// Always run migrations when this file is executed
+console.log('🚀 Migration script started!');
+runMigrations();
 
 export { runMigrations };

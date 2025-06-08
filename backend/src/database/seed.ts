@@ -110,9 +110,8 @@ async function seedDatabase() {
   }
 }
 
-// Run seeding if this file is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  seedDatabase();
-}
+// Always run seeding when this file is executed
+console.log('🚀 Seed script started!');
+seedDatabase();
 
 export { seedDatabase };

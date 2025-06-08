@@ -18,22 +18,35 @@ async function handleAuthResponse(response: Response): Promise<LoginResponse> {
     const errorData = await response.json().catch(() => ({ message: 'Login failed. Please check your credentials.' }));
     throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
   }
-  return response.json();
+  const result = await response.json();
+  // Handle backend response format {success: true, data: {...}}
+  if (result.success && result.data !== undefined) {
+    return result.data;
+  }
+  return result;
 }
 
 export const loginUser = async (credentials: LoginCredentials): Promise<User | null> => {
   try {
+    console.log('authService: Making login request to:', `${API_BASE_URL}/login`);
+    console.log('authService: Credentials:', credentials);
+
     const response = await fetch(`${API_BASE_URL}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(credentials),
     });
+
+    console.log('authService: Response status:', response.status);
     const data = await handleAuthResponse(response);
+    console.log('authService: Parsed response data:', data);
+
     if (data.token && data.user) {
       localStorage.setItem('megaInvestToken', data.token); // Store token
-      // The AuthContext will now likely store the user object separately after login
+      console.log('authService: Token stored, returning user:', data.user);
       return data.user;
     }
+    console.log('authService: No token or user in response');
     return null;
   } catch (error) {
     console.error('Login API error:', error);

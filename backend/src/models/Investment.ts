@@ -48,12 +48,11 @@ export class InvestmentModel {
       query += ` ORDER BY submission_date DESC`;
 
       // Add pagination
-      const limit = filters.limit || 10;
-      const page = filters.page || 1;
+      const limit = parseInt(String(filters.limit || 10));
+      const page = parseInt(String(filters.page || 1));
       const offset = (page - 1) * limit;
 
-      query += ` LIMIT ? OFFSET ?`;
-      values.push(limit, offset);
+      query += ` LIMIT ${limit} OFFSET ${offset}`;
 
       const [rows] = await pool.execute(query, values);
 
@@ -64,6 +63,7 @@ export class InvestmentModel {
         tags: typeof row.tags === 'string' ? JSON.parse(row.tags) : row.tags
       }));
     } catch (error) {
+      console.error('Investment.findAll error:', error);
       throw new DatabaseError('Failed to fetch investments');
     }
   }
@@ -197,8 +197,13 @@ export class InvestmentModel {
 
       for (const [key, dbField] of Object.entries(fieldMappings)) {
         if (updates[key as keyof Investment] !== undefined) {
-          updateFields.push(`${dbField} = $${paramCount++}`);
-          values.push(updates[key as keyof Investment]);
+          updateFields.push(`${dbField} = ?`);
+          let value = updates[key as keyof Investment];
+          // Handle JSON fields
+          if (key === 'images' || key === 'tags') {
+            value = JSON.stringify(value);
+          }
+          values.push(value);
         }
       }
 
@@ -208,20 +213,14 @@ export class InvestmentModel {
 
       values.push(id);
 
-      const result = await pool.query(`
+      await pool.execute(`
         UPDATE investments
         SET ${updateFields.join(', ')}
-        WHERE id = $${paramCount}
-        RETURNING
-          id, title, description, long_description as "longDescription",
-          amount_goal as "amountGoal", amount_raised as "amountRaised",
-          currency, images, category, status, submitted_by as "submittedBy",
-          submitter_email as "submitterEmail", submission_date as "submissionDate",
-          apy_range as "apyRange", min_investment as "minInvestment",
-          term, tags
+        WHERE id = ?
       `, values);
 
-      return result.rows[0];
+      // Return the updated investment
+      return await this.findById(id) as Investment;
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw error;
@@ -236,8 +235,8 @@ export class InvestmentModel {
     }
 
     try {
-      const result = await pool.query('DELETE FROM investments WHERE id = $1', [id]);
-      return result.rowCount > 0;
+      const [result] = await pool.execute('DELETE FROM investments WHERE id = ?', [id]);
+      return (result as any).affectedRows > 0;
     } catch (error) {
       throw new DatabaseError('Failed to delete investment');
     }
@@ -253,15 +252,14 @@ export class InvestmentModel {
       let query = 'SELECT COUNT(*) as count FROM investments';
       const conditions = [];
       const values = [];
-      let paramCount = 1;
 
       if (filters.status) {
-        conditions.push(`status = $${paramCount++}`);
+        conditions.push(`status = ?`);
         values.push(filters.status);
       }
 
       if (filters.category) {
-        conditions.push(`category = $${paramCount++}`);
+        conditions.push(`category = ?`);
         values.push(filters.category);
       }
 
@@ -269,8 +267,8 @@ export class InvestmentModel {
         query += ` WHERE ${conditions.join(' AND ')}`;
       }
 
-      const result = await pool.query(query, values);
-      return parseInt(result.rows[0].count);
+      const [rows] = await pool.execute(query, values);
+      return parseInt((rows as any[])[0].count);
     } catch (error) {
       throw new DatabaseError('Failed to count investments');
     }
@@ -278,12 +276,12 @@ export class InvestmentModel {
 
   static async getTotalValueLocked(): Promise<number> {
     try {
-      const result = await pool.query(`
+      const [rows] = await pool.execute(`
         SELECT COALESCE(SUM(amount_raised), 0) as total
         FROM investments
         WHERE status IN ('Open', 'Funded')
       `);
-      return parseFloat(result.rows[0].total);
+      return parseFloat((rows as any[])[0].total);
     } catch (error) {
       throw new DatabaseError('Failed to calculate total value locked');
     }
@@ -291,12 +289,12 @@ export class InvestmentModel {
 
   static async getPendingCount(): Promise<number> {
     try {
-      const result = await pool.query(`
+      const [rows] = await pool.execute(`
         SELECT COUNT(*) as count
         FROM investments
         WHERE status = 'Pending Approval'
       `);
-      return parseInt(result.rows[0].count);
+      return parseInt((rows as any[])[0].count);
     } catch (error) {
       throw new DatabaseError('Failed to count pending investments');
     }

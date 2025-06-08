@@ -9,14 +9,14 @@ A robust Node.js/Express.js backend API for the MegaInvest investment platform.
 - **Lead Management**: Contact form submissions and lead tracking
 - **User Management**: Admin user management system
 - **Security**: Rate limiting, CORS, input validation, password hashing
-- **Database**: PostgreSQL with connection pooling
+- **Database**: MySQL with connection pooling
 - **Error Handling**: Comprehensive error handling and logging
 
 ## Tech Stack
 
 - **Runtime**: Node.js with TypeScript
 - **Framework**: Express.js
-- **Database**: PostgreSQL
+- **Database**: MySQL
 - **Authentication**: JWT (jsonwebtoken)
 - **Validation**: Zod
 - **Security**: Helmet, bcryptjs, express-rate-limit
@@ -27,7 +27,7 @@ A robust Node.js/Express.js backend API for the MegaInvest investment platform.
 ### Prerequisites
 
 - Node.js (v18 or higher)
-- PostgreSQL (v12 or higher)
+- MySQL (v8.0 or higher)
 - npm or yarn
 
 ### Installation
@@ -45,14 +45,13 @@ cp .env.example .env
 
 3. Set up the database:
 ```bash
-# Create database
-createdb megainvest_db
+# Create database and run migrations
+npm run db:init
 
-# Run migrations
-npm run db:migrate
-
-# Seed with sample data
-npm run db:seed
+# Or run individually:
+npm run db:setup    # Create database
+npm run db:migrate  # Create tables
+npm run db:seed     # Add sample data
 ```
 
 4. Start the development server:
@@ -99,9 +98,9 @@ After running the seed script:
 
 ```env
 # Database
-DATABASE_URL=postgresql://username:password@localhost:5432/megainvest_db
+DATABASE_URL=mysql://username:password@localhost:3306/megainvest_db
 DB_HOST=localhost
-DB_PORT=5432
+DB_PORT=3306
 DB_NAME=megainvest_db
 DB_USER=username
 DB_PASSWORD=password

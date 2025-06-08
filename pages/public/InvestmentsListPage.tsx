@@ -17,6 +17,7 @@ const InvestmentsListPage: React.FC = () => {
   const [sortBy, setSortBy] = useState<'date_desc' | 'date_asc' | 'goal_asc' | 'goal_desc' | 'raised_asc' | 'raised_desc'>('date_desc');
 
   const categories = useMemo(() => {
+    if (!Array.isArray(investments)) return [];
     const uniqueCategories = new Set(investments.map(inv => inv.category));
     return Array.from(uniqueCategories).sort();
   }, [investments]);
@@ -27,10 +28,18 @@ const InvestmentsListPage: React.FC = () => {
       setError(null);
       try {
         const data = await getInvestments(); // Fetch all initially
-        setInvestments(data);
+        console.log('InvestmentsListPage: Received data:', data);
+        if (Array.isArray(data)) {
+          setInvestments(data);
+        } else {
+          console.error('InvestmentsListPage: Data is not an array:', typeof data, data);
+          setInvestments([]);
+          setError("Invalid data format received from server.");
+        }
       } catch (err) {
         console.error("Failed to fetch investments:", err);
         setError("Could not load investments. Please try again later.");
+        setInvestments([]);
       } finally {
         setIsLoading(false);
       }
@@ -39,6 +48,7 @@ const InvestmentsListPage: React.FC = () => {
   }, []);
 
   const filteredAndSortedInvestments = useMemo(() => {
+    if (!Array.isArray(investments)) return [];
     let filtered = investments;
 
     if (searchTerm) {

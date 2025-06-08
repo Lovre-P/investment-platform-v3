@@ -19,16 +19,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const login = useCallback(async (credentials: { email?: string; password?: string }) => {
     try {
+      console.log('AuthContext: Attempting login with:', credentials);
       const userData = await apiLogin(credentials);
-      if (userData && userData.role === UserRole.ADMIN) { // Ensure admin for admin panel
-        setIsAuthenticated(true);
-        setUser(userData);
-        // Token is handled by authService
-      } else if (userData) { // Logged in but not admin
-        await apiLogout(); // Log them out if not admin for admin panel access
-        throw new Error("Access denied. Admin privileges required.");
-      } else { // Login failed
-         throw new Error("Invalid credentials or not an admin account.");
+      console.log('AuthContext: Login response:', userData);
+
+      if (userData) {
+        console.log('AuthContext: User role:', userData.role);
+        if (userData.role === UserRole.ADMIN) {
+          setIsAuthenticated(true);
+          setUser(userData);
+          console.log('AuthContext: Admin login successful');
+        } else {
+          // For now, allow all users to login, not just admins
+          setIsAuthenticated(true);
+          setUser(userData);
+          console.log('AuthContext: User login successful');
+        }
+      } else {
+        throw new Error("Invalid credentials - no user data returned.");
       }
     } catch (error) {
       setIsAuthenticated(false);

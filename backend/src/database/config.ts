@@ -12,11 +12,8 @@ const config = {
   port: parseInt(process.env.DB_PORT || '3306'),
   database: process.env.DB_NAME || 'megainvest_db',
   user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'password',
+  password: process.env.DB_PASSWORD || '',
   connectionLimit: 20,
-  acquireTimeout: 60000,
-  timeout: 60000,
-  reconnect: true,
   charset: 'utf8mb4'
 };
 

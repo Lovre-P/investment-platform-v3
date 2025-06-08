@@ -2,13 +2,26 @@ import { Investment, InvestmentStatus } from '../types';
 
 const API_BASE_URL = '/api'; // Replace with your actual API base URL
 
+function getAuthHeaders(): HeadersInit {
+  const token = localStorage.getItem('megaInvestToken');
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` })
+  };
+}
+
 // Helper function to handle fetch responses
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ message: response.statusText }));
     throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
   }
-  return response.json();
+  const result = await response.json();
+  // Handle backend response format {success: true, data: [...]}
+  if (result.success && result.data !== undefined) {
+    return result.data;
+  }
+  return result;
 }
 
 export const getInvestments = async (filters?: { status?: InvestmentStatus, category?: string }): Promise<Investment[]> => {
@@ -45,7 +58,7 @@ export interface CreateInvestmentData extends Omit<Investment, 'id' | 'submissio
 export const createInvestment = async (investmentData: CreateInvestmentData): Promise<Investment> => {
   const response = await fetch(`${API_BASE_URL}/investments`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify(investmentData),
   });
   return handleResponse<Investment>(response);
@@ -54,7 +67,7 @@ export const createInvestment = async (investmentData: CreateInvestmentData): Pr
 export const updateInvestment = async (investmentId: string, updates: Partial<Investment>): Promise<Investment | null> => {
   const response = await fetch(`${API_BASE_URL}/investments/${investmentId}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify(updates),
   });
   return handleResponse<Investment>(response);
@@ -63,6 +76,7 @@ export const updateInvestment = async (investmentId: string, updates: Partial<In
 export const deleteInvestment = async (id: string): Promise<boolean> => {
   const response = await fetch(`${API_BASE_URL}/investments/${id}`, {
     method: 'DELETE',
+    headers: getAuthHeaders()
   });
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ message: response.statusText }));

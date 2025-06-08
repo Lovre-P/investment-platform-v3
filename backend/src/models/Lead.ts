@@ -94,16 +94,14 @@ export class LeadModel {
         throw new NotFoundError('Lead not found');
       }
 
-      const result = await pool.query(`
+      await pool.execute(`
         UPDATE leads
-        SET status = $1
-        WHERE id = $2
-        RETURNING
-          id, name, email, phone, message, investment_id as "investmentId",
-          submission_date as "submissionDate", status
+        SET status = ?
+        WHERE id = ?
       `, [status, id]);
 
-      return result.rows[0];
+      // Return the updated lead
+      return await this.findById(id) as Lead;
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw error;
@@ -118,8 +116,8 @@ export class LeadModel {
     }
 
     try {
-      const result = await pool.query('DELETE FROM leads WHERE id = $1', [id]);
-      return result.rowCount > 0;
+      const [result] = await pool.execute('DELETE FROM leads WHERE id = ?', [id]);
+      return (result as any).affectedRows > 0;
     } catch (error) {
       throw new DatabaseError('Failed to delete lead');
     }
@@ -131,8 +129,8 @@ export class LeadModel {
     }
 
     try {
-      const result = await pool.query('SELECT COUNT(*) as count FROM leads');
-      return parseInt(result.rows[0].count);
+      const [rows] = await pool.execute('SELECT COUNT(*) as count FROM leads');
+      return parseInt((rows as any[])[0].count);
     } catch (error) {
       throw new DatabaseError('Failed to count leads');
     }
@@ -140,16 +138,16 @@ export class LeadModel {
 
   static async findByInvestmentId(investmentId: string): Promise<Lead[]> {
     try {
-      const result = await pool.query(`
+      const [rows] = await pool.execute(`
         SELECT
-          id, name, email, phone, message, investment_id as "investmentId",
-          submission_date as "submissionDate", status
+          id, name, email, phone, message, investment_id as investmentId,
+          submission_date as submissionDate, status
         FROM leads
-        WHERE investment_id = $1
+        WHERE investment_id = ?
         ORDER BY submission_date DESC
       `, [investmentId]);
 
-      return result.rows;
+      return rows as Lead[];
     } catch (error) {
       throw new DatabaseError('Failed to fetch leads by investment');
     }
@@ -157,7 +155,7 @@ export class LeadModel {
 
   static async getStatusCounts(): Promise<Record<string, number>> {
     try {
-      const result = await pool.query(`
+      const [rows] = await pool.execute(`
         SELECT status, COUNT(*) as count
         FROM leads
         GROUP BY status
@@ -170,7 +168,7 @@ export class LeadModel {
         'Rejected': 0
       };
 
-      result.rows.forEach(row => {
+      (rows as any[]).forEach(row => {
         counts[row.status] = parseInt(row.count);
       });
 

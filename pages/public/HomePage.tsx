@@ -18,10 +18,19 @@ const HomePage: React.FC = () => {
       try {
         // Fix: Use InvestmentStatus.OPEN enum member
         const allInvestments = await getInvestments({ status: InvestmentStatus.OPEN });
-        // Select top 3 or specific featured ones
-        setFeaturedInvestments(allInvestments.sort((a,b) => b.amountRaised - a.amountRaised).slice(0, 3));
+        console.log('HomePage: Received investments:', allInvestments);
+
+        // Check if allInvestments is an array
+        if (Array.isArray(allInvestments)) {
+          // Select top 3 or specific featured ones
+          setFeaturedInvestments(allInvestments.sort((a,b) => b.amountRaised - a.amountRaised).slice(0, 3));
+        } else {
+          console.error('HomePage: allInvestments is not an array:', typeof allInvestments, allInvestments);
+          setFeaturedInvestments([]);
+        }
       } catch (error) {
         console.error("Failed to fetch featured investments:", error);
+        setFeaturedInvestments([]);
       } finally {
         setIsLoading(false);
       }
