@@ -198,12 +198,7 @@ export class InvestmentModel {
       for (const [key, dbField] of Object.entries(fieldMappings)) {
         if (updates[key as keyof Investment] !== undefined) {
           updateFields.push(`${dbField} = ?`);
-          let value = updates[key as keyof Investment];
-          // Handle JSON fields
-          if (key === 'images' || key === 'tags') {
-            value = JSON.stringify(value);
-          }
-          values.push(value);
+          values.push(updates[key as keyof Investment]);
         }
       }
 
@@ -213,14 +208,25 @@ export class InvestmentModel {
 
       values.push(id);
 
-      await pool.execute(`
-        UPDATE investments
-        SET ${updateFields.join(', ')}
-        WHERE id = ?
-      `, values);
+      await pool.execute(
+        `UPDATE investments SET ${updateFields.join(', ')} WHERE id = ?`,
+        values
+      );
 
-      // Return the updated investment
-      return await this.findById(id) as Investment;
+      const [rows] = await pool.execute(
+        `SELECT
+          id, title, description, long_description as longDescription,
+          amount_goal as amountGoal, amount_raised as amountRaised,
+          currency, images, category, status, submitted_by as submittedBy,
+          submitter_email as submitterEmail, submission_date as submissionDate,
+          apy_range as apyRange, min_investment as minInvestment,
+          term, tags
+        FROM investments
+        WHERE id = ?`,
+        [id]
+      );
+
+      return (rows as any[])[0];
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw error;
@@ -250,16 +256,16 @@ export class InvestmentModel {
 
     try {
       let query = 'SELECT COUNT(*) as count FROM investments';
-      const conditions = [];
-      const values = [];
+      const conditions: string[] = [];
+      const values: any[] = [];
 
       if (filters.status) {
-        conditions.push(`status = ?`);
+        conditions.push('status = ?');
         values.push(filters.status);
       }
 
       if (filters.category) {
-        conditions.push(`category = ?`);
+        conditions.push('category = ?');
         values.push(filters.category);
       }
 
@@ -276,11 +282,11 @@ export class InvestmentModel {
 
   static async getTotalValueLocked(): Promise<number> {
     try {
-      const [rows] = await pool.execute(`
-        SELECT COALESCE(SUM(amount_raised), 0) as total
-        FROM investments
-        WHERE status IN ('Open', 'Funded')
-      `);
+      const [rows] = await pool.execute(
+        `SELECT COALESCE(SUM(amount_raised), 0) as total
+         FROM investments
+         WHERE status IN ('Open', 'Funded')`
+      );
       return parseFloat((rows as any[])[0].total);
     } catch (error) {
       throw new DatabaseError('Failed to calculate total value locked');
@@ -289,11 +295,9 @@ export class InvestmentModel {
 
   static async getPendingCount(): Promise<number> {
     try {
-      const [rows] = await pool.execute(`
-        SELECT COUNT(*) as count
-        FROM investments
-        WHERE status = 'Pending Approval'
-      `);
+      const [rows] = await pool.execute(
+        `SELECT COUNT(*) as count FROM investments WHERE status = 'Pending Approval'`
+      );
       return parseInt((rows as any[])[0].count);
     } catch (error) {
       throw new DatabaseError('Failed to count pending investments');

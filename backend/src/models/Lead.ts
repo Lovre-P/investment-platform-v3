@@ -94,14 +94,21 @@ export class LeadModel {
         throw new NotFoundError('Lead not found');
       }
 
-      await pool.execute(`
-        UPDATE leads
-        SET status = ?
-        WHERE id = ?
-      `, [status, id]);
+      await pool.execute(
+        `UPDATE leads SET status = ? WHERE id = ?`,
+        [status, id]
+      );
 
-      // Return the updated lead
-      return await this.findById(id) as Lead;
+      const [rows] = await pool.execute(
+        `SELECT
+          id, name, email, phone, message, investment_id as investmentId,
+          submission_date as submissionDate, status
+         FROM leads
+         WHERE id = ?`,
+        [id]
+      );
+
+      return (rows as any[])[0];
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw error;
@@ -138,14 +145,15 @@ export class LeadModel {
 
   static async findByInvestmentId(investmentId: string): Promise<Lead[]> {
     try {
-      const [rows] = await pool.execute(`
-        SELECT
+      const [rows] = await pool.execute(
+        `SELECT
           id, name, email, phone, message, investment_id as investmentId,
           submission_date as submissionDate, status
-        FROM leads
-        WHERE investment_id = ?
-        ORDER BY submission_date DESC
-      `, [investmentId]);
+         FROM leads
+         WHERE investment_id = ?
+         ORDER BY submission_date DESC`,
+        [investmentId]
+      );
 
       return rows as Lead[];
     } catch (error) {
@@ -155,11 +163,9 @@ export class LeadModel {
 
   static async getStatusCounts(): Promise<Record<string, number>> {
     try {
-      const [rows] = await pool.execute(`
-        SELECT status, COUNT(*) as count
-        FROM leads
-        GROUP BY status
-      `);
+      const [rows] = await pool.execute(
+        `SELECT status, COUNT(*) as count FROM leads GROUP BY status`
+      );
 
       const counts: Record<string, number> = {
         'New': 0,
