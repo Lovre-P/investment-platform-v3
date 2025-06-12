@@ -18,7 +18,16 @@ async function setupDatabase() {
   try {
     console.log('🔧 Setting up MySQL database...');
 
-    // Connect to MySQL server
+    // For Railway, the database already exists, so we just test the connection
+    if (process.env.DATABASE_URL) {
+      console.log('🚂 Railway environment detected, using provided database');
+      connection = await mysql.createConnection(process.env.DATABASE_URL);
+      await connection.execute('SELECT 1');
+      console.log('✅ Database connection successful');
+      return;
+    }
+
+    // Connect to MySQL server (local development)
     connection = await mysql.createConnection(setupConfig);
 
     // Check if database exists
