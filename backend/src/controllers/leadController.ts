@@ -4,7 +4,7 @@ import { NotFoundError } from '../utils/errors.js';
 import { CreateLeadData } from '../types/index.js';
 
 export class LeadController {
-  static async getLeads(req: Request, res: Response, next: NextFunction): Promise<void> {
+  static async getLeads(_req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const leads = await LeadModel.findAll();
 

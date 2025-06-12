@@ -12,7 +12,7 @@ declare global {
   }
 }
 
-export const authenticate = (req: Request, res: Response, next: NextFunction): void => {
+export const authenticate = (req: Request, _res: Response, next: NextFunction): void => {
   try {
     const token = extractTokenFromHeader(req.headers.authorization);
     const payload = verifyToken(token);
@@ -23,7 +23,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
   }
 };
 
-export const requireAdmin = (req: Request, res: Response, next: NextFunction): void => {
+export const requireAdmin = (req: Request, _res: Response, next: NextFunction): void => {
   if (!req.user) {
     return next(new AuthenticationError('Authentication required'));
   }
@@ -35,7 +35,7 @@ export const requireAdmin = (req: Request, res: Response, next: NextFunction): v
   next();
 };
 
-export const optionalAuth = (req: Request, res: Response, next: NextFunction): void => {
+export const optionalAuth = (req: Request, _res: Response, next: NextFunction): void => {
   try {
     const authHeader = req.headers.authorization;
     if (authHeader) {

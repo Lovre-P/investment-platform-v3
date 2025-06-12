@@ -162,7 +162,7 @@ export class InvestmentModel {
       if (!existingInvestment) {
         throw new NotFoundError('Investment not found');
       }
-      return mockDb.investments.update(id, updates);
+      return mockDb.investments.update(id, updates) as Investment;
     }
 
     try {
@@ -175,7 +175,6 @@ export class InvestmentModel {
       // Build dynamic update query
       const updateFields = [];
       const values = [];
-      let paramCount = 1;
 
       const fieldMappings = {
         title: 'title',
@@ -226,7 +225,12 @@ export class InvestmentModel {
         [id]
       );
 
-      return (rows as any[])[0];
+      const updatedRow = (rows as any[])[0];
+      return {
+        ...updatedRow,
+        images: typeof updatedRow.images === 'string' ? JSON.parse(updatedRow.images) : updatedRow.images,
+        tags: typeof updatedRow.tags === 'string' ? JSON.parse(updatedRow.tags) : updatedRow.tags
+      };
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw error;

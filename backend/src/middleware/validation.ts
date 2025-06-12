@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { ValidationError } from '../utils/errors.js';
 
 export const validateBody = <T>(schema: z.ZodSchema<T>) => {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
     try {
       req.body = schema.parse(req.body);
       next();
@@ -21,9 +21,9 @@ export const validateBody = <T>(schema: z.ZodSchema<T>) => {
 };
 
 export const validateQuery = <T>(schema: z.ZodSchema<T>) => {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
     try {
-      req.query = schema.parse(req.query);
+      req.query = schema.parse(req.query) as any;
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -39,9 +39,9 @@ export const validateQuery = <T>(schema: z.ZodSchema<T>) => {
 };
 
 export const validateParams = <T>(schema: z.ZodSchema<T>) => {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
     try {
-      req.params = schema.parse(req.params);
+      req.params = schema.parse(req.params) as any;
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {

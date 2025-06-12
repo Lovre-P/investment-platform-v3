@@ -73,7 +73,7 @@ export class AuthController {
     }
   }
 
-  static async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
+  static async logout(_req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       // In a stateless JWT implementation, logout is primarily handled client-side
       // Here we could implement token blacklisting if needed

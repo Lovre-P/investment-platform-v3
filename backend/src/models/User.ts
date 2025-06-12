@@ -1,6 +1,6 @@
 import { pool, isMockMode } from '../database/config.js';
 import { mockDb } from '../database/mock.js';
-import { User, UserRole, CreateUserData, UpdateUserData } from '../types/index.js';
+import { User, CreateUserData, UpdateUserData } from '../types/index.js';
 import { NotFoundError, ConflictError, DatabaseError } from '../utils/errors.js';
 import { hashPassword } from '../utils/auth.js';
 
@@ -107,7 +107,7 @@ export class UserModel {
       // Hash password
       const passwordHash = await hashPassword(userData.password);
 
-      const [result] = await pool.execute(`
+      const [_result] = await pool.execute(`
         INSERT INTO users (id, username, email, password_hash, role)
         VALUES (UUID(), ?, ?, ?, ?)
       `, [userData.username, userData.email, passwordHash, userData.role]);
@@ -134,7 +134,7 @@ export class UserModel {
       if (!existingUser) {
         throw new NotFoundError('User not found');
       }
-      return mockDb.users.update(id, updates);
+      return mockDb.users.update(id, updates) as Omit<User, 'password'>;
     }
 
     try {
@@ -147,7 +147,6 @@ export class UserModel {
       // Build dynamic update query
       const updateFields = [];
       const values = [];
-      let paramCount = 1;
 
       if (updates.username) {
         updateFields.push(`username = ?`);

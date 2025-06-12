@@ -3,7 +3,6 @@ import { InvestmentController } from '../controllers/investmentController.js';
 import { authenticate, requireAdmin } from '../middleware/auth.js';
 import { validateBody, validateQuery } from '../middleware/validation.js';
 import { createInvestmentSchema, updateInvestmentSchema, investmentFiltersSchema } from '../utils/validation.js';
-import { z } from 'zod';
 
 const router = Router();
 

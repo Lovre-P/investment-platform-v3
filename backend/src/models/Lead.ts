@@ -84,7 +84,7 @@ export class LeadModel {
       if (!existingLead) {
         throw new NotFoundError('Lead not found');
       }
-      return mockDb.leads.updateStatus(id, status);
+      return mockDb.leads.updateStatus(id, status) as Lead;
     }
 
     try {

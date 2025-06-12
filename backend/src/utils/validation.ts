@@ -75,8 +75,8 @@ export const updateLeadStatusSchema = z.object({
 export const investmentFiltersSchema = z.object({
   status: z.nativeEnum(InvestmentStatus).optional(),
   category: z.string().optional(),
-  page: z.string().transform(val => parseInt(val) || 1).optional(),
-  limit: z.string().transform(val => Math.min(parseInt(val) || 10, 100)).optional()
+  page: z.coerce.number().min(1).default(1).optional(),
+  limit: z.coerce.number().min(1).max(100).default(10).optional()
 });
 
 // Utility function to validate request body

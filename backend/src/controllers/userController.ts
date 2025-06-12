@@ -4,7 +4,7 @@ import { NotFoundError } from '../utils/errors.js';
 import { CreateUserData, UpdateUserData } from '../types/index.js';
 
 export class UserController {
-  static async getUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
+  static async getUsers(_req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const users = await UserModel.findAll();
 
