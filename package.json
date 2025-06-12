@@ -6,10 +6,13 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "start": "vite preview",
     "preview": "vite preview",
     "backend:dev": "cd backend && npm run dev",
     "backend:build": "cd backend && npm run build",
-    "backend:start": "cd backend && npm start"
+    "backend:start": "cd backend && npm start",
+    "deploy:check": "node deploy-check.js",
+    "railway:setup": "node railway-setup.js"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

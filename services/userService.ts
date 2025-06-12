@@ -1,6 +1,6 @@
 import { User } from '../types'; // UserRole removed as it's not used directly here anymore
 
-const API_BASE_URL = '/api'; // Replace with your actual API base URL
+const API_BASE_URL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api';
 
 function getAuthHeaders(): HeadersInit {
   const token = localStorage.getItem('megaInvestToken');
