@@ -19,7 +19,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const login = useCallback(async (credentials: { email?: string; password?: string }) => {
     try {
-      console.log('AuthContext: Attempting login with:', credentials);
+      console.log('AuthContext: Attempting login for:', credentials.email);
       const userData = await apiLogin(credentials);
       console.log('AuthContext: Login response:', userData);
 

@@ -29,7 +29,7 @@ async function handleAuthResponse(response: Response): Promise<LoginResponse> {
 export const loginUser = async (credentials: LoginCredentials): Promise<User | null> => {
   try {
     console.log('authService: Making login request to:', `${API_BASE_URL}/login`);
-    console.log('authService: Credentials:', credentials);
+    console.log('authService: Login attempt for:', credentials.email || credentials.username);
 
     const response = await fetch(`${API_BASE_URL}/login`, {
       method: 'POST',
