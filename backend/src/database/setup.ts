@@ -18,12 +18,22 @@ async function setupDatabase() {
   try {
     console.log('🔧 Setting up MySQL database...');
 
-    // For Railway, the database already exists, so we just test the connection
+    // For Railway, we need to create the database first
     if (process.env.DATABASE_URL) {
-      console.log('🚂 Railway environment detected, using provided database');
-      connection = await mysql.createConnection(process.env.DATABASE_URL);
-      await connection.execute('SELECT 1');
-      console.log('✅ Database connection successful');
+      console.log('🚂 Railway environment detected, creating database if needed');
+
+      // Parse the DATABASE_URL to get connection details without database name
+      const dbUrl = new URL(process.env.DATABASE_URL);
+      const dbName = dbUrl.pathname.slice(1); // Remove leading slash
+
+      // Connect without specifying database
+      const baseUrl = `mysql://${dbUrl.username}:${dbUrl.password}@${dbUrl.host}:${dbUrl.port || 3306}`;
+      connection = await mysql.createConnection(baseUrl);
+
+      // Create database if it doesn't exist
+      console.log(`📦 Creating database: ${dbName}`);
+      await connection.execute(`CREATE DATABASE IF NOT EXISTS \`${dbName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
+      console.log('✅ Database created/verified successfully');
       return;
     }
 
