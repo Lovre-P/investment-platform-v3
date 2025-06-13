@@ -26,9 +26,10 @@ async function setupDatabase() {
       const dbUrl = new URL(process.env.DATABASE_URL);
       const dbName = dbUrl.pathname.slice(1); // Remove leading slash
 
-      // Connect without specifying database
-      const port = dbUrl.port || '3306';
-      const baseUrl = `mysql://${dbUrl.username}:${dbUrl.password}@${dbUrl.host}:${port}`;
+      // Connect without specifying database - construct URL properly
+      const baseUrl = `mysql://${dbUrl.username}:${dbUrl.password}@${dbUrl.host}${dbUrl.port ? ':' + dbUrl.port : ''}`;
+      console.log(`🔗 Connecting to: mysql://${dbUrl.username}:***@${dbUrl.host}${dbUrl.port ? ':' + dbUrl.port : ''}`);
+
       connection = await mysql.createConnection(baseUrl);
 
       // Create database if it doesn't exist
