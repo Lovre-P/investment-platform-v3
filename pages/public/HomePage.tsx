@@ -41,29 +41,39 @@ const HomePage: React.FC = () => {
   return (
     <div className="space-y-16">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-primary-600 to-primary-800 text-white py-20 px-6 rounded-xl shadow-2xl overflow-hidden">
-        <div className="absolute inset-0 bg-black opacity-20"></div>
-        <div className="container mx-auto text-center relative z-10">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-            Invest in the Future. <span className="block sm:inline">Empower Innovation.</span>
+      <section className="relative bg-gradient-to-br from-primary-700 via-primary-600 to-accent-600 text-white py-24 px-8 rounded-2xl shadow-2xl overflow-hidden min-h-[70vh] flex items-center">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/60 to-black/40"
+             style={{
+               backgroundImage: 'url(/images/hero/ChatGPT%20Image%20Hero.png)',
+               backgroundSize: 'cover',
+               backgroundPosition: 'center',
+               backgroundRepeat: 'no-repeat'
+             }}></div>
+        <div className="container mx-auto text-center relative z-10 max-w-5xl">
+          <h1 className="text-6xl md:text-7xl lg:text-8xl font-extrabold mb-8 leading-tight tracking-tight text-white filter drop-shadow-2xl"
+              style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.6)' }}>
+            Invest in the <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-300"
+                                style={{ textShadow: 'none', filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))' }}>Future</span>.
+            <span className="block mt-2">Empower Innovation.</span>
           </h1>
-          <p className="text-xl md:text-2xl mb-10 max-w-3xl mx-auto text-primary-100">
+          <p className="text-xl md:text-2xl lg:text-3xl mb-12 max-w-4xl mx-auto text-white font-bold leading-relaxed filter drop-shadow-xl"
+             style={{ textShadow: '2px 2px 6px rgba(0,0,0,0.8), 0 0 15px rgba(0,0,0,0.5)' }}>
             Discover curated investment opportunities in groundbreaking projects and growing businesses. Join MegaInvest to shape tomorrow, today.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
+          <div className="flex flex-col sm:flex-row justify-center items-center space-y-6 sm:space-y-0 sm:space-x-8">
             <Button
               variant="secondary" // Base variant, styling overridden by className
               size="lg"
-              className="bg-white !text-primary-600 hover:bg-primary-50 hover:!text-primary-700 !px-8 !py-3.5" // Enforce text color
+              className="bg-white/95 backdrop-blur-sm !text-primary-700 hover:bg-white hover:!text-primary-800 !px-10 !py-4 !text-lg font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300" // Enforce text color
               onClick={() => (window.location.hash = "/investments")}
             >
               Explore Opportunities
-              <ArrowRightIcon className="h-5 w-5 ml-2" />
+              <ArrowRightIcon className="h-6 w-6 ml-3" />
             </Button>
             <Button
               variant="outline"
               size="lg"
-              className="border-white text-white hover:bg-white hover:text-primary-700 !px-8 !py-3.5"
+              className="border-2 border-white/80 text-white hover:bg-white/10 hover:border-white backdrop-blur-sm !px-10 !py-4 !text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
               onClick={() => (window.location.hash = "/submit-investment")}
             >
               Submit Your Project
@@ -77,21 +87,39 @@ const HomePage: React.FC = () => {
         <h2 className="text-3xl font-bold text-center text-secondary-800 mb-12">
           How <span className="text-primary-600">MegaInvest</span> Works
         </h2>
-        <div className="grid md:grid-cols-3 gap-8 text-center">
-          <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-            <LightBulbIcon className="h-16 w-16 mx-auto text-accent-500 mb-4" />
-            <h3 className="text-xl font-semibold text-secondary-700 mb-2">Discover Opportunities</h3>
-            <p className="text-secondary-600 text-sm">Browse a diverse range of vetted investment projects across various sectors.</p>
+        <div className="grid md:grid-cols-3 gap-8">
+          <div className="relative bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow bg-cover bg-center min-h-[280px] overflow-hidden"
+               style={{
+                 backgroundImage: 'url(/images/hero/ChatGPT%20Image%201.Div.png)'
+               }}>
+            <div className="absolute inset-0 bg-gradient-to-br from-white/85 via-white/70 to-white/50"></div>
+            <div className="relative z-10 text-left">
+              <LightBulbIcon className="h-16 w-16 text-accent-600 mb-4" />
+              <h3 className="text-xl font-bold text-secondary-800 mb-3">Discover Opportunities</h3>
+              <p className="text-secondary-700 text-sm font-medium">Browse a diverse range of vetted investment projects across various sectors.</p>
+            </div>
           </div>
-          <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-            <PresentationChartLineIcon className="h-16 w-16 mx-auto text-accent-500 mb-4" />
-            <h3 className="text-xl font-semibold text-secondary-700 mb-2">Invest with Confidence</h3>
-            <p className="text-secondary-600 text-sm">Access detailed information, due diligence reports, and transparent terms for each project.</p>
+          <div className="relative bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow bg-cover bg-center min-h-[280px] overflow-hidden"
+               style={{
+                 backgroundImage: 'url(/images/hero/ChatGPT%20Image%202.Div.png)'
+               }}>
+            <div className="absolute inset-0 bg-gradient-to-br from-white/85 via-white/70 to-white/50"></div>
+            <div className="relative z-10 text-left">
+              <PresentationChartLineIcon className="h-16 w-16 text-accent-600 mb-4" />
+              <h3 className="text-xl font-bold text-secondary-800 mb-3">Invest with Confidence</h3>
+              <p className="text-secondary-700 text-sm font-medium">Access detailed information, due diligence reports, and transparent terms for each project.</p>
+            </div>
           </div>
-          <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-            <UserGroupIcon className="h-16 w-16 mx-auto text-accent-500 mb-4" />
-            <h3 className="text-xl font-semibold text-secondary-700 mb-2">Grow Your Portfolio</h3>
-            <p className="text-secondary-600 text-sm">Track your investments, receive updates, and potentially reap significant returns.</p>
+          <div className="relative bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow bg-cover bg-center min-h-[280px] overflow-hidden"
+               style={{
+                 backgroundImage: 'url(/images/hero/ChatGPT%20Image%203.Div.png)'
+               }}>
+            <div className="absolute inset-0 bg-gradient-to-br from-white/85 via-white/70 to-white/50"></div>
+            <div className="relative z-10 text-left">
+              <UserGroupIcon className="h-16 w-16 text-accent-600 mb-4" />
+              <h3 className="text-xl font-bold text-secondary-800 mb-3">Grow Your Portfolio</h3>
+              <p className="text-secondary-700 text-sm font-medium">Track your investments, receive updates, and potentially reap significant returns.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -139,3 +167,4 @@ const HomePage: React.FC = () => {
 };
 
 export default HomePage;
+
