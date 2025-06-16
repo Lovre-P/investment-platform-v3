@@ -28,10 +28,10 @@ const ContactPage: React.FC = () => {
                 <MapPinIcon className="h-8 w-8 text-primary-600 mt-1 mr-4 flex-shrink-0" />
                 <div>
                   <h3 className="text-lg font-medium text-secondary-700">Our Office</h3>
-                  <p className="text-secondary-600">123 Investment Drive, Capital City, CC 12345</p>
-                  <a 
-                    href="https://maps.google.com/?q=123+Investment+Drive,+Capital+City" 
-                    target="_blank" 
+                  <p className="text-secondary-600">Put Gvozdenova 283, 22000 Šibenik</p>
+                  <a
+                    href="https://maps.google.com/?q=Put+Gvozdenova+283,+22000+Šibenik"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-primary-500 hover:text-primary-700 hover:underline"
                   >
@@ -44,10 +44,7 @@ const ContactPage: React.FC = () => {
                 <div>
                   <h3 className="text-lg font-medium text-secondary-700">Email Us</h3>
                   <p className="text-secondary-600">
-                    General Inquiries: <a href="mailto:info@megainvest.com" className="text-primary-500 hover:text-primary-700 hover:underline">info@megainvest.com</a>
-                  </p>
-                  <p className="text-secondary-600">
-                    Support: <a href="mailto:support@megainvest.com" className="text-primary-500 hover:text-primary-700 hover:underline">support@megainvest.com</a>
+                    General Inquiries: <a href="mailto:info@apolon-plovila.com" className="text-primary-500 hover:text-primary-700 hover:underline">info@apolon-plovila.com</a>
                   </p>
                 </div>
               </div>
@@ -56,9 +53,9 @@ const ContactPage: React.FC = () => {
                 <div>
                   <h3 className="text-lg font-medium text-secondary-700">Call Us</h3>
                   <p className="text-secondary-600">
-                    <a href="tel:+1234567890" className="text-primary-500 hover:text-primary-700 hover:underline">+1 (234) 567-890</a>
+                    <a href="tel:+38591310151" className="text-primary-500 hover:text-primary-700 hover:underline">+385 91 310 15 12</a>
                   </p>
-                  <p className="text-sm text-secondary-500">Mon - Fri, 9:00 AM - 5:00 PM (EST)</p>
+                  <p className="text-sm text-secondary-500">Mon - Fri, 9:00 AM - 5:00 PM (CET)</p>
                 </div>
               </div>
             </div>
@@ -68,6 +65,16 @@ const ContactPage: React.FC = () => {
             <h3 className="text-lg font-medium text-secondary-700 mb-3">Office Hours</h3>
             <p className="text-secondary-600">Monday - Friday: 9:00 AM - 5:00 PM</p>
             <p className="text-secondary-600">Saturday - Sunday: Closed</p>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-medium text-secondary-700 mb-3">Company Information</h3>
+            <div className="space-y-1 text-sm text-secondary-600">
+              <p><span className="font-medium">MB:</span> 05728711</p>
+              <p><span className="font-medium">OIB:</span> 94198216157</p>
+              <p><span className="font-medium">SWIFT:</span> HAABHR22</p>
+              <p><span className="font-medium">IBAN:</span> HR58 2500 0091 1015 5216 2</p>
+            </div>
           </div>
         </div>
       </div>
