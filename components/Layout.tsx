@@ -8,7 +8,7 @@ const Layout: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen font-body bg-secondary-50 text-secondary-800">
       <Navbar />
-      <main className="flex-grow container mx-auto px-4 py-8">
+      <main className="flex-grow container mx-auto px-4 pt-32 pb-8">
         <Outlet />
       </main>
       <Footer />
