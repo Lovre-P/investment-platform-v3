@@ -4,7 +4,7 @@ import { BuildingOffice2Icon, UsersIcon, SparklesIcon, ShieldCheckIcon } from '@
 
 const AboutPage: React.FC = () => {
   return (
-    <div className="bg-white p-6 md:p-10 rounded-xl shadow-2xl space-y-12">
+    <div className="bg-white p-4 sm:p-6 md:p-10 rounded-xl shadow-2xl space-y-8 sm:space-y-12">
       {/* Header Section */}
       <section className="text-center">
         <BuildingOffice2Icon className="h-20 w-20 mx-auto text-primary-600 mb-4" />
@@ -68,12 +68,12 @@ const AboutPage: React.FC = () => {
         <p className="text-lg text-secondary-600 mb-6 max-w-2xl mx-auto">
           Our dedicated team of financial experts, tech innovators, and customer support professionals are passionate about helping you succeed.
         </p>
-        <div className="flex flex-wrap justify-center gap-8">
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
           {[1,2,3].map(i => (
-            <div key={i} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-4">
-              <div className="bg-white rounded-lg shadow-lg p-6">
-                <img src={`https://picsum.photos/seed/team${i}/200/200`} alt={`Team member ${i}`} className="w-32 h-32 rounded-full mx-auto mb-4 object-cover" />
-                <h4 className="text-xl font-medium text-secondary-700">Team Member {i}</h4>
+            <div key={i} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2 sm:p-4">
+              <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+                <img src={`https://picsum.photos/seed/team${i}/200/200`} alt={`Team member ${i}`} className="w-24 h-24 sm:w-32 sm:h-32 rounded-full mx-auto mb-4 object-cover" />
+                <h4 className="text-lg sm:text-xl font-medium text-secondary-700">Team Member {i}</h4>
                 <p className="text-primary-600 text-sm">Role/Title</p>
               </div>
             </div>
@@ -83,16 +83,16 @@ const AboutPage: React.FC = () => {
       </section>
 
       {/* Join Us CTA */}
-      <section className="bg-gradient-to-r from-primary-500 to-primary-700 text-white py-12 px-6 rounded-lg shadow-xl text-center">
-        <h2 className="text-3xl font-bold mb-4">Ready to Be Part of Something Mega?</h2>
-        <p className="text-lg mb-8">
+      <section className="bg-gradient-to-r from-primary-500 to-primary-700 text-white py-8 sm:py-12 px-4 sm:px-6 rounded-lg shadow-xl text-center">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-4">Ready to Be Part of Something Mega?</h2>
+        <p className="text-base sm:text-lg mb-6 sm:mb-8 px-2">
           Whether you're an investor looking for your next big opportunity or an entrepreneur with a game-changing idea, MegaInvest is your platform for growth.
         </p>
-        <div className="space-x-4">
-          <a href="#/investments" className="bg-white text-primary-600 font-semibold py-3 px-6 rounded-lg hover:bg-primary-100 transition-colors">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-0 sm:space-x-4 items-center justify-center">
+          <a href="#/investments" className="w-full sm:w-auto bg-white text-primary-600 font-semibold py-3 px-4 sm:px-6 rounded-lg hover:bg-primary-100 transition-colors text-sm sm:text-base">
             Explore Investments
           </a>
-          <a href="#/submit-investment" className="border-2 border-white text-white font-semibold py-3 px-6 rounded-lg hover:bg-white hover:text-primary-600 transition-colors">
+          <a href="#/submit-investment" className="w-full sm:w-auto border-2 border-white text-white font-semibold py-3 px-4 sm:px-6 rounded-lg hover:bg-white hover:text-primary-600 transition-colors text-sm sm:text-base">
             Submit Your Project
           </a>
         </div>
