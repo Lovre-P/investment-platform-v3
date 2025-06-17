@@ -39,9 +39,9 @@ const HomePage: React.FC = () => {
   }, []);
 
   return (
-    <div className="space-y-16">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary-800 via-primary-500 to-teal-600 text-white py-24 px-8 rounded-2xl shadow-2xl overflow-hidden min-h-[70vh] flex items-center">
+    <>
+      {/* Hero Section - Full Page */}
+      <section className="relative bg-gradient-to-br from-primary-800 via-primary-500 to-teal-600 text-white overflow-hidden h-screen flex items-center w-full">
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/60 to-black/40"
              style={{
                backgroundImage: 'url(/images/hero/ChatGPT-Image-Hero.jpg)',
@@ -49,7 +49,7 @@ const HomePage: React.FC = () => {
                backgroundPosition: 'center',
                backgroundRepeat: 'no-repeat'
              }}></div>
-        <div className="container mx-auto text-center relative z-10 max-w-5xl">
+        <div className="w-full text-center relative z-10 px-8">
           <h1 className="text-6xl md:text-7xl lg:text-8xl font-extrabold mb-8 leading-tight tracking-tight text-white filter drop-shadow-2xl"
               style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.6)' }}>
             Invest in the <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-accent-500"
@@ -81,6 +81,9 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Content Sections */}
+      <div className="container mx-auto px-8 space-y-16 py-16">
 
       {/* How It Works Section */}
       <section>
@@ -162,7 +165,8 @@ const HomePage: React.FC = () => {
           <LightBulbIcon className="h-5 w-5 ml-2" />
         </Button>
       </section>
-    </div>
+      </div>
+    </>
   );
 };
 
