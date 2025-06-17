@@ -44,7 +44,7 @@ const HomePage: React.FC = () => {
       <section className="relative bg-gradient-to-br from-primary-700 via-primary-600 to-accent-600 text-white py-24 px-8 rounded-2xl shadow-2xl overflow-hidden min-h-[70vh] flex items-center">
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/60 to-black/40"
              style={{
-               backgroundImage: 'url(/images/hero/ChatGPT%20Image%20Hero.png)',
+               backgroundImage: 'url(/images/hero/ChatGPT-Image-Hero.jpg)',
                backgroundSize: 'cover',
                backgroundPosition: 'center',
                backgroundRepeat: 'no-repeat'
@@ -90,7 +90,7 @@ const HomePage: React.FC = () => {
         <div className="grid md:grid-cols-3 gap-8">
           <div className="relative bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow bg-cover bg-center min-h-[280px] overflow-hidden"
                style={{
-                 backgroundImage: 'url(/images/hero/ChatGPT%20Image%201.Div.png)'
+                 backgroundImage: 'url(/images/hero/ChatGPT-Image-1.Div.jpg)'
                }}>
             <div className="absolute inset-0 bg-gradient-to-br from-white/85 via-white/70 to-white/50"></div>
             <div className="relative z-10 text-left">
@@ -101,7 +101,7 @@ const HomePage: React.FC = () => {
           </div>
           <div className="relative bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow bg-cover bg-center min-h-[280px] overflow-hidden"
                style={{
-                 backgroundImage: 'url(/images/hero/ChatGPT%20Image%202.Div.png)'
+                 backgroundImage: 'url(/images/hero/ChatGPT-Image-2.Div.jpg)'
                }}>
             <div className="absolute inset-0 bg-gradient-to-br from-white/85 via-white/70 to-white/50"></div>
             <div className="relative z-10 text-left">
@@ -112,7 +112,7 @@ const HomePage: React.FC = () => {
           </div>
           <div className="relative bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow bg-cover bg-center min-h-[280px] overflow-hidden"
                style={{
-                 backgroundImage: 'url(/images/hero/ChatGPT%20Image%203.Div.png)'
+                 backgroundImage: 'url(/images/hero/ChatGPT-Image-3.Div.jpg)'
                }}>
             <div className="absolute inset-0 bg-gradient-to-br from-white/85 via-white/70 to-white/50"></div>
             <div className="relative z-10 text-left">
