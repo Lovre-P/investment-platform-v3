@@ -31,7 +31,7 @@ const Navbar: React.FC = () => {
         className="fixed left-0 right-0 h-32 pointer-events-none z-40 opacity-60"
         style={{
           top: '0px',
-          background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.1) 30%, transparent 70%)',
+          background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(88, 159, 241, 0.15) 0%, rgba(33, 75, 139, 0.1) 30%, transparent 70%)',
           filter: 'blur(20px)',
           transform: 'translateY(-10px)'
         }}
@@ -44,28 +44,28 @@ const Navbar: React.FC = () => {
       style={{
         top: '0px',
         background: scrolled
-          ? 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.1) 30%, rgba(139,92,246,0.15) 60%, rgba(59,130,246,0.1) 100%)'
-          : 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.08) 30%, rgba(139,92,246,0.12) 60%, rgba(59,130,246,0.08) 100%)',
+          ? 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.1) 30%, rgba(88,159,241,0.15) 60%, rgba(33,75,139,0.1) 100%)'
+          : 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.08) 30%, rgba(88,159,241,0.12) 60%, rgba(33,75,139,0.08) 100%)',
         borderBottom: scrolled
-          ? '1px solid rgba(139,92,246,0.3)'
+          ? '1px solid rgba(88,159,241,0.3)'
           : '1px solid rgba(255,255,255,0.2)',
         boxShadow: scrolled
-          ? '0 10px 40px rgba(139,92,246,0.2), 0 2px 20px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.4)'
-          : '0 5px 30px rgba(139,92,246,0.1), 0 2px 15px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.3)'
+          ? '0 10px 40px rgba(88,159,241,0.2), 0 2px 20px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.4)'
+          : '0 5px 30px rgba(88,159,241,0.1), 0 2px 15px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.3)'
       }}>
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center h-20">
             {/* Logo with enhanced prismatic effect */}
             <Link
               to={PUBLIC_ROUTES.HOME}
-              className="flex items-center space-x-2 sm:space-x-3 text-primary-700 hover:text-primary-800 transition-all duration-500 group"
+              className="flex items-center space-x-2 sm:space-x-3 text-primary-800 hover:text-primary-900 transition-all duration-500 group"
             >
               <div className="relative">
                 <BuildingOffice2Icon className="h-8 w-8 sm:h-10 sm:w-10 lg:h-11 lg:w-11 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 drop-shadow-2xl" />
-                <div className="absolute inset-0 bg-gradient-to-br from-violet-400/30 via-blue-400/20 to-indigo-600/30 rounded-xl blur-lg group-hover:blur-md transition-all duration-500 group-hover:scale-125" />
+                <div className="absolute inset-0 bg-gradient-to-br from-primary-400/30 via-primary-500/20 to-teal-500/30 rounded-xl blur-lg group-hover:blur-md transition-all duration-500 group-hover:scale-125" />
                 <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
-              <span className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-violet-700 via-blue-600 to-indigo-800 bg-clip-text text-transparent drop-shadow-lg group-hover:drop-shadow-xl transition-all duration-500">
+              <span className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-primary-800 via-primary-500 to-teal-600 bg-clip-text text-transparent drop-shadow-lg group-hover:drop-shadow-xl transition-all duration-500">
                 {APP_NAME}
               </span>
             </Link>
@@ -80,15 +80,15 @@ const Navbar: React.FC = () => {
                     `relative px-2 lg:px-4 py-2.5 rounded-2xl text-xs lg:text-sm font-medium transition-all duration-500 group overflow-hidden transform hover:scale-105 ${
                       isActive
                         ? 'text-white shadow-2xl scale-105'
-                        : 'text-slate-700 hover:text-violet-700'
+                        : 'text-primary-800 hover:text-teal-600'
                     }`
                   }
                   style={({ isActive }) => ({
                     ...(isActive ? {
-                      background: 'linear-gradient(135deg, rgba(139,92,246,0.95) 0%, rgba(59,130,246,0.9) 50%, rgba(37,99,235,0.85) 100%)',
+                      background: 'linear-gradient(135deg, rgba(33,75,139,0.95) 0%, rgba(88,159,241,0.9) 50%, rgba(6,147,169,0.85) 100%)',
                       backdropFilter: 'blur(20px)',
                       border: '1px solid rgba(255,255,255,0.4)',
-                      boxShadow: '0 8px 32px rgba(139,92,246,0.4), 0 2px 16px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.5), inset 0 -1px 0 rgba(0,0,0,0.1)',
+                      boxShadow: '0 8px 32px rgba(33,75,139,0.4), 0 2px 16px rgba(88,159,241,0.3), inset 0 1px 0 rgba(255,255,255,0.5), inset 0 -1px 0 rgba(0,0,0,0.1)',
                       transform: 'translateY(-2px)'
                     } : {}),
                     animationDelay: `${index * 100}ms`
@@ -137,12 +137,12 @@ const Navbar: React.FC = () => {
             <div className="lg:hidden flex items-center">
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative inline-flex items-center justify-center p-3 rounded-2xl text-slate-600 hover:text-violet-700 transition-all duration-500 group transform hover:scale-110"
+                className="relative inline-flex items-center justify-center p-3 rounded-2xl text-primary-800 hover:text-teal-600 transition-all duration-500 group transform hover:scale-110"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(139,92,246,0.1) 100%)',
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(88,159,241,0.1) 100%)',
                   backdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(139,92,246,0.3)',
-                  boxShadow: '0 4px 20px rgba(139,92,246,0.2), inset 0 1px 0 rgba(255,255,255,0.3)'
+                  border: '1px solid rgba(88,159,241,0.3)',
+                  boxShadow: '0 4px 20px rgba(88,159,241,0.2), inset 0 1px 0 rgba(255,255,255,0.3)'
                 }}
               >
                 <span className="sr-only">Open main menu</span>
@@ -163,15 +163,15 @@ const Navbar: React.FC = () => {
           <div
             className="lg:hidden absolute top-20 inset-x-0 z-40 overflow-hidden transition-all duration-700 ease-out transform animate-in slide-in-from-top-5"
             style={{
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.8) 30%, rgba(139,92,246,0.2) 60%, rgba(59,130,246,0.15) 100%)',
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.8) 30%, rgba(88,159,241,0.2) 60%, rgba(33,75,139,0.15) 100%)',
               backdropFilter: 'blur(24px)',
-              border: '1px solid rgba(139,92,246,0.3)',
-              boxShadow: '0 25px 50px rgba(139,92,246,0.3), 0 10px 25px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(139,92,246,0.2)',
+              border: '1px solid rgba(88,159,241,0.3)',
+              boxShadow: '0 25px 50px rgba(88,159,241,0.3), 0 10px 25px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(88,159,241,0.2)',
               borderRadius: '0 0 24px 24px'
             }}
           >
             {/* Decorative top border */}
-            <div className="h-1 bg-gradient-to-r from-violet-400 via-blue-500 to-indigo-600 opacity-60" />
+            <div className="h-1 bg-gradient-to-r from-primary-400 via-primary-500 to-teal-500 opacity-60" />
             
             <div className="px-4 pt-6 pb-8 space-y-3">
               {navLinks.map((link, index) => (
@@ -183,15 +183,15 @@ const Navbar: React.FC = () => {
                     `relative block px-5 py-4 rounded-2xl text-base font-semibold transition-all duration-500 group overflow-hidden transform hover:scale-102 animate-in slide-in-from-left-5 ${
                       isActive
                         ? 'text-white shadow-2xl scale-102'
-                        : 'text-slate-700 hover:text-violet-700'
+                        : 'text-primary-800 hover:text-teal-600'
                     }`
                   }
                   style={({ isActive }) => ({
                     ...(isActive ? {
-                      background: 'linear-gradient(135deg, rgba(139,92,246,0.95) 0%, rgba(59,130,246,0.9) 50%, rgba(37,99,235,0.85) 100%)',
+                      background: 'linear-gradient(135deg, rgba(33,75,139,0.95) 0%, rgba(88,159,241,0.9) 50%, rgba(6,147,169,0.85) 100%)',
                       backdropFilter: 'blur(20px)',
                       border: '1px solid rgba(255,255,255,0.4)',
-                      boxShadow: '0 8px 32px rgba(139,92,246,0.4), 0 2px 16px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.5), inset 0 -1px 0 rgba(0,0,0,0.1)'
+                      boxShadow: '0 8px 32px rgba(33,75,139,0.4), 0 2px 16px rgba(88,159,241,0.3), inset 0 1px 0 rgba(255,255,255,0.5), inset 0 -1px 0 rgba(0,0,0,0.1)'
                     } : {}),
                     animationDelay: `${index * 100}ms`,
                     animationDuration: '600ms'

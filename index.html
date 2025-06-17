@@ -12,9 +12,73 @@
         theme: {
           extend: {
             colors: {
-              primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a","950":"#172554"},
-              secondary: {"50":"#f8fafc","100":"#f1f5f9","200":"#e2e8f0","300":"#cbd5e1","400":"#94a3b8","500":"#64748b","600":"#475569","700":"#334155","800":"#1e293b","900":"#0f172a","950":"#020617"},
-              accent: {"50":"#f0fdf4","100":"#dcfce7","200":"#bbf7d0","300":"#86efac","400":"#4ade80","500":"#22c55e","600":"#16a34a","700":"#15803d","800":"#166534","900":"#14532d","950":"#052e16"}
+              // New color palette based on provided design system
+              primary: {
+                "50": "#f0f9fc",   // Very light Bright Sky
+                "100": "#e0f2f9",  // Light Bright Sky
+                "200": "#c1e5f3",  // Lighter Bright Sky
+                "300": "#89d0ed",  // Light Bright Sky
+                "400": "#589ff1",  // Bright Sky (main)
+                "500": "#214b8b",  // Royal Blue (main CTA)
+                "600": "#1d4277",  // Darker Royal Blue
+                "700": "#193963",  // Even darker Royal Blue
+                "800": "#09364d",  // Midnight Blue (main dark)
+                "900": "#072a3a",  // Darker Midnight Blue
+                "950": "#051f2a"   // Darkest Midnight Blue
+              },
+              secondary: {
+                "50": "#f9f9f7",   // Very light Mist Grey
+                "100": "#f2f2f0",  // Light Mist Grey
+                "200": "#e5e5d5",  // Mist Grey (main neutral)
+                "300": "#d4d4c4",  // Darker Mist Grey
+                "400": "#a8a898",  // Medium grey
+                "500": "#7c7c6c",  // Darker grey
+                "600": "#5a5a4a",  // Dark grey
+                "700": "#3e3e2e",  // Very dark grey
+                "800": "#2a2a1a",  // Almost black grey
+                "900": "#1a1a0a",  // Very dark
+                "950": "#0f0f05"   // Darkest
+              },
+              accent: {
+                "50": "#fef9f0",   // Very light Golden Yellow
+                "100": "#fef3e0",  // Light Golden Yellow
+                "200": "#fde6c1",  // Lighter Golden Yellow
+                "300": "#fcd089",  // Light Golden Yellow
+                "400": "#fec642",  // Golden Yellow (main)
+                "500": "#f89b21",  // Warm Orange (main)
+                "600": "#e8851d",  // Darker Warm Orange
+                "700": "#c16f18",  // Even darker Orange
+                "800": "#9a5713",  // Dark Orange
+                "900": "#7a440f",  // Very dark Orange
+                "950": "#4a2909"   // Darkest Orange
+              },
+              // Additional semantic colors
+              teal: {
+                "50": "#f0fdfc",   // Very light Deep Teal
+                "100": "#ccfbf1",  // Light Deep Teal
+                "200": "#99f6e4",  // Lighter Deep Teal
+                "300": "#5eead4",  // Light Deep Teal
+                "400": "#2dd4bf",  // Medium Deep Teal
+                "500": "#0693a9",  // Deep Teal (main)
+                "600": "#0891b2",  // Darker Deep Teal
+                "700": "#0e7490",  // Even darker Deep Teal
+                "800": "#155e75",  // Dark Deep Teal
+                "900": "#164e63",  // Very dark Deep Teal
+                "950": "#083344"   // Darkest Deep Teal
+              },
+              mint: {
+                "50": "#f0fdf9",   // Very light Mint Green
+                "100": "#ccfdf3",  // Light Mint Green
+                "200": "#99fae6",  // Lighter Mint Green
+                "300": "#5df5d3",  // Light Mint Green
+                "400": "#2ee5bd",  // Medium Mint Green
+                "500": "#6dd8b5",  // Mint Green (main)
+                "600": "#059669",  // Darker Mint Green
+                "700": "#047857",  // Even darker Mint Green
+                "800": "#065f46",  // Dark Mint Green
+                "900": "#064e3b",  // Very dark Mint Green
+                "950": "#022c22"   // Darkest Mint Green
+              }
             },
             fontFamily: {
               'body': [

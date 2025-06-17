@@ -41,7 +41,7 @@ const HomePage: React.FC = () => {
   return (
     <div className="space-y-16">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary-700 via-primary-600 to-accent-600 text-white py-24 px-8 rounded-2xl shadow-2xl overflow-hidden min-h-[70vh] flex items-center">
+      <section className="relative bg-gradient-to-br from-primary-800 via-primary-500 to-teal-600 text-white py-24 px-8 rounded-2xl shadow-2xl overflow-hidden min-h-[70vh] flex items-center">
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/60 to-black/40"
              style={{
                backgroundImage: 'url(/images/hero/ChatGPT-Image-Hero.jpg)',
@@ -52,7 +52,7 @@ const HomePage: React.FC = () => {
         <div className="container mx-auto text-center relative z-10 max-w-5xl">
           <h1 className="text-6xl md:text-7xl lg:text-8xl font-extrabold mb-8 leading-tight tracking-tight text-white filter drop-shadow-2xl"
               style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.6)' }}>
-            Invest in the <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-300"
+            Invest in the <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-accent-500"
                                 style={{ textShadow: 'none', filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))' }}>Future</span>.
             <span className="block mt-2">Empower Innovation.</span>
           </h1>
@@ -64,7 +64,7 @@ const HomePage: React.FC = () => {
             <Button
               variant="secondary" // Base variant, styling overridden by className
               size="lg"
-              className="bg-white/95 backdrop-blur-sm !text-primary-700 hover:bg-white hover:!text-primary-800 !px-10 !py-4 !text-lg font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300" // Enforce text color
+              className="bg-white/95 backdrop-blur-sm !text-primary-800 hover:bg-white hover:!text-primary-900 !px-10 !py-4 !text-lg font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300" // Enforce text color
               onClick={() => (window.location.hash = "/investments")}
             >
               Explore Opportunities
@@ -84,8 +84,8 @@ const HomePage: React.FC = () => {
 
       {/* How It Works Section */}
       <section>
-        <h2 className="text-3xl font-bold text-center text-secondary-800 mb-12">
-          How <span className="text-primary-600">MegaInvest</span> Works
+        <h2 className="text-3xl font-bold text-center text-primary-800 mb-12">
+          How <span className="text-primary-500">MegaInvest</span> Works
         </h2>
         <div className="grid md:grid-cols-3 gap-8">
           <div className="relative bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow bg-cover bg-center min-h-[280px] overflow-hidden"
@@ -94,9 +94,9 @@ const HomePage: React.FC = () => {
                }}>
             <div className="absolute inset-0 bg-gradient-to-br from-white/85 via-white/70 to-white/50"></div>
             <div className="relative z-10 text-left">
-              <LightBulbIcon className="h-16 w-16 text-accent-600 mb-4" />
-              <h3 className="text-xl font-bold text-secondary-800 mb-3">Discover Opportunities</h3>
-              <p className="text-secondary-700 text-sm font-medium">Browse a diverse range of vetted investment projects across various sectors.</p>
+              <LightBulbIcon className="h-16 w-16 text-accent-500 mb-4" />
+              <h3 className="text-xl font-bold text-primary-800 mb-3">Discover Opportunities</h3>
+              <p className="text-primary-700 text-sm font-medium">Browse a diverse range of vetted investment projects across various sectors.</p>
             </div>
           </div>
           <div className="relative bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow bg-cover bg-center min-h-[280px] overflow-hidden"
@@ -105,9 +105,9 @@ const HomePage: React.FC = () => {
                }}>
             <div className="absolute inset-0 bg-gradient-to-br from-white/85 via-white/70 to-white/50"></div>
             <div className="relative z-10 text-left">
-              <PresentationChartLineIcon className="h-16 w-16 text-accent-600 mb-4" />
-              <h3 className="text-xl font-bold text-secondary-800 mb-3">Invest with Confidence</h3>
-              <p className="text-secondary-700 text-sm font-medium">Access detailed information, due diligence reports, and transparent terms for each project.</p>
+              <PresentationChartLineIcon className="h-16 w-16 text-accent-500 mb-4" />
+              <h3 className="text-xl font-bold text-primary-800 mb-3">Invest with Confidence</h3>
+              <p className="text-primary-700 text-sm font-medium">Access detailed information, due diligence reports, and transparent terms for each project.</p>
             </div>
           </div>
           <div className="relative bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow bg-cover bg-center min-h-[280px] overflow-hidden"
@@ -116,9 +116,9 @@ const HomePage: React.FC = () => {
                }}>
             <div className="absolute inset-0 bg-gradient-to-br from-white/85 via-white/70 to-white/50"></div>
             <div className="relative z-10 text-left">
-              <UserGroupIcon className="h-16 w-16 text-accent-600 mb-4" />
-              <h3 className="text-xl font-bold text-secondary-800 mb-3">Grow Your Portfolio</h3>
-              <p className="text-secondary-700 text-sm font-medium">Track your investments, receive updates, and potentially reap significant returns.</p>
+              <UserGroupIcon className="h-16 w-16 text-accent-500 mb-4" />
+              <h3 className="text-xl font-bold text-primary-800 mb-3">Grow Your Portfolio</h3>
+              <p className="text-primary-700 text-sm font-medium">Track your investments, receive updates, and potentially reap significant returns.</p>
             </div>
           </div>
         </div>
@@ -127,8 +127,8 @@ const HomePage: React.FC = () => {
       {/* Featured Investments Section */}
       <section>
         <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-secondary-800">Featured Investments</h2>
-            <Link to="/investments" className="text-primary-600 hover:text-primary-700 font-medium flex items-center group">
+            <h2 className="text-3xl font-bold text-primary-800">Featured Investments</h2>
+            <Link to="/investments" className="text-primary-500 hover:text-teal-600 font-medium flex items-center group">
                 View All <ArrowRightIcon className="h-5 w-5 ml-1 transition-transform group-hover:translate-x-1" />
             </Link>
         </div>
@@ -143,14 +143,14 @@ const HomePage: React.FC = () => {
             ))}
           </div>
         ) : (
-          <p className="text-center text-secondary-600 py-8">No featured investments available at the moment. Check back soon!</p>
+          <p className="text-center text-secondary-500 py-8">No featured investments available at the moment. Check back soon!</p>
         )}
       </section>
 
       {/* Call to Action - Submit Project */}
       <section className="bg-white py-16 px-6 rounded-xl shadow-xl text-center">
-        <h2 className="text-3xl font-bold text-secondary-800 mb-4">Have a Groundbreaking Project?</h2>
-        <p className="text-lg text-secondary-600 mb-8 max-w-2xl mx-auto">
+        <h2 className="text-3xl font-bold text-primary-800 mb-4">Have a Groundbreaking Project?</h2>
+        <p className="text-lg text-secondary-500 mb-8 max-w-2xl mx-auto">
           MegaInvest is always looking for innovative projects and promising businesses seeking funding. If you have a vision, we want to hear about it.
         </p>
         <Button

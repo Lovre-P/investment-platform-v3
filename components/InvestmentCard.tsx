@@ -16,10 +16,10 @@ const InvestmentCard: React.FC<InvestmentCardProps> = ({ investment }) => {
 
   const getStatusColor = (status: InvestmentStatus) => {
     switch (status) {
-      case InvestmentStatus.OPEN: return 'bg-green-100 text-green-700';
-      case InvestmentStatus.FUNDED: return 'bg-blue-100 text-blue-700';
-      case InvestmentStatus.CLOSED: return 'bg-gray-100 text-gray-700';
-      case InvestmentStatus.PENDING: return 'bg-yellow-100 text-yellow-700';
+      case InvestmentStatus.OPEN: return 'bg-mint-100 text-mint-700';
+      case InvestmentStatus.FUNDED: return 'bg-primary-100 text-primary-700';
+      case InvestmentStatus.CLOSED: return 'bg-secondary-200 text-secondary-700';
+      case InvestmentStatus.PENDING: return 'bg-accent-100 text-accent-700';
       default: return 'bg-secondary-100 text-secondary-700';
     }
   };
@@ -36,18 +36,18 @@ const InvestmentCard: React.FC<InvestmentCardProps> = ({ investment }) => {
       <div className="relative p-6 bg-white/70 backdrop-blur-md min-h-[380px] flex flex-col justify-between">
         <div>
           <div className="flex justify-between items-start mb-3">
-            <h3 className="text-2xl font-bold text-secondary-800 leading-tight group-hover:text-primary-600 transition-colors">
+            <h3 className="text-2xl font-bold text-primary-800 leading-tight group-hover:text-primary-500 transition-colors">
               {title}
             </h3>
             <span className={`px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(status)}`}>
               {status}
             </span>
           </div>
-          <p className="text-sm text-secondary-600 mb-4 h-16 overflow-hidden">
+          <p className="text-sm text-primary-700 mb-4 h-16 overflow-hidden">
             {description.substring(0, 100)}{description.length > 100 ? '...' : ''}
           </p>
 
-          <div className="space-y-2 text-sm text-secondary-700 mb-4">
+          <div className="space-y-2 text-sm text-primary-700 mb-4">
             {apyRange && (
               <div className="flex items-center">
                 <ArrowTrendingUpIcon className="h-5 w-5 mr-2 text-accent-500" />
@@ -69,13 +69,13 @@ const InvestmentCard: React.FC<InvestmentCardProps> = ({ investment }) => {
 
         <div>
           <div className="mb-3">
-            <div className="flex justify-between text-sm font-medium text-secondary-700 mb-1">
+            <div className="flex justify-between text-sm font-medium text-primary-700 mb-1">
               <span>Raised: {displayCurrency} {amountRaised.toLocaleString()}</span>
               <span>Goal: {displayCurrency} {amountGoal.toLocaleString()}</span>
             </div>
             <div className="w-full bg-secondary-200 rounded-full h-2.5">
-              <div 
-                className="bg-primary-500 h-2.5 rounded-full transition-all duration-500 ease-out" 
+              <div
+                className="bg-gradient-to-r from-primary-500 to-teal-500 h-2.5 rounded-full transition-all duration-500 ease-out"
                 style={{ width: `${Math.min(progress, 100)}%` }}
               ></div>
             </div>
