@@ -137,7 +137,16 @@ const Navbar: React.FC = () => {
             <div className="lg:hidden flex items-center">
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative inline-flex items-center justify-center p-3 rounded-2xl text-primary-800 hover:text-teal-600 transition-all duration-500 group transform hover:scale-110"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setIsOpen(!isOpen);
+                  }
+                }}
+                aria-expanded={isOpen}
+                aria-controls="mobile-menu"
+                aria-label={isOpen ? "Close main menu" : "Open main menu"}
+                className="relative inline-flex items-center justify-center p-3 rounded-2xl text-primary-800 hover:text-teal-600 transition-all duration-500 group transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                 style={{
                   background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(88,159,241,0.1) 100%)',
                   backdropFilter: 'blur(12px)',
@@ -145,7 +154,7 @@ const Navbar: React.FC = () => {
                   boxShadow: '0 4px 20px rgba(88,159,241,0.2), inset 0 1px 0 rgba(255,255,255,0.3)'
                 }}
               >
-                <span className="sr-only">Open main menu</span>
+                <span className="sr-only">{isOpen ? "Close main menu" : "Open main menu"}</span>
                 <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-violet-100/10 to-blue-100/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
                 <div className="absolute -inset-1 bg-gradient-to-r from-violet-400 to-blue-500 opacity-0 group-hover:opacity-20 transition-opacity duration-500 rounded-2xl blur-lg" />
                 {isOpen ? (
@@ -161,6 +170,9 @@ const Navbar: React.FC = () => {
         {/* Mobile Menu with enhanced glass morphism and animations */}
         {isOpen && (
           <div
+            id="mobile-menu"
+            role="navigation"
+            aria-label="Mobile navigation menu"
             className="lg:hidden absolute top-20 inset-x-0 z-40 overflow-hidden transition-all duration-700 ease-out transform animate-in slide-in-from-top-5"
             style={{
               background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.8) 30%, rgba(88,159,241,0.2) 60%, rgba(33,75,139,0.15) 100%)',

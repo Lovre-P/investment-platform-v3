@@ -16,6 +16,23 @@ export default defineConfig(({ mode }) => {
           '@': path.resolve(__dirname, '.'),
         }
       },
+      build: {
+        rollupOptions: {
+          output: {
+            manualChunks: {
+              // Vendor chunks for better caching
+              'react-vendor': ['react', 'react-dom'],
+              'router-vendor': ['react-router-dom'],
+              'chart-vendor': ['recharts'],
+              'icon-vendor': ['@heroicons/react']
+            }
+          }
+        },
+        // Optimize chunk size
+        chunkSizeWarningLimit: 1000,
+        // Enable source maps for production debugging
+        sourcemap: mode === 'development'
+      },
       server: {
         port: 5173,
         host: true,
