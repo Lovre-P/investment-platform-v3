@@ -20,7 +20,7 @@ const AboutPage: React.FC = () => {
       <section className="grid md:grid-cols-2 gap-10 items-center">
         <div>
           <img 
-            src="https://picsum.photos/seed/mission/600/400" 
+            src='/images/hero/ChatGPT-Image-1.Div.jpg' 
             alt="Our Mission" 
             className="rounded-lg shadow-lg aspect-video object-cover"
           />
@@ -62,26 +62,6 @@ const AboutPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Meet the Team (Placeholder) */}
-      <section className="text-center">
-        <h2 className="text-3xl font-semibold text-secondary-800 mb-10">Meet Our Team (Placeholder)</h2>
-        <p className="text-lg text-secondary-600 mb-6 max-w-2xl mx-auto">
-          Our dedicated team of financial experts, tech innovators, and customer support professionals are passionate about helping you succeed.
-        </p>
-        <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
-          {[1,2,3].map(i => (
-            <div key={i} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-2 sm:p-4">
-              <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
-                <img src={`https://picsum.photos/seed/team${i}/200/200`} alt={`Team member ${i}`} className="w-24 h-24 sm:w-32 sm:h-32 rounded-full mx-auto mb-4 object-cover" />
-                <h4 className="text-lg sm:text-xl font-medium text-secondary-700">Team Member {i}</h4>
-                <p className="text-primary-600 text-sm">Role/Title</p>
-              </div>
-            </div>
-          ))}
-        </div>
-        <p className="mt-8 text-secondary-500 italic">More detailed team bios coming soon!</p>
-      </section>
-
       {/* Join Us CTA */}
       <section className="bg-gradient-to-r from-primary-500 to-primary-700 text-white py-8 sm:py-12 px-4 sm:px-6 rounded-lg shadow-xl text-center">
         <h2 className="text-2xl sm:text-3xl font-bold mb-4">Ready to Be Part of Something Mega?</h2>
@@ -95,6 +75,30 @@ const AboutPage: React.FC = () => {
           <a href="#/submit-investment" className="w-full sm:w-auto border-2 border-white text-white font-semibold py-3 px-4 sm:px-6 rounded-lg hover:bg-white hover:text-primary-600 transition-colors text-sm sm:text-base">
             Submit Your Project
           </a>
+        </div>
+      </section>
+
+      {/* Our Location Section */}
+      <section className="text-center">
+        <h2 className="text-3xl font-semibold text-secondary-800 mb-6">Our Location</h2>
+        <p className="text-lg text-secondary-600 mb-8 max-w-2xl mx-auto">
+          Visit us at our headquarters in Šibenik, Croatia. We're always happy to meet with potential partners and investors.
+        </p>
+        <div className="py-8 sm:py-12 px-4 sm:px-6 rounded-lg shadow-xl">
+          <div className="flex justify-center">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2882.046710875904!2d15.8849221760077!3d43.75112677109767!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x13352f4883a563c5%3A0xa344cf135c6fa085!2sPut%20Gvozdenova%20283%2C%2022000%2C%20%C5%A0ibenik!5e0!3m2!1shr!2shr!4v1750863733515!5m2!1shr!2shr"
+              width="800"
+              height="450"
+              style={{border: 0}}
+              allowFullScreen={true}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="w-full max-w-4xl h-64 sm:h-80 md:h-96 rounded-lg"
+            />
+          </div>
+        </div>
+        <div className="mt-6 text-secondary-600">
         </div>
       </section>
     </div>
