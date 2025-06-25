@@ -306,19 +306,40 @@ const SubmitInvestmentForm: React.FC = () => {
 
       <style dangerouslySetInnerHTML={{ __html: `
         .form-input, .form-textarea, .form-select {
-          @apply w-full px-4 py-3 bg-white text-secondary-700 border-2 border-secondary-200 rounded-xl shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 placeholder-secondary-400 font-medium;
+          width: 100% !important;
+          max-width: 100% !important;
+          padding: 0.75rem 1rem !important;
+          background-color: white !important;
+          color: #374151 !important;
+          border: 1px solid #d1d5db !important;
+          border-radius: 0.5rem !important;
+          box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+          transition: all 0.2s ease-in-out !important;
+          font-weight: 400 !important;
+          box-sizing: border-box !important;
+        }
+        .form-input::placeholder, .form-textarea::placeholder {
+          color: #9ca3af !important;
         }
         .form-input:hover, .form-textarea:hover, .form-select:hover {
-          @apply border-secondary-300 shadow-md;
+          border-color: #9ca3af !important;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
         }
         .form-input:focus, .form-textarea:focus, .form-select:focus {
-          @apply transform scale-[1.02] shadow-lg;
+          outline: none !important;
+          border-color: #3b82f6 !important;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
         }
         .form-input.border-red-500, .form-textarea.border-red-500, .form-select.border-red-500 {
-            @apply border-red-400 focus:ring-red-500 focus:border-red-500 bg-red-50;
+          border-color: #ef4444 !important;
+          background-color: #fef2f2 !important;
+        }
+        .form-input.border-red-500:focus, .form-textarea.border-red-500:focus, .form-select.border-red-500:focus {
+          border-color: #ef4444 !important;
+          box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
         }
         .form-textarea {
-          @apply resize-none;
+          resize: none !important;
         }
       `}} />
 
