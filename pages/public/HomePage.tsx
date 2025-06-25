@@ -58,7 +58,7 @@ const HomePage: React.FC = () => {
           - Opacity can be adjusted by changing the /60 value (e.g., /40 for lighter, /80 for darker)
           - Alternative colors: bg-primary-900/60, bg-slate-900/60, bg-indigo-900/60
         */}
-        <div className="absolute inset-0 bg-blue-900/60"></div>
+        <div className="absolute inset-0 bg-indigo-900/10"></div>
 
         {/* Original gradient overlay (can be disabled if dark blue overlay is sufficient) */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/60 to-black/40"></div>
