@@ -42,13 +42,26 @@ const HomePage: React.FC = () => {
     <>
       {/* Hero Section - Full Page */}
       <section className="relative bg-gradient-to-br from-primary-800 via-primary-500 to-teal-600 text-white overflow-hidden h-screen flex items-center w-full">
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/60 to-black/40"
+        {/* Background Image */}
+        <div className="absolute inset-0"
              style={{
                backgroundImage: 'url(/images/hero/ChatGPT-Image-Hero.jpg)',
                backgroundSize: 'cover',
                backgroundPosition: 'center',
                backgroundRepeat: 'no-repeat'
              }}></div>
+
+        {/*
+          DARK BLUE TRANSPARENT OVERLAY
+          - This overlay can be toggled on/off by commenting/uncommenting the div below
+          - Color can be changed by modifying the bg-blue-900/60 class
+          - Opacity can be adjusted by changing the /60 value (e.g., /40 for lighter, /80 for darker)
+          - Alternative colors: bg-primary-900/60, bg-slate-900/60, bg-indigo-900/60
+        */}
+        <div className="absolute inset-0 bg-indigo-900/10"></div>
+
+        {/* Original gradient overlay (can be disabled if dark blue overlay is sufficient) */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/60 to-black/40"></div>
         <div className="w-full text-center relative z-10 px-8">
           <h1 className="text-6xl md:text-7xl lg:text-8xl font-extrabold mb-8 leading-tight tracking-tight text-white filter drop-shadow-2xl"
               style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.6)' }}>
