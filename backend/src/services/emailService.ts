@@ -13,8 +13,8 @@ interface InvestmentLeadEmailData {
 }
 
 export class EmailService {
-  private static readonly ADMIN_EMAIL = 'info@mega-invest.hr';
-  private static readonly FROM_EMAIL = 'noreply@mega-invest.hr';
+  private static readonly ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'info@mega-invest.hr';
+  private static readonly FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@mega-invest.hr';
   
   /**
    * Send email notification (currently logs to console for development)
@@ -25,6 +25,7 @@ export class EmailService {
       // For development: log email content
       console.log('\n📧 EMAIL NOTIFICATION:');
       console.log('═══════════════════════════════════════');
+      console.log(`From: ${this.FROM_EMAIL}`);
       console.log(`To: ${options.to}`);
       console.log(`Subject: ${options.subject}`);
       console.log('─────────────────────────────────────');
@@ -38,6 +39,25 @@ export class EmailService {
       // await sgMail.send({
       //   to: options.to,
       //   from: this.FROM_EMAIL,
+      //   subject: options.subject,
+      //   text: options.text,
+      //   html: options.html
+      // });
+
+      // Example with Nodemailer (SMTP):
+      // const nodemailer = require('nodemailer');
+      // const transporter = nodemailer.createTransporter({
+      //   host: process.env.SMTP_HOST,
+      //   port: process.env.SMTP_PORT,
+      //   secure: process.env.SMTP_SECURE === 'true',
+      //   auth: {
+      //     user: process.env.SMTP_USER,
+      //     pass: process.env.SMTP_PASS
+      //   }
+      // });
+      // await transporter.sendMail({
+      //   from: this.FROM_EMAIL,
+      //   to: options.to,
       //   subject: options.subject,
       //   text: options.text,
       //   html: options.html

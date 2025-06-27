@@ -3,7 +3,6 @@ import Modal from './Modal';
 import Button from './Button';
 import { Investment, Lead } from '../types';
 import { createLead } from '../services/leadService';
-import { XMarkIcon } from '@heroicons/react/24/outline';
 
 // Declare Calendly global for TypeScript
 declare global {

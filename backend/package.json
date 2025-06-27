@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "tsc --project tsconfig.build.json",
     "start": "node dist/server.js",
     "db:test": "tsx src/database/test-connection.ts",
     "db:setup": "tsx src/database/setup.ts",
