@@ -42,8 +42,8 @@ const HomePage: React.FC = () => {
     <>
       {/* Hero Section - Full Page */}
       <section className="relative bg-gradient-to-br from-primary-800 via-primary-500 to-teal-600 text-white overflow-hidden h-screen flex items-center w-full">
-        {/* Background Image */}
-        <div className="absolute inset-0"
+        {/* Background Image with Zoom Animation */}
+        <div className="absolute inset-0 animate-hero-zoom"
              style={{
                backgroundImage: 'url(/images/hero/ChatGPT-Image-Hero.jpg)',
                backgroundSize: 'cover',

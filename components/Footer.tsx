@@ -31,7 +31,7 @@ const Footer: React.FC = () => {
           <div>
             <h5 className="text-lg font-semibold text-white mb-4">Get in Touch</h5>
             <p className="text-sm mb-2">Put Gvozdenova 283, 22000 Šibenik, Hrvatska</p>
-            <p className="text-sm mb-2">Email: <a href="mailto:info@mega-invest.hr" className="hover:text-accent-400 transition-colors">info@megainvest.com</a></p>
+            <p className="text-sm mb-2">Email: <a href="mailto:info@mega-invest.hr" className="hover:text-accent-400 transition-colors">info@mega-invest.hr</a></p>
             <p className="text-sm">Phone: <a href="tel:+385913101512" className="hover:text-accent-400 transition-colors">+385 (91) 310-1512</a></p>
             {/* Add social media icons here if needed */}
           </div>
