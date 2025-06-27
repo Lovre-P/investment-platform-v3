@@ -10,13 +10,14 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { PUBLIC_ROUTES } from '../../constants';
 
 // InvestmentFormData for the admin modal
-type InvestmentFormData = Omit<Investment, 'id' | 'submissionDate' | 'amountRaised'> & { id?: string };
+type InvestmentFormData = Omit<Investment, 'id' | 'submissionDate'> & { id?: string };
 
 const initialFormData: InvestmentFormData = {
   title: '',
   description: '',
   longDescription: '',
   amountGoal: 0,
+  amountRaised: 0,
   currency: 'USD',
   images: [], // Should be array of strings (URLs)
   category: '',

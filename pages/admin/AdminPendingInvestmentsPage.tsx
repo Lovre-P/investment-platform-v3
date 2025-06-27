@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Investment, InvestmentStatus } from '../../types';
 // Fix: Import updateInvestment, it was missing.
-import { getInvestments, approveInvestment, rejectInvestment, deleteInvestment, updateInvestment } from '../../services/investmentService';
+import { getInvestments, approveInvestment, deleteInvestment, updateInvestment } from '../../services/investmentService';
 import Button from '../../components/Button';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import Modal from '../../components/Modal';

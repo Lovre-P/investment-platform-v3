@@ -1,4 +1,4 @@
-import { Investment, Lead, User, InvestmentStatus, UserRole, PlatformMetrics } from '../types';
+import { Investment, Lead, User, InvestmentStatus, PlatformMetrics } from '../types';
 import { PLACEHOLDER_IMAGE_URL } from '../constants';
 
 // All mock data arrays are now empty.
@@ -51,12 +51,12 @@ export const addMockInvestment = (investmentData: NewInvestmentData): Investment
   };
 };
 
-export const updateMockInvestment = (updatedInvestment: Investment): Investment | null => {
+export const updateMockInvestment = (_updatedInvestment: Investment): Investment | null => {
   console.warn("updateMockInvestment is deprecated. API calls should be used.");
   return null; // Or the updatedInvestment itself, but it won't persist.
 };
 
-export const deleteMockInvestment = (investmentId: string): boolean => {
+export const deleteMockInvestment = (_investmentId: string): boolean => {
   console.warn("deleteMockInvestment is deprecated. API calls should be used.");
   return false;
 };
@@ -71,7 +71,7 @@ export const addMockLead = (leadData: Omit<Lead, 'id' | 'submissionDate' | 'stat
   };
 };
 
-export const updateMockLead = (updatedLead: Lead): Lead | null => {
+export const updateMockLead = (_updatedLead: Lead): Lead | null => {
   console.warn("updateMockLead is deprecated. API calls should be used.");
   return null;
 };
@@ -85,12 +85,12 @@ export const addMockUser = (userData: Omit<User, 'id' | 'joinDate'>): User => {
   };
 };
 
-export const updateMockUser = (updatedUser: User): User | null => {
+export const updateMockUser = (_updatedUser: User): User | null => {
   console.warn("updateMockUser is deprecated. API calls should be used.");
   return null;
 };
 
-export const deleteMockUser = (userId: string): boolean => {
+export const deleteMockUser = (_userId: string): boolean => {
   console.warn("deleteMockUser is deprecated. API calls should be used.");
   return false;
 };

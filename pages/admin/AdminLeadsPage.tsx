@@ -6,7 +6,7 @@ import { getInvestments } from '../../services/investmentService'; // To display
 import Button from '../../components/Button';
 import Modal from '../../components/Modal';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import { EyeIcon, EnvelopeIcon, PhoneIcon, PencilIcon } from '@heroicons/react/24/outline';
+import { EyeIcon, PencilIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import { PUBLIC_ROUTES } from '../../constants';
 

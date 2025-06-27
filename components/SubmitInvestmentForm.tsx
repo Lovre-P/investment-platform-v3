@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import Button from './Button';
-import { Investment, InvestmentStatus } from '../types';
+import { Investment } from '../types';
 import { createInvestment } from '../services/investmentService'; // Mock service
 
 // Updated form data type

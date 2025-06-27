@@ -23,6 +23,11 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Trust proxy for Railway/production deployment
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1); // Trust first proxy (Railway, Render, etc.)
+}
+
 // Security middleware
 app.use(helmet());
 

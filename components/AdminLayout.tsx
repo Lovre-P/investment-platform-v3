@@ -3,8 +3,8 @@ import React from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { APP_NAME, ADMIN_ROUTES } from '../constants';
 import { useAuth } from '../contexts/AuthContext';
-import { 
-  HomeIcon, CogIcon, BriefcaseIcon, UserGroupIcon, 
+import {
+  CogIcon, BriefcaseIcon, UserGroupIcon,
   DocumentTextIcon, InboxArrowDownIcon, ArrowLeftOnRectangleIcon, PresentationChartLineIcon
 } from '@heroicons/react/24/outline';
 

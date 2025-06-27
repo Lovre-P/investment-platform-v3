@@ -8,7 +8,7 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import InvestmentModal from '../../components/InvestmentModal';
 import { DEFAULT_CURRENCY } from '../../constants';
 import {
-  CalendarDaysIcon, BanknotesIcon, ArrowTrendingUpIcon, ScaleIcon, TagIcon, UserCircleIcon, InformationCircleIcon, ClockIcon
+  CalendarDaysIcon, BanknotesIcon, ArrowTrendingUpIcon, TagIcon, UserCircleIcon, InformationCircleIcon, ClockIcon
 } from '@heroicons/react/24/outline';
 import Button from '../../components/Button';
 

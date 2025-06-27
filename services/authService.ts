@@ -1,6 +1,8 @@
 import { User, UserRole } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/auth` : '/api/auth';
+const API_BASE_URL = (typeof window !== 'undefined' && (window as any).VITE_API_URL)
+  ? `${(window as any).VITE_API_URL}/api/auth`
+  : '/api/auth';
 
 interface LoginCredentials {
   email?: string;

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 // Fix: Import UserRole to resolve 'Cannot find name UserRole' error.
-import { PlatformMetrics, Investment, Lead, User, InvestmentStatus, UserRole } from '../../types';
+import { PlatformMetrics, Investment, Lead, InvestmentStatus, UserRole } from '../../types';
 // Removed direct mockData imports
 import { getInvestments } from '../../services/investmentService'; // To fetch investments
 import { getLeads } from '../../services/leadService'; // To fetch leads
 import { getUsers } from '../../services/userService'; // To fetch users for metrics
 import { Link } from 'react-router-dom';
 import { ADMIN_ROUTES } from '../../constants';
-import { 
-  ChartBarIcon, BanknotesIcon, UserGroupIcon, InboxStackIcon, BriefcaseIcon, DocumentTextIcon, CogIcon 
+import {
+  BanknotesIcon, UserGroupIcon, InboxStackIcon, BriefcaseIcon, DocumentTextIcon, CogIcon
 } from '@heroicons/react/24/outline';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -140,7 +140,7 @@ const AdminDashboardPage: React.FC = () => {
                   dataKey="value"
                   label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
                 >
-                  {investmentStatusData.map((entry, index) => (
+                  {investmentStatusData.map((_entry, index) => (
                     <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                   ))}
                 </Pie>
