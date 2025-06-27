@@ -1,7 +1,21 @@
-import React from 'react';
-import { ShieldCheckIcon, EyeIcon, LockClosedIcon, UserGroupIcon } from '@heroicons/react/24/outline';
+import React, { useEffect } from 'react';
+import { ShieldCheckIcon, EyeIcon, LockClosedIcon, UserGroupIcon, BookOpenIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 const PrivacyPolicyPage: React.FC = () => {
+  useEffect(() => {
+    // Set page title and meta description
+    document.title = 'Privacy Policy - MegaInvest | Data Protection & Privacy Rights';
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute('content', 'Learn how MegaInvest protects your privacy and personal data. Comprehensive privacy policy covering data collection, usage, rights, and GDPR compliance.');
+    } else {
+      const meta = document.createElement('meta');
+      meta.name = 'description';
+      meta.content = 'Learn how MegaInvest protects your privacy and personal data. Comprehensive privacy policy covering data collection, usage, rights, and GDPR compliance.';
+      document.head.appendChild(meta);
+    }
+  }, []);
+
   return (
     <div className="bg-white p-4 sm:p-6 md:p-10 rounded-xl shadow-2xl space-y-8 sm:space-y-12">
       {/* Header Section */}
@@ -16,6 +30,62 @@ const PrivacyPolicyPage: React.FC = () => {
         <p className="text-sm text-secondary-500 mt-4">
           Last updated: {new Date().toLocaleDateString()}
         </p>
+
+        {/* GDPR Compliance Notice */}
+        <div className="mt-8 bg-blue-50 p-6 rounded-lg border border-blue-200">
+          <h2 className="text-lg font-semibold text-blue-800 mb-3 flex items-center justify-center">
+            <ExclamationCircleIcon className="h-5 w-5 mr-2" />
+            GDPR Compliance Notice
+          </h2>
+          <p className="text-blue-700 text-sm">
+            This privacy policy complies with the General Data Protection Regulation (GDPR) and other applicable data protection laws.
+            As a data subject, you have specific rights regarding your personal data which are detailed below.
+          </p>
+        </div>
+
+        {/* Quick Rights Summary */}
+        <div className="mt-6 bg-green-50 p-6 rounded-lg border border-green-200">
+          <h2 className="text-lg font-semibold text-green-800 mb-4 flex items-center justify-center">
+            <BookOpenIcon className="h-5 w-5 mr-2" />
+            Your Privacy Rights at a Glance
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div className="text-center">
+              <div className="font-medium text-green-800">Access</div>
+              <div className="text-green-700">Request your data</div>
+            </div>
+            <div className="text-center">
+              <div className="font-medium text-green-800">Correction</div>
+              <div className="text-green-700">Fix inaccurate data</div>
+            </div>
+            <div className="text-center">
+              <div className="font-medium text-green-800">Deletion</div>
+              <div className="text-green-700">Request data removal</div>
+            </div>
+            <div className="text-center">
+              <div className="font-medium text-green-800">Portability</div>
+              <div className="text-green-700">Transfer your data</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Navigation */}
+        <div className="mt-6 bg-secondary-50 p-6 rounded-lg border border-secondary-200">
+          <h2 className="text-lg font-semibold text-secondary-800 mb-4 flex items-center justify-center">
+            <BookOpenIcon className="h-5 w-5 mr-2" />
+            Quick Navigation
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+            <a href="#information-collection" className="text-primary-600 hover:text-primary-700 hover:underline">Data Collection</a>
+            <a href="#information-usage" className="text-primary-600 hover:text-primary-700 hover:underline">How We Use Data</a>
+            <a href="#information-sharing" className="text-primary-600 hover:text-primary-700 hover:underline">Data Sharing</a>
+            <a href="#data-security" className="text-primary-600 hover:text-primary-700 hover:underline">Security</a>
+            <a href="#your-rights" className="text-primary-600 hover:text-primary-700 hover:underline">Your Rights</a>
+            <a href="#cookies" className="text-primary-600 hover:text-primary-700 hover:underline">Cookies</a>
+            <a href="#data-retention" className="text-primary-600 hover:text-primary-700 hover:underline">Data Retention</a>
+            <a href="#international-transfers" className="text-primary-600 hover:text-primary-700 hover:underline">International Transfers</a>
+          </div>
+        </div>
       </section>
 
       {/* Introduction */}
@@ -25,15 +95,24 @@ const PrivacyPolicyPage: React.FC = () => {
             <LockClosedIcon className="h-6 w-6 mr-2" />
             Our Commitment to Privacy
           </h2>
-          <p className="mb-0">
-            MegaInvest is committed to protecting your privacy and ensuring the security of your personal information. 
+          <p className="mb-4">
+            MegaInvest is committed to protecting your privacy and ensuring the security of your personal information.
             This Privacy Policy describes how we collect, use, disclose, and safeguard your information when you use our platform.
           </p>
+          <div className="bg-white p-4 rounded border border-primary-200">
+            <h3 className="font-semibold text-primary-800 mb-2">Legal Basis for Processing (GDPR Article 6):</h3>
+            <ul className="text-sm text-primary-700 space-y-1">
+              <li><strong>Consent:</strong> When you explicitly agree to data processing</li>
+              <li><strong>Contract:</strong> To provide our investment platform services</li>
+              <li><strong>Legal Obligation:</strong> To comply with financial regulations</li>
+              <li><strong>Legitimate Interest:</strong> For platform security and fraud prevention</li>
+            </ul>
+          </div>
         </div>
       </section>
 
       {/* Information We Collect */}
-      <section className="prose prose-lg max-w-none text-secondary-700">
+      <section id="information-collection" className="prose prose-lg max-w-none text-secondary-700">
         <h2 className="text-2xl font-semibold text-secondary-800 mb-4 flex items-center">
           <EyeIcon className="h-6 w-6 mr-2" />
           1. Information We Collect
@@ -59,7 +138,7 @@ const PrivacyPolicyPage: React.FC = () => {
       </section>
 
       {/* How We Use Information */}
-      <section className="prose prose-lg max-w-none text-secondary-700">
+      <section id="information-usage" className="prose prose-lg max-w-none text-secondary-700">
         <h2 className="text-2xl font-semibold text-secondary-800 mb-4">2. How We Use Your Information</h2>
         <div className="grid md:grid-cols-2 gap-6">
           <div className="bg-accent-50 p-6 rounded-lg">
@@ -86,7 +165,7 @@ const PrivacyPolicyPage: React.FC = () => {
       </section>
 
       {/* Information Sharing */}
-      <section className="prose prose-lg max-w-none text-secondary-700">
+      <section id="information-sharing" className="prose prose-lg max-w-none text-secondary-700">
         <h2 className="text-2xl font-semibold text-secondary-800 mb-4 flex items-center">
           <UserGroupIcon className="h-6 w-6 mr-2" />
           3. Information Sharing and Disclosure
@@ -115,7 +194,7 @@ const PrivacyPolicyPage: React.FC = () => {
       </section>
 
       {/* Data Security */}
-      <section className="prose prose-lg max-w-none text-secondary-700">
+      <section id="data-security" className="prose prose-lg max-w-none text-secondary-700">
         <h2 className="text-2xl font-semibold text-secondary-800 mb-4">4. Data Security and Protection</h2>
         <p className="mb-4">
           We implement industry-standard security measures to protect your personal information:
@@ -145,7 +224,7 @@ const PrivacyPolicyPage: React.FC = () => {
       </section>
 
       {/* Your Rights */}
-      <section className="prose prose-lg max-w-none text-secondary-700">
+      <section id="your-rights" className="prose prose-lg max-w-none text-secondary-700">
         <h2 className="text-2xl font-semibold text-secondary-800 mb-4">5. Your Privacy Rights</h2>
         <p className="mb-4">You have the following rights regarding your personal information:</p>
         <div className="bg-secondary-50 p-6 rounded-lg">
@@ -162,7 +241,7 @@ const PrivacyPolicyPage: React.FC = () => {
       </section>
 
       {/* Cookies and Tracking */}
-      <section className="prose prose-lg max-w-none text-secondary-700">
+      <section id="cookies" className="prose prose-lg max-w-none text-secondary-700">
         <h2 className="text-2xl font-semibold text-secondary-800 mb-4">6. Cookies and Tracking Technologies</h2>
         <p className="mb-4">We use cookies and similar technologies to enhance your experience:</p>
         <ul className="list-disc pl-6 space-y-2">
@@ -171,13 +250,20 @@ const PrivacyPolicyPage: React.FC = () => {
           <li><strong>Functional Cookies:</strong> Remember your preferences and settings</li>
           <li><strong>Analytics:</strong> Provide insights into platform usage and performance</li>
         </ul>
-        <p className="mt-4 text-sm text-secondary-600">
-          You can control cookie settings through your browser preferences, but disabling certain cookies may affect platform functionality.
-        </p>
+        <div className="mt-6 bg-yellow-50 p-6 rounded-lg border border-yellow-200">
+          <h3 className="text-lg font-medium text-yellow-800 mb-3">Cookie Management:</h3>
+          <p className="text-yellow-700 text-sm mb-3">
+            You can control cookie settings through your browser preferences, but disabling certain cookies may affect platform functionality.
+          </p>
+          <div className="text-sm text-yellow-700">
+            <p className="mb-2"><strong>EU Users:</strong> We respect your cookie preferences and provide clear consent mechanisms for non-essential cookies.</p>
+            <p><strong>Browser Controls:</strong> Most browsers allow you to view, manage, and delete cookies through their settings menu.</p>
+          </div>
+        </div>
       </section>
 
       {/* Data Retention */}
-      <section className="prose prose-lg max-w-none text-secondary-700">
+      <section id="data-retention" className="prose prose-lg max-w-none text-secondary-700">
         <h2 className="text-2xl font-semibold text-secondary-800 mb-4">7. Data Retention</h2>
         <p>
           We retain your personal information only as long as necessary for the purposes outlined in this policy or as required by law. 
@@ -192,18 +278,41 @@ const PrivacyPolicyPage: React.FC = () => {
       </section>
 
       {/* International Transfers */}
-      <section className="prose prose-lg max-w-none text-secondary-700">
+      <section id="international-transfers" className="prose prose-lg max-w-none text-secondary-700">
         <h2 className="text-2xl font-semibold text-secondary-800 mb-4">8. International Data Transfers</h2>
-        <p>
-          Your information may be transferred to and processed in countries other than Croatia. 
-          We ensure appropriate safeguards are in place for international transfers, including:
-        </p>
-        <ul className="list-disc pl-6 space-y-2 mt-4">
-          <li>Adequacy decisions by the European Commission</li>
-          <li>Standard contractual clauses</li>
-          <li>Binding corporate rules</li>
-          <li>Certification schemes</li>
-        </ul>
+        <div className="bg-orange-50 p-6 rounded-lg border-l-4 border-orange-500 mb-6">
+          <p className="mb-4">
+            Your information may be transferred to and processed in countries other than Croatia.
+            We ensure appropriate safeguards are in place for international transfers, including:
+          </p>
+          <ul className="list-disc pl-6 space-y-2 mb-4">
+            <li>Adequacy decisions by the European Commission</li>
+            <li>Standard contractual clauses (SCCs)</li>
+            <li>Binding corporate rules</li>
+            <li>Certification schemes</li>
+          </ul>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="bg-blue-50 p-6 rounded-lg">
+            <h3 className="text-lg font-medium text-blue-800 mb-3">Current Third-Party Services:</h3>
+            <ul className="text-sm text-blue-700 space-y-2">
+              <li><strong>Cloud Hosting:</strong> EU-based servers (GDPR compliant)</li>
+              <li><strong>Analytics:</strong> Google Analytics (with data processing agreement)</li>
+              <li><strong>Email Services:</strong> EU-based email providers</li>
+              <li><strong>Payment Processing:</strong> PCI DSS compliant processors</li>
+            </ul>
+          </div>
+          <div className="bg-purple-50 p-6 rounded-lg">
+            <h3 className="text-lg font-medium text-purple-800 mb-3">Your Transfer Rights:</h3>
+            <ul className="text-sm text-purple-700 space-y-2">
+              <li>Right to be informed about transfers</li>
+              <li>Right to object to transfers in certain cases</li>
+              <li>Right to request details about safeguards</li>
+              <li>Right to file complaints with supervisory authorities</li>
+            </ul>
+          </div>
+        </div>
       </section>
 
       {/* Contact Information */}
