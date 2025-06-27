@@ -1,7 +1,8 @@
 import { User, UserRole } from '../types';
 
-const API_BASE_URL = (typeof window !== 'undefined' && (window as any).VITE_API_URL)
-  ? `${(window as any).VITE_API_URL}/api/auth`
+// Use backend service URL in production, proxy in development
+const API_BASE_URL = import.meta.env.PROD
+  ? 'https://mega-invest-backend-production.up.railway.app/api/auth'
   : '/api/auth';
 
 interface LoginCredentials {
