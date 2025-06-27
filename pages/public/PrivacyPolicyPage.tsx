@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { ShieldCheckIcon, EyeIcon, LockClosedIcon, UserGroupIcon, BookOpenIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
+import { ShieldCheckIcon, EyeIcon, LockClosedIcon, UserGroupIcon, BookOpenIcon, ExclamationCircleIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 
 const PrivacyPolicyPage: React.FC = () => {
   useEffect(() => {
@@ -75,15 +75,22 @@ const PrivacyPolicyPage: React.FC = () => {
             <BookOpenIcon className="h-5 w-5 mr-2" />
             Quick Navigation
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-            <a href="#information-collection" className="text-primary-600 hover:text-primary-700 hover:underline">Data Collection</a>
-            <a href="#information-usage" className="text-primary-600 hover:text-primary-700 hover:underline">How We Use Data</a>
-            <a href="#information-sharing" className="text-primary-600 hover:text-primary-700 hover:underline">Data Sharing</a>
-            <a href="#data-security" className="text-primary-600 hover:text-primary-700 hover:underline">Security</a>
-            <a href="#your-rights" className="text-primary-600 hover:text-primary-700 hover:underline">Your Rights</a>
-            <a href="#cookies" className="text-primary-600 hover:text-primary-700 hover:underline">Cookies</a>
-            <a href="#data-retention" className="text-primary-600 hover:text-primary-700 hover:underline">Data Retention</a>
-            <a href="#international-transfers" className="text-primary-600 hover:text-primary-700 hover:underline">International Transfers</a>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm mb-4">
+            <button onClick={() => document.getElementById('information-collection')?.scrollIntoView({ behavior: 'smooth' })} className="text-left text-primary-600 hover:text-primary-700 hover:underline">Data Collection</button>
+            <button onClick={() => document.getElementById('information-usage')?.scrollIntoView({ behavior: 'smooth' })} className="text-left text-primary-600 hover:text-primary-700 hover:underline">How We Use Data</button>
+            <button onClick={() => document.getElementById('information-sharing')?.scrollIntoView({ behavior: 'smooth' })} className="text-left text-primary-600 hover:text-primary-700 hover:underline">Data Sharing</button>
+            <button onClick={() => document.getElementById('data-security')?.scrollIntoView({ behavior: 'smooth' })} className="text-left text-primary-600 hover:text-primary-700 hover:underline">Security</button>
+            <button onClick={() => document.getElementById('your-rights')?.scrollIntoView({ behavior: 'smooth' })} className="text-left text-primary-600 hover:text-primary-700 hover:underline">Your Rights</button>
+            <button onClick={() => document.getElementById('cookies')?.scrollIntoView({ behavior: 'smooth' })} className="text-left text-primary-600 hover:text-primary-700 hover:underline">Cookies</button>
+            <button onClick={() => document.getElementById('data-retention')?.scrollIntoView({ behavior: 'smooth' })} className="text-left text-primary-600 hover:text-primary-700 hover:underline">Data Retention</button>
+            <button onClick={() => document.getElementById('international-transfers')?.scrollIntoView({ behavior: 'smooth' })} className="text-left text-primary-600 hover:text-primary-700 hover:underline">International Transfers</button>
+          </div>
+          <div className="border-t border-secondary-200 pt-4">
+            <p className="text-xs text-secondary-600 mb-2">Related Legal Documents:</p>
+            <a href="#/terms" className="inline-flex items-center text-sm text-primary-600 hover:text-primary-700 hover:underline font-medium">
+              <DocumentTextIcon className="h-4 w-4 mr-1" />
+              Terms of Service
+            </a>
           </div>
         </div>
       </section>
@@ -322,10 +329,9 @@ const PrivacyPolicyPage: React.FC = () => {
           If you have questions about this Privacy Policy or wish to exercise your privacy rights, please contact us:
         </p>
         <div className="space-y-2 text-secondary-600">
-          <p><strong>Data Protection Officer:</strong> privacy@megainvest.com</p>
-          <p><strong>General Inquiries:</strong> info@megainvest.com</p>
+          <p><strong>Email:</strong> info@mega-invest.hr</p>
           <p><strong>Address:</strong> Put Gvozdenova 283, 22000 Šibenik, Croatia</p>
-          <p><strong>Phone:</strong> +385 (0)22 XXX-XXX</p>
+          <p><strong>Phone:</strong> +385 91 310 1512</p>
         </div>
       </section>
 

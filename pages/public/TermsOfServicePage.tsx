@@ -37,15 +37,22 @@ const TermsOfServicePage: React.FC = () => {
             <BookOpenIcon className="h-5 w-5 mr-2" />
             Quick Navigation
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-            <a href="#definitions" className="text-primary-600 hover:text-primary-700 hover:underline">Definitions</a>
-            <a href="#platform-description" className="text-primary-600 hover:text-primary-700 hover:underline">Platform Description</a>
-            <a href="#user-responsibilities" className="text-primary-600 hover:text-primary-700 hover:underline">User Responsibilities</a>
-            <a href="#prohibited-activities" className="text-primary-600 hover:text-primary-700 hover:underline">Prohibited Activities</a>
-            <a href="#investment-risks" className="text-primary-600 hover:text-primary-700 hover:underline">Investment Risks</a>
-            <a href="#data-privacy" className="text-primary-600 hover:text-primary-700 hover:underline">Data & Privacy</a>
-            <a href="#termination" className="text-primary-600 hover:text-primary-700 hover:underline">Account Termination</a>
-            <a href="#governing-law" className="text-primary-600 hover:text-primary-700 hover:underline">Governing Law</a>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm mb-4">
+            <button onClick={() => document.getElementById('definitions')?.scrollIntoView({ behavior: 'smooth' })} className="text-left text-primary-600 hover:text-primary-700 hover:underline">Definitions</button>
+            <button onClick={() => document.getElementById('platform-description')?.scrollIntoView({ behavior: 'smooth' })} className="text-left text-primary-600 hover:text-primary-700 hover:underline">Platform Description</button>
+            <button onClick={() => document.getElementById('user-responsibilities')?.scrollIntoView({ behavior: 'smooth' })} className="text-left text-primary-600 hover:text-primary-700 hover:underline">User Responsibilities</button>
+            <button onClick={() => document.getElementById('prohibited-activities')?.scrollIntoView({ behavior: 'smooth' })} className="text-left text-primary-600 hover:text-primary-700 hover:underline">Prohibited Activities</button>
+            <button onClick={() => document.getElementById('investment-risks')?.scrollIntoView({ behavior: 'smooth' })} className="text-left text-primary-600 hover:text-primary-700 hover:underline">Investment Risks</button>
+            <button onClick={() => document.getElementById('data-privacy')?.scrollIntoView({ behavior: 'smooth' })} className="text-left text-primary-600 hover:text-primary-700 hover:underline">Data & Privacy</button>
+            <button onClick={() => document.getElementById('termination')?.scrollIntoView({ behavior: 'smooth' })} className="text-left text-primary-600 hover:text-primary-700 hover:underline">Account Termination</button>
+            <button onClick={() => document.getElementById('governing-law')?.scrollIntoView({ behavior: 'smooth' })} className="text-left text-primary-600 hover:text-primary-700 hover:underline">Governing Law</button>
+          </div>
+          <div className="border-t border-secondary-200 pt-4">
+            <p className="text-xs text-secondary-600 mb-2">Related Legal Documents:</p>
+            <a href="#/privacy" className="inline-flex items-center text-sm text-primary-600 hover:text-primary-700 hover:underline font-medium">
+              <ShieldCheckIcon className="h-4 w-4 mr-1" />
+              Privacy Policy
+            </a>
           </div>
         </div>
       </section>
