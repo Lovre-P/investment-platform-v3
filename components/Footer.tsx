@@ -30,9 +30,9 @@ const Footer: React.FC = () => {
           {/* Contact Info & Social */}
           <div>
             <h5 className="text-lg font-semibold text-white mb-4">Get in Touch</h5>
-            <p className="text-sm mb-2">123 Investment Drive, Capital City, CC 12345</p>
-            <p className="text-sm mb-2">Email: <a href="mailto:info@megainvest.com" className="hover:text-accent-400 transition-colors">info@megainvest.com</a></p>
-            <p className="text-sm">Phone: <a href="tel:+1234567890" className="hover:text-accent-400 transition-colors">+1 (234) 567-890</a></p>
+            <p className="text-sm mb-2">Put Gvozdenova 283, 22000 Šibenik, Hrvatska</p>
+            <p className="text-sm mb-2">Email: <a href="mailto:info@mega-invest.hr" className="hover:text-accent-400 transition-colors">info@megainvest.com</a></p>
+            <p className="text-sm">Phone: <a href="tel:+385913101512" className="hover:text-accent-400 transition-colors">+385 (91) 310-1512</a></p>
             {/* Add social media icons here if needed */}
           </div>
         </div>

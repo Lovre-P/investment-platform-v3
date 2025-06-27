@@ -44,7 +44,7 @@ const ContactPage: React.FC = () => {
                 <div>
                   <h3 className="text-lg font-medium text-secondary-700">Email Us</h3>
                   <p className="text-secondary-600">
-                    General Inquiries: <a href="mailto:info@apolon-plovila.com" className="text-primary-500 hover:text-primary-700 hover:underline">info@apolon-plovila.com</a>
+                    General Inquiries: <a href="mailto:info@mega-invest.hr" className="text-primary-500 hover:text-primary-700 hover:underline">info@mega-invest.hr</a>
                   </p>
                 </div>
               </div>
@@ -55,7 +55,7 @@ const ContactPage: React.FC = () => {
                   <p className="text-secondary-600">
                     <a href="tel:+38591310151" className="text-primary-500 hover:text-primary-700 hover:underline">+385 91 310 15 12</a>
                   </p>
-                  <p className="text-sm text-secondary-500">Mon - Fri, 9:00 AM - 5:00 PM (CET)</p>
+                  <p className="text-sm text-secondary-500">Mon - Fri, 8:00 AM - 3:00 PM (CET)</p>
                 </div>
               </div>
             </div>
@@ -63,7 +63,7 @@ const ContactPage: React.FC = () => {
           
           <div>
             <h3 className="text-lg font-medium text-secondary-700 mb-3">Office Hours</h3>
-            <p className="text-secondary-600">Monday - Friday: 9:00 AM - 5:00 PM</p>
+            <p className="text-secondary-600">Monday - Friday: 8:00 AM - 3:00 PM</p>
             <p className="text-secondary-600">Saturday - Sunday: Closed</p>
           </div>
 

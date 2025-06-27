@@ -51,22 +51,20 @@ const HomePage: React.FC = () => {
                backgroundRepeat: 'no-repeat'
              }}></div>
 
-        {/*
-          DARK BLUE TRANSPARENT OVERLAY
-          - This overlay can be toggled on/off by commenting/uncommenting the div below
-          - Color can be changed by modifying the bg-blue-900/60 class
-          - Opacity can be adjusted by changing the /60 value (e.g., /40 for lighter, /80 for darker)
-          - Alternative colors: bg-primary-900/60, bg-slate-900/60, bg-indigo-900/60
-        */}
-        <div className="absolute inset-0 bg-indigo-900/10"></div>
+        {/* 
+          DARK BLACK TRANSPARENT OVERLAY
+            - Original gradient overlay (can be disabled if dark blue overlay is sufficient) */}
 
-        {/* Original gradient overlay (can be disabled if dark blue overlay is sufficient) */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/60 to-black/40"></div>
+        {/* <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/60 to-black/40"></div>*/}
+
+        {/* Light transparent blur overlay */}
+        <div className="absolute inset-0 backdrop-blur-sm bg-white/10 mix-blend-overlay"></div>
+
         <div className="w-full text-center relative z-10 px-8">
           <h1 className="text-6xl md:text-7xl lg:text-8xl font-extrabold mb-8 leading-tight tracking-tight text-white filter drop-shadow-2xl"
-              style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.6)' }}>
+              style={{ textShadow: 'rgba(0, 0, 0, 0.8) -8px -7px 4px, rgba(0, 0, 0, 0.6) -6px -9px 18px' }}>
             Invest in the <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-accent-500"
-                                style={{ textShadow: 'none', filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))' }}>Future</span>.
+                                style={{ textShadow: 'none', filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))' }}>Future.</span>
             <span className="block mt-2">Empower Innovation.</span>
           </h1>
           <p className="text-xl md:text-2xl lg:text-3xl mb-12 max-w-4xl mx-auto text-white font-bold leading-relaxed filter drop-shadow-xl"
