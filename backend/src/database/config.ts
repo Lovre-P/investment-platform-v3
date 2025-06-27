@@ -5,7 +5,7 @@ import { initializeMockData } from './mock.js';
 dotenv.config();
 
 // Check if we should use mock database
-const USE_MOCK_DB = process.env.USE_MOCK_DB === 'true' || process.env.NODE_ENV === 'test';
+let USE_MOCK_DB = process.env.USE_MOCK_DB === 'true' || process.env.NODE_ENV === 'test';
 
 const config = {
   host: process.env.DB_HOST || 'localhost',
@@ -36,6 +36,7 @@ export const testConnection = async (): Promise<boolean> => {
   } catch (error) {
     console.error('❌ MySQL connection failed:', error);
     console.log('🔧 Falling back to mock database mode');
+    USE_MOCK_DB = true; // Enable mock mode
     await initializeMockData();
     return true; // Return true to allow server to start with mock data
   }

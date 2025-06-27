@@ -5,6 +5,7 @@ import { Investment, InvestmentStatus } from '../../types';
 import { getInvestmentById } from '../../services/investmentService';
 import ImageGallery from '../../components/ImageGallery';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import InvestmentModal from '../../components/InvestmentModal';
 import { DEFAULT_CURRENCY } from '../../constants';
 import {
   CalendarDaysIcon, BanknotesIcon, ArrowTrendingUpIcon, ScaleIcon, TagIcon, UserCircleIcon, InformationCircleIcon, ClockIcon
@@ -16,6 +17,7 @@ const InvestmentDetailPage: React.FC = () => {
   const [investment, setInvestment] = useState<Investment | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (!id) {
@@ -133,7 +135,12 @@ const InvestmentDetailPage: React.FC = () => {
           </div>
 
           {status === InvestmentStatus.OPEN && (
-            <Button variant="primary" size="lg" className="w-full mt-4">
+            <Button
+              variant="primary"
+              size="lg"
+              className="w-full mt-4"
+              onClick={() => setIsModalOpen(true)}
+            >
               Invest Now
             </Button>
           )}
@@ -195,6 +202,15 @@ const InvestmentDetailPage: React.FC = () => {
           Have questions? Contact us &rarr;
         </Link>
       </section>
+
+      {/* Investment Modal */}
+      {investment && (
+        <InvestmentModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          investment={investment}
+        />
+      )}
     </div>
   );
 };

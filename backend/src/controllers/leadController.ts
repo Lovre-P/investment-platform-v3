@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { LeadModel } from '../models/Lead.js';
+import { InvestmentModel } from '../models/Investment.js';
+import { EmailService } from '../services/emailService.js';
 import { NotFoundError } from '../utils/errors.js';
 import { CreateLeadData } from '../types/index.js';
 
@@ -39,6 +41,30 @@ export class LeadController {
     try {
       const leadData: CreateLeadData = req.body;
       const lead = await LeadModel.create(leadData);
+
+      // Send email notification asynchronously (don't wait for it to complete)
+      setImmediate(async () => {
+        try {
+          let investment = null;
+
+          // If this is an investment-specific lead, fetch the investment details
+          if (lead.investmentId) {
+            investment = await InvestmentModel.findById(lead.investmentId);
+          }
+
+          // Send appropriate email notification
+          if (investment) {
+            await EmailService.sendInvestmentLeadNotification({ lead, investment });
+            console.log(`📧 Investment lead notification sent for: ${lead.name} (Investment: ${investment.title})`);
+          } else {
+            await EmailService.sendContactLeadNotification(lead);
+            console.log(`📧 Contact lead notification sent for: ${lead.name}`);
+          }
+        } catch (emailError) {
+          // Log email error but don't fail the lead creation
+          console.error('Failed to send email notification for lead:', lead.id, emailError);
+        }
+      });
 
       res.status(201).json({
         success: true,

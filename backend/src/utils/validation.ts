@@ -67,6 +67,15 @@ export const createLeadSchema = z.object({
   investmentId: z.string().uuid().optional()
 });
 
+// Investment-specific lead validation schema (stricter requirements)
+export const createInvestmentLeadSchema = z.object({
+  name: z.string().min(1).max(255),
+  email: z.string().email(),
+  phone: z.string().min(1, 'Phone number is required for investment inquiries'),
+  message: z.string().min(1),
+  investmentId: z.string().uuid()
+});
+
 export const updateLeadStatusSchema = z.object({
   status: z.enum(['New', 'Contacted', 'Converted', 'Rejected'])
 });
