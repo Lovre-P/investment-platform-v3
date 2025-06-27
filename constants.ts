@@ -9,6 +9,8 @@ export const PUBLIC_ROUTES = {
   INVESTMENTS: '/investments',
   INVESTMENT_DETAIL: '/investments/:id',
   SUBMIT_INVESTMENT: '/submit-investment',
+  TERMS: '/terms',
+  PRIVACY: '/privacy',
 };
 
 export const ADMIN_ROUTES = {
