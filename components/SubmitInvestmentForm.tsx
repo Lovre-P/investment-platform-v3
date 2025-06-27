@@ -235,7 +235,6 @@ const SubmitInvestmentForm: React.FC = () => {
             <div>
                 <label htmlFor="apyRange" className="block text-sm font-semibold text-secondary-700 mb-2">Expected APY Range</label>
                 <input type="text" name="apyRange" id="apyRange" value={formData.apyRange} onChange={handleChange} className="form-input" placeholder="5-8%"/>
-                <p className="text-xs text-secondary-500 mt-1">e.g., 5-8% or 12%</p>
             </div>
             <div>
                 <label htmlFor="minInvestment" className="block text-sm font-semibold text-secondary-700 mb-2">Minimum Investment ({formData.currency})</label>
@@ -274,7 +273,6 @@ const SubmitInvestmentForm: React.FC = () => {
                 onChange={handleFileChange}
                 className="block w-full text-sm text-secondary-500 file:mr-4 file:py-3 file:px-6 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-500 file:text-white hover:file:bg-primary-600 file:cursor-pointer cursor-pointer"
               />
-              <p className="text-xs text-secondary-500 mt-2">Upload project images, charts, or diagrams (PNG, JPG, GIF)</p>
               {formData.imageFiles && <p className="text-sm text-primary-600 font-medium mt-2">{formData.imageFiles.length} file(s) selected</p>}
             </div>
           </div>
