@@ -7,6 +7,9 @@ import { getLeads } from '../../services/leadService'; // To fetch leads
 import { getUsers } from '../../services/userService'; // To fetch users for metrics
 import { Link } from 'react-router-dom';
 import { ADMIN_ROUTES } from '../../constants';
+import { logError, getUserFriendlyErrorMessage, withRetry } from '../../utils/errorHandling';
+import { useAuth } from '../../contexts/AuthContext';
+import ErrorAlert from '../../components/ErrorAlert';
 import {
   BanknotesIcon, UserGroupIcon, InboxStackIcon, BriefcaseIcon, DocumentTextIcon, CogIcon
 } from '@heroicons/react/24/outline';
@@ -31,6 +34,7 @@ const MetricCard: React.FC<{ title: string; value: string | number; icon: React.
 
 
 const AdminDashboardPage: React.FC = () => {
+  const { isLoggingOut } = useAuth();
   const [metrics, setMetrics] = useState<PlatformMetrics | null>(null);
   const [allInvestments, setAllInvestments] = useState<Investment[]>([]); // Store all for charts
   const [recentInvestments, setRecentInvestments] = useState<Investment[]>([]);
@@ -41,17 +45,26 @@ const AdminDashboardPage: React.FC = () => {
 
   useEffect(() => {
     const fetchDashboardData = async () => {
+      // Skip data fetching if logout is in progress
+      if (isLoggingOut) {
+        return;
+      }
+
       setIsLoading(true);
       setError(null);
       try {
-        const [investmentsData, leadsData, usersData] = await Promise.all([
-          getInvestments(),
-          getLeads(),
-          getUsers()
-        ]);
+        const [investmentsData, leadsData, usersData] = await withRetry(
+          () => Promise.all([
+            getInvestments(),
+            getLeads(),
+            getUsers()
+          ]),
+          2,
+          'AdminDashboard data fetch'
+        );
 
         setAllInvestments(investmentsData);
-        
+
         setRecentInvestments(
           [...investmentsData]
             .sort((a, b) => new Date(b.submissionDate).getTime() - new Date(a.submissionDate).getTime())
@@ -79,15 +92,21 @@ const AdminDashboardPage: React.FC = () => {
         });
 
       } catch (err: any) {
-        console.error("Failed to fetch dashboard data:", err);
-        setError(err.message || "Could not load dashboard data. Please ensure the backend is running.");
+        // Don't show errors if logout is in progress
+        if (!isLoggingOut) {
+          logError(err, 'AdminDashboard fetchDashboardData', {
+            component: 'AdminDashboardPage',
+            action: 'fetchDashboardData'
+          });
+          setError(getUserFriendlyErrorMessage(err));
+        }
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchDashboardData();
-  }, []);
+  }, [isLoggingOut]);
 
   const investmentStatusData = allInvestments.reduce((acc, inv) => {
     const status = inv.status;
@@ -114,6 +133,15 @@ const AdminDashboardPage: React.FC = () => {
   return (
     <div className="space-y-8">
       <h1 className="text-3xl font-bold text-secondary-800">Admin Dashboard</h1>
+
+      {/* Error Alert */}
+      {error && (
+        <ErrorAlert
+          error={error}
+          onDismiss={() => setError(null)}
+          className="mb-6"
+        />
+      )}
 
       {/* Metric Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

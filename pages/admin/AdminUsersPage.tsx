@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { User, UserRole } from '../../types';
 import { getUsers, createUser, updateUser, deleteUser } from '../../services/userService';
+import { logError, getUserFriendlyErrorMessage, withRetry } from '../../utils/errorHandling';
 import Button from '../../components/Button';
 import Modal from '../../components/Modal';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -33,11 +34,18 @@ const AdminUsersPage: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await getUsers();
+      const data = await withRetry(
+        () => getUsers(),
+        2,
+        'AdminUsersPage fetchUsers'
+      );
       setUsers(data);
     } catch (err) {
-      console.error("Failed to fetch users:", err);
-      setError("Could not load users.");
+      logError(err, 'AdminUsersPage fetchUsers', {
+        component: 'AdminUsersPage',
+        action: 'fetchUsers'
+      });
+      setError(getUserFriendlyErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -107,30 +115,36 @@ const AdminUsersPage: React.FC = () => {
     try {
       if (isEditing && currentUser.id) {
         // For edit, don't send password unless it's being changed.
-        // Mock API doesn't handle password change, so we omit it.
         const { password, ...editData } = currentUser; // eslint-disable-line @typescript-eslint/no-unused-vars
         await updateUser(currentUser.id, editData);
       } else {
-        await createUser(userDataForApi as Omit<User, 'id' | 'joinDate'>); // Cast as password is handled by mock
+        await createUser(userDataForApi as Omit<User, 'id' | 'joinDate'>);
       }
       fetchUsers();
       handleCloseModal();
     } catch (err: any) {
-      console.error("Failed to save user:", err);
-      setError(err.message || "Failed to save user. Please try again.");
+      logError(err, 'AdminUsersPage saveUser', {
+        component: 'AdminUsersPage',
+        action: isEditing ? 'updateUser' : 'createUser',
+        userId: currentUser.id
+      });
+      setError(getUserFriendlyErrorMessage(err));
     }
   };
 
   const handleDelete = async (id: string) => {
     if (!showDeleteConfirm || showDeleteConfirm.id !== id) return;
-    // Add specific loading state
     try {
       await deleteUser(id);
       fetchUsers();
       setShowDeleteConfirm(null);
     } catch (err: any) {
-      console.error("Failed to delete user:", err);
-      setError(err.message || "Failed to delete user. Please try again.");
+      logError(err, 'AdminUsersPage deleteUser', {
+        component: 'AdminUsersPage',
+        action: 'deleteUser',
+        userId: id
+      });
+      setError(getUserFriendlyErrorMessage(err));
     }
   };
   

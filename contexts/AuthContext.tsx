@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, ReactNode, useCallback, useEffect } from 'react';
 import { User, UserRole } from '../types';
-import { loginUser as apiLogin, logoutUser as apiLogout, checkSession as apiCheckSession } from '../services/authService'; // Import new service functions
+import { loginUser as apiLogin, logoutUser as apiLogout, checkSession as apiCheckSession, setGlobalLogoutCallback } from '../services/authService'; // Import new service functions
+import { setGlobalLoggingOutState } from '../utils/apiClient';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -8,6 +9,7 @@ interface AuthContextType {
   login: (credentials: { email?: string; password?: string }) => Promise<void>; // Credentials for login
   logout: () => Promise<void>;
   isLoading: boolean; // To handle initial session check
+  isLoggingOut: boolean; // To prevent API calls during logout
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -15,7 +17,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true); // Start with loading true
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false); // Start with loading true
 
   const login = useCallback(async (credentials: { email?: string; password?: string }) => {
     try {
@@ -47,6 +50,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   const logout = useCallback(async () => {
+    setIsLoggingOut(true);
+    setGlobalLoggingOutState(true);
     try {
       await apiLogout();
     } catch (error) {
@@ -55,6 +60,31 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
     setIsAuthenticated(false);
     setUser(null);
+    setIsLoggingOut(false);
+    setGlobalLoggingOutState(false);
+  }, []);
+
+  // Set up global logout callback for automatic logout on auth errors
+  useEffect(() => {
+    const handleGlobalLogout = () => {
+      console.log('Global logout triggered due to authentication error');
+      setIsLoggingOut(true);
+      setGlobalLoggingOutState(true);
+      setIsAuthenticated(false);
+      setUser(null);
+      // Reset logging out state after a brief delay
+      setTimeout(() => {
+        setIsLoggingOut(false);
+        setGlobalLoggingOutState(false);
+      }, 100);
+    };
+
+    setGlobalLogoutCallback(handleGlobalLogout);
+
+    // Cleanup on unmount
+    return () => {
+      setGlobalLogoutCallback(() => {});
+    };
   }, []);
   
   useEffect(() => {
@@ -82,7 +112,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []); // Run once on mount
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, isLoading, isLoggingOut }}>
       {!isLoading ? children : <div className="flex justify-center items-center min-h-screen">Loading Application...</div> /* Or a proper spinner component */}
     </AuthContext.Provider>
   );

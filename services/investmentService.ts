@@ -1,45 +1,22 @@
 import { Investment, InvestmentStatus } from '../types';
-
-// Use backend service URL in production, proxy in development
-const API_BASE_URL = import.meta.env.PROD
-  ? 'https://mega-invest-backend-production.up.railway.app/api'
-  : '/api';
-
-function getAuthHeaders(): HeadersInit {
-  const token = localStorage.getItem('megaInvestToken');
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` })
-  };
-}
-
-// Helper function to handle fetch responses
-async function handleResponse<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ message: response.statusText }));
-    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-  }
-  const result = await response.json();
-  // Handle backend response format {success: true, data: [...]}
-  if (result.success && result.data !== undefined) {
-    return result.data;
-  }
-  return result;
-}
+import { apiClient } from '../utils/apiClient';
 
 export const getInvestments = async (filters?: { status?: InvestmentStatus, category?: string }): Promise<Investment[]> => {
   const queryParams = new URLSearchParams();
   if (filters?.status) queryParams.append('status', filters.status);
   if (filters?.category) queryParams.append('category', filters.category);
-  
-  const response = await fetch(`${API_BASE_URL}/investments?${queryParams.toString()}`);
-  return handleResponse<Investment[]>(response);
+
+  const endpoint = queryParams.toString() ? `/investments?${queryParams.toString()}` : '/investments';
+  return apiClient.get<Investment[]>(endpoint);
 };
 
 export const getInvestmentById = async (id: string): Promise<Investment | undefined> => {
-  const response = await fetch(`${API_BASE_URL}/investments/${id}`);
-  if (response.status === 404) return undefined;
-  return handleResponse<Investment>(response);
+  try {
+    return await apiClient.get<Investment>(`/investments/${id}`);
+  } catch (error: any) {
+    if (error.status === 404) return undefined;
+    throw error;
+  }
 };
 
 export interface CreateInvestmentData extends Omit<Investment, 'id' | 'submissionDate' | 'status' | 'amountRaised' | 'submittedBy' | 'submitterEmail'> {
@@ -59,35 +36,20 @@ export interface CreateInvestmentData extends Omit<Investment, 'id' | 'submissio
 }
 
 export const createInvestment = async (investmentData: CreateInvestmentData): Promise<Investment> => {
-  const response = await fetch(`${API_BASE_URL}/investments`, {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(investmentData),
-  });
-  return handleResponse<Investment>(response);
+  return apiClient.post<Investment>('/investments', investmentData);
 };
 
 export const updateInvestment = async (investmentId: string, updates: Partial<Investment>): Promise<Investment | null> => {
-  const response = await fetch(`${API_BASE_URL}/investments/${investmentId}`, {
-    method: 'PUT',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(updates),
-  });
-  return handleResponse<Investment>(response);
+  return apiClient.put<Investment>(`/investments/${investmentId}`, updates);
 };
 
 export const deleteInvestment = async (id: string): Promise<boolean> => {
-  const response = await fetch(`${API_BASE_URL}/investments/${id}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders()
-  });
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ message: response.statusText }));
-    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+  try {
+    await apiClient.delete<void>(`/investments/${id}`);
+    return true;
+  } catch (error) {
+    throw error;
   }
-  // DELETE typically returns 204 No Content on success, or 200/202 with a body.
-  // Adjust based on your backend's behavior.
-  return response.ok; // Or check for specific status codes
 };
 
 export const approveInvestment = async (id: string): Promise<Investment | null> => {

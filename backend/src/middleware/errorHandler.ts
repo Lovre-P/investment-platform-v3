@@ -51,16 +51,37 @@ export const errorHandler = (
     code = 'INVALID_REFERENCE';
   }
 
-  // Log error in development
-  if (process.env.NODE_ENV === 'development') {
-    console.error('Error:', {
-      message: error.message,
+  // Enhanced error logging
+  const errorLog = {
+    message: error.message,
+    code,
+    statusCode,
+    url: req.url,
+    method: req.method,
+    timestamp: new Date().toISOString(),
+    userAgent: req.headers['user-agent'],
+    ...(process.env.NODE_ENV === 'development' && {
       stack: error.stack,
-      url: req.url,
-      method: req.method,
       body: req.body,
       params: req.params,
       query: req.query
+    })
+  };
+
+  // Log authentication errors specifically
+  if (statusCode === 401) {
+    console.warn('Authentication error:', errorLog);
+  } else if (process.env.NODE_ENV === 'development') {
+    console.error('Error:', errorLog);
+  } else {
+    // In production, log errors without sensitive data
+    console.error('Error:', {
+      message: error.message,
+      code,
+      statusCode,
+      url: req.url,
+      method: req.method,
+      timestamp: errorLog.timestamp
     });
   }
 

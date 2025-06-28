@@ -17,8 +17,30 @@ export const authenticate = (req: Request, _res: Response, next: NextFunction): 
     const token = extractTokenFromHeader(req.headers.authorization);
     const payload = verifyToken(token);
     req.user = payload;
+
+    // Log successful authentication in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Authentication successful:', {
+        userId: payload.userId,
+        role: payload.role,
+        url: req.url,
+        method: req.method,
+        timestamp: new Date().toISOString()
+      });
+    }
+
     next();
   } catch (error) {
+    // Enhanced error logging for authentication failures
+    console.error('Authentication failed:', {
+      error: error instanceof Error ? error.message : String(error),
+      url: req.url,
+      method: req.method,
+      authHeader: req.headers.authorization ? 'present' : 'missing',
+      userAgent: req.headers['user-agent'],
+      timestamp: new Date().toISOString()
+    });
+
     next(new AuthenticationError('Invalid or expired token'));
   }
 };

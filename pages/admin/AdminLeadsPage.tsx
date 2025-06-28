@@ -3,6 +3,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Lead, Investment } from '../../types';
 import { getLeads, updateLeadStatus } from '../../services/leadService';
 import { getInvestments } from '../../services/investmentService'; // To display investment title
+import { logError, getUserFriendlyErrorMessage, withRetry } from '../../utils/errorHandling';
 import Button from '../../components/Button';
 import Modal from '../../components/Modal';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -28,15 +29,22 @@ const AdminLeadsPage: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const [leadsData, investmentsData] = await Promise.all([
-        getLeads(),
-        getInvestments() 
-      ]);
+      const [leadsData, investmentsData] = await withRetry(
+        () => Promise.all([
+          getLeads(),
+          getInvestments()
+        ]),
+        2,
+        'AdminLeadsPage fetchAllData'
+      );
       setLeads(leadsData);
       setInvestments(investmentsData);
     } catch (err) {
-      console.error("Failed to fetch data:", err);
-      setError("Could not load leads or investment data.");
+      logError(err, 'AdminLeadsPage fetchAllData', {
+        component: 'AdminLeadsPage',
+        action: 'fetchAllData'
+      });
+      setError(getUserFriendlyErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
