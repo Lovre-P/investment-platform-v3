@@ -1,4 +1,5 @@
 import { Lead, Investment } from '../types/index.js';
+import nodemailer from 'nodemailer';
 
 interface EmailOptions {
   to: string;
@@ -20,54 +21,99 @@ export class EmailService {
    * Send email notification (currently logs to console for development)
    * In production, this should be replaced with actual email service (SendGrid, AWS SES, etc.)
    */
-  private static async sendEmail(options: EmailOptions): Promise<boolean> {
-    try {
-      // For development: log email content
-      console.log('\n📧 EMAIL NOTIFICATION:');
-      console.log('═══════════════════════════════════════');
-      console.log(`From: ${this.FROM_EMAIL}`);
-      console.log(`To: ${options.to}`);
-      console.log(`Subject: ${options.subject}`);
-      console.log('─────────────────────────────────────');
-      console.log(options.text);
-      console.log('═══════════════════════════════════════\n');
+  private static transporter: nodemailer.Transporter | null = null;
 
-      // TODO: In production, replace with actual email service
-      // Example with SendGrid:
-      // const sgMail = require('@sendgrid/mail');
-      // sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-      // await sgMail.send({
-      //   to: options.to,
-      //   from: this.FROM_EMAIL,
-      //   subject: options.subject,
-      //   text: options.text,
-      //   html: options.html
-      // });
-
-      // Example with Nodemailer (SMTP):
-      // const nodemailer = require('nodemailer');
-      // const transporter = nodemailer.createTransporter({
-      //   host: process.env.SMTP_HOST,
-      //   port: process.env.SMTP_PORT,
-      //   secure: process.env.SMTP_SECURE === 'true',
-      //   auth: {
-      //     user: process.env.SMTP_USER,
-      //     pass: process.env.SMTP_PASS
-      //   }
-      // });
-      // await transporter.sendMail({
-      //   from: this.FROM_EMAIL,
-      //   to: options.to,
-      //   subject: options.subject,
-      //   text: options.text,
-      //   html: options.html
-      // });
-
-      return true;
-    } catch (error) {
-      console.error('Failed to send email:', error);
+  private static validateConfig(): boolean {
+    const required = [
+      'SMTP_HOST',
+      'SMTP_PORT',
+      'SMTP_USER',
+      'SMTP_PASS',
+    ];
+    const missing = required.filter((v) => !process.env[v]);
+    if (missing.length) {
+      console.error(
+        `Email configuration missing: ${missing.join(', ')}`,
+      );
       return false;
     }
+    return true;
+  }
+
+  private static getTransporter(): nodemailer.Transporter | null {
+    if (this.transporter) return this.transporter;
+    if (!this.validateConfig()) return null;
+
+    try {
+      this.transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT),
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+        connectionTimeout: Number(process.env.SMTP_TIMEOUT || '10000'),
+        socketTimeout: Number(process.env.SMTP_TIMEOUT || '10000'),
+      });
+    } catch (err) {
+      console.error('Failed to create email transporter', err);
+      this.transporter = null;
+    }
+
+    return this.transporter;
+  }
+
+  private static isValidEmail(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  private static async sendEmail(options: EmailOptions): Promise<boolean> {
+    if (!this.isValidEmail(options.to)) {
+      console.error('Invalid recipient email address:', options.to);
+      return false;
+    }
+
+    const transporter = this.getTransporter();
+    if (!transporter) return false;
+
+    const maxRetries = Number(process.env.EMAIL_MAX_RETRIES || 3);
+    const delayMs = Number(process.env.EMAIL_RETRY_DELAY || 1000);
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        await transporter.sendMail({
+          from: this.FROM_EMAIL,
+          to: options.to,
+          subject: options.subject,
+          text: options.text,
+          html: options.html,
+        });
+        return true;
+      } catch (err: any) {
+        const code = err?.code || 'UNKNOWN';
+        const message = err?.message || 'Unknown error';
+        console.error(`Email send attempt ${attempt} failed`, {
+          code,
+          message,
+        });
+
+        const networkErrors = [
+          'ECONNECTION',
+          'ETIMEDOUT',
+          'EAI_AGAIN',
+          'ENOTFOUND',
+          'ECONNRESET',
+        ];
+        if (attempt < maxRetries && networkErrors.includes(code)) {
+          await new Promise((r) => setTimeout(r, delayMs));
+          continue;
+        }
+        return false;
+      }
+    }
+
+    return false;
   }
 
   /**
