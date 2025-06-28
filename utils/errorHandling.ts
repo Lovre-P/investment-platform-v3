@@ -15,7 +15,7 @@ export const parseError = (error: unknown): ErrorInfo => {
     return {
       message: error.message,
       isAuthError: error.status === 401,
-      shouldRetry: error.status !== 401 && error.status !== 403,
+      shouldRetry: error.status !== 401 && error.status !== 403 && error.status !== 429, // Don't retry rate limit errors
       code: error.code
     };
   }
@@ -47,6 +47,10 @@ export const getUserFriendlyErrorMessage = (error: unknown): string => {
   
   if (errorInfo.code === 'LOGOUT_IN_PROGRESS') {
     return 'Logout in progress...';
+  }
+
+  if (errorInfo.code === 'RATE_LIMIT_EXCEEDED' || errorInfo.code === 'AUTH_RATE_LIMIT_EXCEEDED') {
+    return 'Too many requests. Please wait a moment and try again.';
   }
 
   if (errorInfo.code === 'NETWORK_ERROR') {
@@ -87,30 +91,33 @@ export const logError = (error: unknown, context: string, additionalInfo?: Recor
 // Retry wrapper for API calls
 export const withRetry = async <T>(
   operation: () => Promise<T>,
-  maxRetries: number = 2,
+  maxRetries: number = 1, // Reduced from 2 to 1 to prevent rate limiting
   context: string = 'API operation'
 ): Promise<T> => {
   let lastError: unknown;
-  
+
   for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
     try {
       return await operation();
     } catch (error) {
       lastError = error;
       const errorInfo = parseError(error);
-      
+
       logError(error, `${context} (attempt ${attempt})`);
-      
-      // Don't retry auth errors or if we've exhausted retries
-      if (errorInfo.isAuthError || attempt > maxRetries || !errorInfo.shouldRetry) {
+
+      // Don't retry auth errors, rate limit errors, or if we've exhausted retries
+      if (errorInfo.isAuthError ||
+          errorInfo.code === 'RATE_LIMIT_EXCEEDED' ||
+          attempt > maxRetries ||
+          !errorInfo.shouldRetry) {
         break;
       }
-      
+
       // Wait before retrying (exponential backoff)
-      const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+      const delay = Math.min(1000 * Math.pow(2, attempt - 1), 3000);
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
-  
+
   throw lastError;
 };

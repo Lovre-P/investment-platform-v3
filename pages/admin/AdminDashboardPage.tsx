@@ -59,7 +59,7 @@ const AdminDashboardPage: React.FC = () => {
             getLeads(),
             getUsers()
           ]),
-          2,
+          0, // No retries for dashboard to prevent rate limiting
           'AdminDashboard data fetch'
         );
 

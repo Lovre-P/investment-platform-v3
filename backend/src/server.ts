@@ -39,10 +39,10 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Rate limiting
-const limiter = rateLimit({
+// Rate limiting - More reasonable limits for admin usage
+const generalLimiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'), // limit each IP to 100 requests per windowMs
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '1000'), // Increased to 1000 requests per 15 minutes (~66/min)
   message: {
     success: false,
     error: {
@@ -52,9 +52,32 @@ const limiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  // Skip rate limiting for authenticated admin users in development
+  skip: (req) => {
+    if (process.env.NODE_ENV === 'development') {
+      return true; // Skip rate limiting in development
+    }
+    return false;
+  }
 });
 
-app.use(limiter);
+// Stricter rate limiting for auth endpoints (login attempts)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // Limit login attempts to 20 per 15 minutes
+  message: {
+    success: false,
+    error: {
+      message: 'Too many login attempts from this IP, please try again later.',
+      code: 'AUTH_RATE_LIMIT_EXCEEDED'
+    }
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Apply general rate limiting to all routes
+app.use(generalLimiter);
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
@@ -77,8 +100,8 @@ app.get('/health', (_req, res) => {
   });
 });
 
-// API routes
-app.use('/api/auth', authRoutes);
+// API routes with specific rate limiting
+app.use('/api/auth', authLimiter, authRoutes); // Apply stricter rate limiting to auth routes
 app.use('/api/investments', investmentRoutes);
 app.use('/api/leads', leadRoutes);
 app.use('/api/users', userRoutes);

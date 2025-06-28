@@ -34,7 +34,7 @@ const AdminLeadsPage: React.FC = () => {
           getLeads(),
           getInvestments()
         ]),
-        2,
+        0, // No retries to prevent rate limiting
         'AdminLeadsPage fetchAllData'
       );
       setLeads(leadsData);

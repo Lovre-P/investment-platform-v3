@@ -7,6 +7,13 @@ export const setGlobalLoggingOutState = (state: boolean) => {
   isLoggingOutGlobal = state;
 };
 
+// Request deduplication to prevent multiple identical requests
+const pendingRequests = new Map<string, Promise<any>>();
+
+const getRequestKey = (endpoint: string, options: RequestInit): string => {
+  return `${options.method || 'GET'}:${endpoint}:${JSON.stringify(options.body || '')}`;
+};
+
 // Use backend service URL in production, proxy in development
 const API_BASE_URL = import.meta.env.PROD
   ? 'https://mega-invest-backend-production.up.railway.app/api'
@@ -124,6 +131,15 @@ async function apiRequest<T>(
     );
   }
 
+  // Request deduplication for GET requests to prevent rate limiting
+  const requestKey = getRequestKey(endpoint, options);
+  const isGetRequest = !options.method || options.method === 'GET';
+
+  if (isGetRequest && pendingRequests.has(requestKey)) {
+    console.log('Deduplicating request:', requestKey);
+    return pendingRequests.get(requestKey);
+  }
+
   const url = `${API_BASE_URL}${endpoint}`;
 
   const requestOptions: RequestInit = {
@@ -134,28 +150,42 @@ async function apiRequest<T>(
     }
   };
 
-  try {
-    const response = await fetch(url, requestOptions);
-    return await handleApiResponse<T>(response);
-  } catch (error) {
-    // Re-throw API errors as-is
-    if (error instanceof ApiClientError) {
-      throw error;
+  const requestPromise = (async () => {
+    try {
+      const response = await fetch(url, requestOptions);
+      return await handleApiResponse<T>(response);
+    } catch (error) {
+      // Re-throw API errors as-is
+      if (error instanceof ApiClientError) {
+        throw error;
+      }
+
+      // Handle network errors
+      console.error('Network error during API request:', {
+        url,
+        error: error instanceof Error ? error.message : String(error),
+        timestamp: new Date().toISOString()
+      });
+
+      throw new ApiClientError(
+        'Network error. Please check your connection and try again.',
+        0,
+        'NETWORK_ERROR'
+      );
+    } finally {
+      // Clean up pending request
+      if (isGetRequest) {
+        pendingRequests.delete(requestKey);
+      }
     }
+  })();
 
-    // Handle network errors
-    console.error('Network error during API request:', {
-      url,
-      error: error instanceof Error ? error.message : String(error),
-      timestamp: new Date().toISOString()
-    });
-
-    throw new ApiClientError(
-      'Network error. Please check your connection and try again.',
-      0,
-      'NETWORK_ERROR'
-    );
+  // Store GET requests for deduplication
+  if (isGetRequest) {
+    pendingRequests.set(requestKey, requestPromise);
   }
+
+  return requestPromise;
 }
 
 // Convenience methods for different HTTP verbs

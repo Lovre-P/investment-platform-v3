@@ -36,7 +36,7 @@ const AdminUsersPage: React.FC = () => {
     try {
       const data = await withRetry(
         () => getUsers(),
-        2,
+        0, // No retries to prevent rate limiting
         'AdminUsersPage fetchUsers'
       );
       setUsers(data);
