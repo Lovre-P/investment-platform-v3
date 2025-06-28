@@ -41,11 +41,11 @@ export class EmailService {
   }
 
   private static getTransporter(): nodemailer.Transporter | null {
-    if (this.transporter) return this.transporter;
-    if (!this.validateConfig()) return null;
+    if (EmailService.transporter) return EmailService.transporter;
+    if (!EmailService.validateConfig()) return null;
 
     try {
-      this.transporter = nodemailer.createTransport({
+      EmailService.transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: Number(process.env.SMTP_PORT),
         secure: process.env.SMTP_SECURE === 'true',
@@ -58,10 +58,10 @@ export class EmailService {
       });
     } catch (err) {
       console.error('Failed to create email transporter', err);
-      this.transporter = null;
+      EmailService.transporter = null;
     }
 
-    return this.transporter;
+    return EmailService.transporter;
   }
 
   private static isValidEmail(email: string): boolean {
@@ -69,12 +69,12 @@ export class EmailService {
   }
 
   private static async sendEmail(options: EmailOptions): Promise<boolean> {
-    if (!this.isValidEmail(options.to)) {
+    if (!EmailService.isValidEmail(options.to)) {
       console.error('Invalid recipient email address:', options.to);
       return false;
     }
 
-    const transporter = this.getTransporter();
+    const transporter = EmailService.getTransporter();
     if (!transporter) return false;
 
     const maxRetries = Number(process.env.EMAIL_MAX_RETRIES || 3);
@@ -83,7 +83,7 @@ export class EmailService {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         await transporter.sendMail({
-          from: this.FROM_EMAIL,
+          from: EmailService.FROM_EMAIL,
           to: options.to,
           subject: options.subject,
           text: options.text,

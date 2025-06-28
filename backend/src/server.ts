@@ -20,7 +20,12 @@ import { testConnection, closePool } from './database/config.js';
 // Load environment variables
 dotenv.config();
 
-if (!process.env.SMTP_HOST || !process.env.SMTP_PASS) {
+if (
+  !process.env.SMTP_HOST ||
+  !process.env.SMTP_PORT ||
+  !process.env.SMTP_USER ||
+  !process.env.SMTP_PASS
+) {
   console.warn('Email service not configured - emails will fail');
 }
 
