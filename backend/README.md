@@ -71,7 +71,7 @@ The API will be available at `http://localhost:3001`
 ### Investments (`/api/investments`)
 - `GET /` - List investments (public, with filters)
 - `GET /:id` - Get investment by ID (public)
-- `POST /` - Create investment (admin only)
+- `POST /` - Create investment (public, pending admin approval)
 - `PUT /:id` - Update investment (admin only)
 - `DELETE /:id` - Delete investment (admin only)
 
