@@ -1,10 +1,23 @@
 import { Router } from 'express';
+import rateLimit from 'express-rate-limit';
 import { InvestmentController } from '../controllers/investmentController.js';
 import { authenticate, requireAdmin } from '../middleware/auth.js';
 import { validateBody, validateQuery } from '../middleware/validation.js';
 import { createInvestmentSchema, updateInvestmentSchema, investmentFiltersSchema } from '../utils/validation.js';
 
 const router = Router();
+
+// Limit public investment submissions to prevent abuse
+const submitInvestmentLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // max 5 submissions per window
+  message: {
+    success: false,
+    error: { message: 'Too many investment submissions, please try again later.' }
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 // GET /api/investments - Public endpoint with optional filters
 router.get('/', 
@@ -19,6 +32,7 @@ router.get('/:id',
 
 // POST /api/investments - Public endpoint to submit new investments
 router.post('/',
+  submitInvestmentLimiter,
   validateBody(createInvestmentSchema),
   InvestmentController.createInvestment
 );

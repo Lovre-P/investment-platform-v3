@@ -52,6 +52,8 @@ export class InvestmentController {
   static async createInvestment(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const investmentData: CreateInvestmentData = req.body;
+      const identifier = req.user?.userId ?? req.ip;
+      console.log(`New investment submission from ${identifier}`);
       const investment = await InvestmentModel.create(investmentData);
 
       res.status(201).json({
