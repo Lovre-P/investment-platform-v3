@@ -90,6 +90,7 @@ The admin login button is hidden from the public navigation for security. To acc
 ### Public Endpoints
 - `GET /api/investments` - List investments
 - `GET /api/investments/:id` - Get investment details
+- `POST /api/investments` - Submit investment proposal
 - `POST /api/leads` - Submit contact form
 
 ### Admin Endpoints (Authentication Required)

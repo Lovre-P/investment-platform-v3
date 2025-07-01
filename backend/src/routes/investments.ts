@@ -17,10 +17,8 @@ router.get('/:id',
   InvestmentController.getInvestmentById
 );
 
-// POST /api/investments - Admin only
-router.post('/', 
-  authenticate,
-  requireAdmin,
+// POST /api/investments - Public endpoint to submit new investments
+router.post('/',
   validateBody(createInvestmentSchema),
   InvestmentController.createInvestment
 );
