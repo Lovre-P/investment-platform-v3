@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Investment, InvestmentStatus } from '../../types';
-import { getInvestments, createInvestment, updateInvestment, deleteInvestment } from '../../services/investmentService';
+import { getInvestments, createInvestment, createInvestmentWithFiles, updateInvestment, deleteInvestment } from '../../services/investmentService';
 import Button from '../../components/Button';
 import Modal from '../../components/Modal';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -225,7 +225,11 @@ const AdminInvestmentsPage: React.FC = () => {
         // For create, ensure it matches CreateInvestmentData from service
         // The 'id' is already removed. We need to ensure all required fields for create are present.
         const { id, ...createData } = investmentDataForApi;
-        await createInvestment(createData as any); // Cast if type mismatch with service due to Omit differences
+        if (currentInvestment.imageFiles && currentInvestment.imageFiles.length > 0) {
+          await createInvestmentWithFiles(createData as any, currentInvestment.imageFiles);
+        } else {
+          await createInvestment(createData as any); // Cast if type mismatch with service due to Omit differences
+        }
       }
       fetchInvestments(); 
       handleCloseModal();

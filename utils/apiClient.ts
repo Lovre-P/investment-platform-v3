@@ -38,7 +38,7 @@ class ApiClientError extends Error implements ApiError {
 }
 
 // Get authentication headers with token validation
-function getAuthHeaders(): HeadersInit {
+function getAuthHeaders(isMultipart = false): HeadersInit {
   const token = localStorage.getItem('megaInvestToken');
   
   if (token && isTokenExpired(token)) {
@@ -49,10 +49,15 @@ function getAuthHeaders(): HeadersInit {
     };
   }
   
-  return {
-    'Content-Type': 'application/json',
+  const headers: HeadersInit = {
     ...(token && { 'Authorization': `Bearer ${token}` })
   };
+
+  if (!isMultipart) {
+    headers['Content-Type'] = 'application/json';
+  }
+
+  return headers;
 }
 
 // Enhanced response handler with authentication error detection
@@ -142,10 +147,12 @@ async function apiRequest<T>(
 
   const url = `${API_BASE_URL}${endpoint}`;
 
+  const isMultipart = typeof FormData !== 'undefined' && options.body instanceof FormData;
+
   const requestOptions: RequestInit = {
     ...options,
     headers: {
-      ...getAuthHeaders(),
+      ...getAuthHeaders(isMultipart),
       ...options.headers
     }
   };
@@ -209,13 +216,21 @@ export const apiClient = {
   post: <T>(endpoint: string, data?: any): Promise<T> =>
     apiRequest<T>(endpoint, {
       method: 'POST',
-      body: data ? JSON.stringify(data) : undefined
+      body: data
+        ? data instanceof FormData
+          ? data
+          : JSON.stringify(data)
+        : undefined
     }),
 
   put: <T>(endpoint: string, data?: any): Promise<T> =>
     apiRequest<T>(endpoint, {
       method: 'PUT',
-      body: data ? JSON.stringify(data) : undefined
+      body: data
+        ? data instanceof FormData
+          ? data
+          : JSON.stringify(data)
+        : undefined
     }),
 
   delete: <T>(endpoint: string): Promise<T> =>
