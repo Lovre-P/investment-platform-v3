@@ -13,6 +13,7 @@ import userRoutes from './routes/users.js';
 
 // Import middleware
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
+import { secureStaticFiles } from './middleware/secureStatic.js';
 
 // Import database
 import { testConnection, closePool } from './database/config.js';
@@ -31,6 +32,7 @@ if (
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const uploadDir = process.env.UPLOAD_DIR || 'uploads';
 
 // Trust proxy for Railway/production deployment
 if (process.env.NODE_ENV === 'production') {
@@ -91,6 +93,9 @@ app.use(generalLimiter);
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Secure static file serving middleware
+app.use(`/${uploadDir}`, secureStaticFiles(uploadDir));
 
 // Logging middleware
 if (process.env.NODE_ENV === 'development') {

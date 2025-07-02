@@ -39,6 +39,27 @@ export const createInvestment = async (investmentData: CreateInvestmentData): Pr
   return apiClient.post<Investment>('/investments', investmentData);
 };
 
+export const createInvestmentWithFiles = async (
+  investmentData: Omit<CreateInvestmentData, 'images'>,
+  imageFiles: FileList
+): Promise<Investment> => {
+  const formData = new FormData();
+
+  Object.entries(investmentData).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      value.forEach(v => formData.append(key, String(v)));
+    } else if (value !== undefined && value !== null) {
+      formData.append(key, String(value));
+    }
+  });
+
+  Array.from(imageFiles).forEach(file => {
+    formData.append('images', file);
+  });
+
+  return apiClient.post<Investment>('/investments', formData);
+};
+
 export const updateInvestment = async (investmentId: string, updates: Partial<Investment>): Promise<Investment | null> => {
   return apiClient.put<Investment>(`/investments/${investmentId}`, updates);
 };
