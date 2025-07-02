@@ -25,3 +25,4 @@ dist-ssr
 backend/.env
 backend/fly.toml
 RENDER_DEPLOYMENT_GUIDE.md
+backend/uploads/
