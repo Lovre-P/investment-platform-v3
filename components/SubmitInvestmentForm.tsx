@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Button from './Button';
 import FileUpload from './FileUpload';
 import { Investment } from '../types';
-import { createInvestment } from '../services/investmentService'; // Mock service
+import { createInvestment, createInvestmentWithFiles } from '../services/investmentService';
 
 // Updated form data type
 type InvestmentFormData = Omit<Investment, 'id' | 'status' | 'submissionDate' | 'amountRaised' | 'images' | 'submittedBy' | 'submitterEmail' | 'tags'> & {
@@ -94,21 +94,15 @@ const SubmitInvestmentForm: React.FC = () => {
     setSubmitStatus(null);
     setFormErrors({});
 
-    const imageUrls = formData.imageFiles 
-      ? Array.from(formData.imageFiles).map(file => URL.createObjectURL(file)) // temporary local URLs
-      : ['https://picsum.photos/seed/default/400/300'];
-
-    // Map formData to the structure expected by createInvestment
-    const newInvestmentData = {
+    const baseData = {
       title: formData.title,
       description: formData.description,
       longDescription: formData.longDescription,
       amountGoal: formData.amountGoal,
       currency: formData.currency,
-      images: imageUrls,
       category: formData.category,
-      submittedBy: formData.submitterName, // Map submitterName to submittedBy
-      submitterEmail: formData.submitterEmail, // Pass submitterEmail
+      submittedBy: formData.submitterName,
+      submitterEmail: formData.submitterEmail,
       apyRange: formData.apyRange,
       minInvestment: formData.minInvestment,
       term: formData.term,
@@ -117,8 +111,18 @@ const SubmitInvestmentForm: React.FC = () => {
         : Array.isArray(formData.tags) ? formData.tags : [],
     };
 
+    const imageUrls = formData.imageFiles
+      ? Array.from(formData.imageFiles).map(file => URL.createObjectURL(file)) // temporary local URLs for preview
+      : ['https://picsum.photos/seed/default/400/300'];
+
+    const jsonPayload = { ...baseData, images: imageUrls };
+
     try {
-      await createInvestment(newInvestmentData);
+      if (formData.imageFiles && formData.imageFiles.length > 0) {
+        await createInvestmentWithFiles(baseData, formData.imageFiles);
+      } else {
+        await createInvestment(jsonPayload);
+      }
       setSubmitStatus({ type: 'success', message: 'Investment submitted successfully! It will be reviewed by our team.' });
       setFormData(initialFormData);
     } catch (error) {
