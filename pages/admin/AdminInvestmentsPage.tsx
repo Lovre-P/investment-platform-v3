@@ -11,10 +11,11 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { PUBLIC_ROUTES } from '../../constants';
 
 // InvestmentFormData for the admin modal
-type InvestmentFormData = Omit<Investment, 'id' | 'submissionDate' | 'images'> & {
+type InvestmentFormData = Omit<Investment, 'id' | 'submissionDate' | 'images' | 'tags'> & {
   id?: string;
-  images?: string[] | string;
+  images?: string[];
   imageFiles?: FileList | null;
+  tags?: string; // Store as string during form editing
 };
 
 const initialFormData: InvestmentFormData = {
@@ -33,7 +34,7 @@ const initialFormData: InvestmentFormData = {
   apyRange: '',
   minInvestment: 0,
   term: '',
-  tags: [] // Should be array of strings
+  tags: '' // Store as string during form editing
 };
 
 const AdminInvestmentsPage: React.FC = () => {
@@ -144,7 +145,13 @@ const AdminInvestmentsPage: React.FC = () => {
 
   const handleOpenModal = (investment?: Investment) => {
     if (investment) {
-      setCurrentInvestment({ ...investment }); // Spread all fields from Investment
+      // Convert arrays to strings for form editing
+      const investmentForEditing = {
+        ...investment,
+        tags: Array.isArray(investment.tags) ? investment.tags.join(', ') : (investment.tags || ''),
+        images: Array.isArray(investment.images) ? investment.images : []
+      };
+      setCurrentInvestment(investmentForEditing);
       setIsEditing(true);
       setSearchParams({ edit: investment.id });
     } else {
@@ -528,7 +535,7 @@ const AdminInvestmentsPage: React.FC = () => {
                     </div>
                     <div>
                         <label htmlFor="tags-modal">Tags (comma-separated)</label>
-                        <input type="text" name="tags" id="tags-modal" value={Array.isArray(currentInvestment.tags) ? currentInvestment.tags.join(', ') : currentInvestment.tags} onChange={handleChange} className="form-input" placeholder="tech, startup, eco-friendly, real-estate"/>
+                        <input type="text" name="tags" id="tags-modal" value={currentInvestment.tags || ''} onChange={handleChange} className="form-input" placeholder="tech, startup, eco-friendly, real-estate"/>
                     </div>
                 </div>
             </div>

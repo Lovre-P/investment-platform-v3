@@ -6,11 +6,12 @@ import { Investment } from '../types';
 import { createInvestment } from '../services/investmentService'; // Mock service
 
 // Updated form data type
-type InvestmentFormData = Omit<Investment, 'id' | 'status' | 'submissionDate' | 'amountRaised' | 'images' | 'submittedBy' | 'submitterEmail'> & {
+type InvestmentFormData = Omit<Investment, 'id' | 'status' | 'submissionDate' | 'amountRaised' | 'images' | 'submittedBy' | 'submitterEmail' | 'tags'> & {
   imageFiles?: FileList | null;
   submitterName: string;
   submitterEmail: string;
   agreeToTerms: boolean;
+  tags: string[] | string; // Allow both string (for input) and array (for submission)
 };
 
 const initialFormData: InvestmentFormData = {
@@ -25,7 +26,7 @@ const initialFormData: InvestmentFormData = {
   apyRange: '',
   minInvestment: 0,
   term: '',
-  tags: [],
+  tags: '', // Store as string to allow comma input
   imageFiles: null,
   agreeToTerms: false, // New field
 };
@@ -67,8 +68,8 @@ const SubmitInvestmentForm: React.FC = () => {
     } else if (type === 'number') {
       setFormData(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
     } else if (name === "tags") {
-        const tagsValue = (e.target as HTMLInputElement).value;
-        setFormData(prev => ({ ...prev, tags: tagsValue.split(',').map(tag => tag.trim()).filter(tag => tag) }));
+        // Store tags as string to allow comma input - conversion to array happens during submission
+        setFormData(prev => ({ ...prev, tags: value }));
     }
     else {
       setFormData(prev => ({ ...prev, [name]: value }));
@@ -111,7 +112,9 @@ const SubmitInvestmentForm: React.FC = () => {
       apyRange: formData.apyRange,
       minInvestment: formData.minInvestment,
       term: formData.term,
-      tags: formData.tags,
+      tags: typeof formData.tags === 'string'
+        ? formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
+        : Array.isArray(formData.tags) ? formData.tags : [],
     };
 
     try {
@@ -256,7 +259,7 @@ const SubmitInvestmentForm: React.FC = () => {
         <div className="space-y-6">
           <div>
             <label htmlFor="tags" className="block text-sm font-semibold text-secondary-700 mb-2">Tags (comma-separated)</label>
-            <input type="text" name="tags" id="tags" value={formData.tags?.join(', ')} onChange={handleChange} className="form-input" placeholder="e.g., startup, green tech, high growth, sustainable"/>
+            <input type="text" name="tags" id="tags" value={typeof formData.tags === 'string' ? formData.tags : (Array.isArray(formData.tags) ? formData.tags.join(', ') : '')} onChange={handleChange} className="form-input" placeholder="e.g., startup, green tech, high growth, sustainable"/>
             <p className="text-xs text-secondary-500 mt-1">Add relevant keywords to help investors find your project</p>
           </div>
 
