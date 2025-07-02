@@ -13,6 +13,7 @@ import userRoutes from './routes/users.js';
 
 // Import middleware
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
+import { secureStaticFiles } from './middleware/secureStatic.js';
 
 // Import database
 import { testConnection, closePool } from './database/config.js';
@@ -93,8 +94,8 @@ app.use(generalLimiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Serve uploaded files
-app.use(`/${uploadDir}`, express.static(uploadDir));
+// Secure static file serving middleware
+app.use(`/${uploadDir}`, secureStaticFiles(uploadDir));
 
 // Logging middleware
 if (process.env.NODE_ENV === 'development') {

@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Investment, InvestmentStatus } from '../../types';
-import { getInvestments, createInvestment, createInvestmentWithFiles, updateInvestment, deleteInvestment } from '../../services/investmentService';
+import { getInvestments, createInvestment, createInvestmentWithFiles, updateInvestment, deleteInvestment, CreateInvestmentData } from '../../services/investmentService';
 import Button from '../../components/Button';
 import Modal from '../../components/Modal';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -224,11 +224,31 @@ const AdminInvestmentsPage: React.FC = () => {
       } else {
         // For create, ensure it matches CreateInvestmentData from service
         // The 'id' is already removed. We need to ensure all required fields for create are present.
-        const { id, ...createData } = investmentDataForApi;
+        const { id, imageFiles, ...createDataBase } = investmentDataForApi;
+
+        // Construct properly typed create data
+        const createData: CreateInvestmentData = {
+          title: createDataBase.title,
+          description: createDataBase.description,
+          longDescription: createDataBase.longDescription,
+          amountGoal: createDataBase.amountGoal,
+          currency: createDataBase.currency,
+          images: createDataBase.images,
+          category: createDataBase.category,
+          submittedBy: createDataBase.submittedBy,
+          submitterEmail: createDataBase.submitterEmail || 'admin@megainvest.com',
+          apyRange: createDataBase.apyRange,
+          minInvestment: createDataBase.minInvestment,
+          term: createDataBase.term,
+          tags: createDataBase.tags
+        };
+
         if (currentInvestment.imageFiles && currentInvestment.imageFiles.length > 0) {
-          await createInvestmentWithFiles(createData as any, currentInvestment.imageFiles);
+          // For createInvestmentWithFiles, we need to omit images from createData
+          const { images, ...createDataWithoutImages } = createData;
+          await createInvestmentWithFiles(createDataWithoutImages, currentInvestment.imageFiles);
         } else {
-          await createInvestment(createData as any); // Cast if type mismatch with service due to Omit differences
+          await createInvestment(createData);
         }
       }
       fetchInvestments(); 
