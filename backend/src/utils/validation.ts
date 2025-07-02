@@ -30,7 +30,7 @@ export const createInvestmentSchema = z.object({
   longDescription: z.string().min(1),
   amountGoal: z.number().positive(),
   currency: z.string().min(3).max(10),
-  images: z.array(z.string().url()),
+  images: z.array(z.string().url()).optional(),
   category: z.string().min(1).max(100),
   submittedBy: z.string().min(1).max(255),
   submitterEmail: z.string().email(),

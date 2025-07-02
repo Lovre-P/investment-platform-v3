@@ -3,6 +3,7 @@ import rateLimit from 'express-rate-limit';
 import { InvestmentController } from '../controllers/investmentController.js';
 import { authenticate, requireAdmin } from '../middleware/auth.js';
 import { validateBody, validateQuery } from '../middleware/validation.js';
+import upload from '../middleware/upload.js';
 import { createInvestmentSchema, updateInvestmentSchema, investmentFiltersSchema } from '../utils/validation.js';
 
 const router = Router();
@@ -33,6 +34,7 @@ router.get('/:id',
 // POST /api/investments - Public endpoint to submit new investments
 router.post('/',
   submitInvestmentLimiter,
+  upload.array('images', 5),
   validateBody(createInvestmentSchema),
   InvestmentController.createInvestment
 );
@@ -41,6 +43,7 @@ router.post('/',
 router.put('/:id',
   authenticate,
   requireAdmin,
+  upload.array('images', 5),
   validateBody(updateInvestmentSchema),
   InvestmentController.updateInvestment
 );

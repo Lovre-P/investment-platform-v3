@@ -31,6 +31,7 @@ if (
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const uploadDir = process.env.UPLOAD_DIR || 'uploads';
 
 // Trust proxy for Railway/production deployment
 if (process.env.NODE_ENV === 'production') {
@@ -91,6 +92,9 @@ app.use(generalLimiter);
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Serve uploaded files
+app.use(`/${uploadDir}`, express.static(uploadDir));
 
 // Logging middleware
 if (process.env.NODE_ENV === 'development') {

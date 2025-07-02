@@ -71,8 +71,8 @@ The API will be available at `http://localhost:3001`
 ### Investments (`/api/investments`)
 - `GET /` - List investments (public, with filters)
 - `GET /:id` - Get investment by ID (public)
-- `POST /` - Create investment (public, pending admin approval)
-- `PUT /:id` - Update investment (admin only)
+- `POST /` - Create investment (public, pending admin approval, supports `multipart/form-data` with `images` files)
+- `PUT /:id` - Update investment (admin only, supports `multipart/form-data` with `images` files)
 - `DELETE /:id` - Delete investment (admin only)
 
 ### Leads (`/api/leads`)
@@ -119,6 +119,9 @@ FRONTEND_URL=http://localhost:5173
 # Rate Limiting
 RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX_REQUESTS=100
+# File Uploads
+MAX_FILE_SIZE=5242880
+UPLOAD_DIR=uploads
 ```
 
 ## Scripts
