@@ -54,7 +54,12 @@ npm run db:migrate  # Create tables
 npm run db:seed     # Add sample data
 ```
 
-4. Start the development server:
+4. Create the uploads directory (required if you enable file uploads):
+```bash
+mkdir -p uploads
+```
+
+5. Start the development server:
 ```bash
 npm run dev
 ```
@@ -119,6 +124,10 @@ FRONTEND_URL=http://localhost:5173
 # Rate Limiting
 RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX_REQUESTS=100
+
+# File Uploads
+MAX_FILE_SIZE=5242880  # Maximum upload size in bytes (5MB default)
+UPLOAD_DIR=uploads    # Directory where uploaded files are stored
 ```
 
 ## Scripts

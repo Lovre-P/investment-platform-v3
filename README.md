@@ -119,6 +119,13 @@ DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=your-password
 DB_NAME=megainvest
+MAX_FILE_SIZE=5242880  # maximum upload size in bytes
+UPLOAD_DIR=uploads    # directory for storing uploaded files
+```
+
+Create the uploads directory before running the backend if you plan to allow file uploads:
+```bash
+mkdir -p backend/uploads
 ```
 
 ### Database Setup
