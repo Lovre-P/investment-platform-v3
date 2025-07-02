@@ -456,12 +456,41 @@ const AdminInvestmentsPage: React.FC = () => {
                             <input type="number" name="amountGoal" id="amountGoal-modal" value={currentInvestment.amountGoal} onChange={handleChange} required className="form-input" placeholder="100000" min="1000"/>
                         </div>
                         <div>
+                            <label htmlFor="amountRaised-modal">Amount Raised</label>
+                            <input type="number" name="amountRaised" id="amountRaised-modal" value={currentInvestment.amountRaised || 0} onChange={handleChange} className="form-input" placeholder="0" min="0"/>
+                            <p className="text-xs text-secondary-500 mt-1">Current amount invested by users</p>
+                        </div>
+                        <div>
                             <label htmlFor="currency-modal">Currency *</label>
                             <input type="text" name="currency" id="currency-modal" value={currentInvestment.currency} onChange={handleChange} required className="form-input" maxLength={3} placeholder="EUR"/>
                         </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label htmlFor="minInvestment-modal">Minimum Investment</label>
                             <input type="number" name="minInvestment" id="minInvestment-modal" value={currentInvestment.minInvestment || 0} onChange={handleChange} className="form-input" placeholder="10000" min="0"/>
+                        </div>
+                        <div className="flex items-center space-x-4 pt-6">
+                            <div className="text-sm text-secondary-600">
+                                <span className="font-medium">Progress:</span>
+                                <span className="ml-2">
+                                    {currentInvestment.amountGoal > 0
+                                        ? `${Math.round(((currentInvestment.amountRaised || 0) / currentInvestment.amountGoal) * 100)}%`
+                                        : '0%'
+                                    }
+                                </span>
+                            </div>
+                            <div className="flex-1 bg-secondary-200 rounded-full h-2">
+                                <div
+                                    className="bg-primary-500 h-2 rounded-full transition-all duration-300"
+                                    style={{
+                                        width: currentInvestment.amountGoal > 0
+                                            ? `${Math.min(((currentInvestment.amountRaised || 0) / currentInvestment.amountGoal) * 100, 100)}%`
+                                            : '0%'
+                                    }}
+                                ></div>
+                            </div>
                         </div>
                     </div>
 

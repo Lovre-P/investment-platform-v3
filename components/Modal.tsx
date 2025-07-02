@@ -1,5 +1,5 @@
 
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useEffect, useRef } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 
 interface ModalProps {
@@ -19,6 +19,9 @@ const Modal: React.FC<ModalProps> = ({
   size = 'md',
   footer
 }) => {
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const mouseDownTargetRef = useRef<EventTarget | null>(null);
+
   // Lock body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -45,6 +48,22 @@ const Modal: React.FC<ModalProps> = ({
     }
   }, [isOpen, onClose]);
 
+  // Handle proper backdrop click (only close if mousedown and mouseup both happen on backdrop)
+  const handleMouseDown = (e: React.MouseEvent) => {
+    mouseDownTargetRef.current = e.target;
+  };
+
+  const handleMouseUp = (e: React.MouseEvent) => {
+    // Only close if both mousedown and mouseup happened on the backdrop (not inside modal)
+    if (
+      mouseDownTargetRef.current === e.target &&
+      e.target === backdropRef.current
+    ) {
+      onClose();
+    }
+    mouseDownTargetRef.current = null;
+  };
+
   if (!isOpen) return null;
 
   const sizeClasses = {
@@ -56,8 +75,10 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
+      ref={backdropRef}
       className="fixed bg-black bg-opacity-50 backdrop-blur-sm flex items-start justify-center transition-opacity duration-300 ease-in-out"
-      onClick={onClose} // Close on backdrop click
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? "modal-title" : undefined}
