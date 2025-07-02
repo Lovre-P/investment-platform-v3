@@ -19,28 +19,53 @@ export const getInvestmentById = async (id: string): Promise<Investment | undefi
   }
 };
 
-export interface CreateInvestmentData extends Omit<Investment, 'id' | 'submissionDate' | 'status' | 'amountRaised' | 'submittedBy' | 'submitterEmail'> {
+export interface CreateInvestmentData extends Omit<Investment, 'id' | 'submissionDate' | 'status' | 'amountRaised'> {
   submittedBy: string;
   submitterEmail: string;
-  title: string;
-  description: string;
-  longDescription: string;
-  amountGoal: number;
-  currency: string;
-  images: string[];
-  category: string;
-  apyRange?: string;
-  minInvestment?: number;
-  term?: string;
-  tags?: string[];
+  imageFiles?: FileList | File[] | null;
 }
 
 export const createInvestment = async (investmentData: CreateInvestmentData): Promise<Investment> => {
-  return apiClient.post<Investment>('/investments', investmentData);
+  const formData = new FormData();
+  Object.entries(investmentData).forEach(([key, value]) => {
+    if (key === 'imageFiles' || value === undefined || value === null) return;
+    if (key === 'tags' && Array.isArray(value)) {
+      formData.append('tags', value.join(','));
+    } else {
+      formData.append(key, String(value));
+    }
+  });
+
+  if (investmentData.imageFiles) {
+    Array.from(investmentData.imageFiles).forEach(file => {
+      formData.append('images', file);
+    });
+  }
+
+  return apiClient.post<Investment>('/investments', formData);
 };
 
-export const updateInvestment = async (investmentId: string, updates: Partial<Investment>): Promise<Investment | null> => {
-  return apiClient.put<Investment>(`/investments/${investmentId}`, updates);
+export const updateInvestment = async (
+  investmentId: string,
+  updates: Partial<Investment> & { imageFiles?: FileList | File[] | null }
+): Promise<Investment | null> => {
+  const formData = new FormData();
+  Object.entries(updates).forEach(([key, value]) => {
+    if (key === 'imageFiles' || value === undefined || value === null) return;
+    if (key === 'tags' && Array.isArray(value)) {
+      formData.append('tags', value.join(','));
+    } else {
+      formData.append(key, String(value));
+    }
+  });
+
+  if (updates.imageFiles) {
+    Array.from(updates.imageFiles).forEach(file => {
+      formData.append('images', file);
+    });
+  }
+
+  return apiClient.put<Investment>(`/investments/${investmentId}`, formData);
 };
 
 export const deleteInvestment = async (id: string): Promise<boolean> => {

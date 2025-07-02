@@ -4,6 +4,8 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
+import path from 'path';
+import fs from 'fs';
 
 // Import routes
 import authRoutes from './routes/auth.js';
@@ -31,6 +33,10 @@ if (
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const uploadDir = process.env.UPLOAD_DIR || 'uploads';
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 // Trust proxy for Railway/production deployment
 if (process.env.NODE_ENV === 'production') {
@@ -91,6 +97,7 @@ app.use(generalLimiter);
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use('/uploads', express.static(path.resolve(uploadDir)));
 
 // Logging middleware
 if (process.env.NODE_ENV === 'development') {

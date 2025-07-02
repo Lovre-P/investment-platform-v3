@@ -38,21 +38,24 @@ class ApiClientError extends Error implements ApiError {
 }
 
 // Get authentication headers with token validation
-function getAuthHeaders(): HeadersInit {
+function getAuthHeaders(isFormData = false): HeadersInit {
   const token = localStorage.getItem('megaInvestToken');
-  
+
   if (token && isTokenExpired(token)) {
     console.warn('Token expired during request preparation, clearing auth state');
     clearAuthState();
-    return {
-      'Content-Type': 'application/json'
-    };
+    const headers: HeadersInit = {};
+    if (!isFormData) headers['Content-Type'] = 'application/json';
+    return headers;
   }
-  
-  return {
-    'Content-Type': 'application/json',
+
+  const headers: HeadersInit = {
     ...(token && { 'Authorization': `Bearer ${token}` })
   };
+  if (!isFormData) {
+    headers['Content-Type'] = 'application/json';
+  }
+  return headers;
 }
 
 // Enhanced response handler with authentication error detection
@@ -145,7 +148,7 @@ async function apiRequest<T>(
   const requestOptions: RequestInit = {
     ...options,
     headers: {
-      ...getAuthHeaders(),
+      ...getAuthHeaders(options.body instanceof FormData),
       ...options.headers
     }
   };
@@ -209,13 +212,13 @@ export const apiClient = {
   post: <T>(endpoint: string, data?: any): Promise<T> =>
     apiRequest<T>(endpoint, {
       method: 'POST',
-      body: data ? JSON.stringify(data) : undefined
+      body: data instanceof FormData ? data : data ? JSON.stringify(data) : undefined
     }),
 
   put: <T>(endpoint: string, data?: any): Promise<T> =>
     apiRequest<T>(endpoint, {
       method: 'PUT',
-      body: data ? JSON.stringify(data) : undefined
+      body: data instanceof FormData ? data : data ? JSON.stringify(data) : undefined
     }),
 
   delete: <T>(endpoint: string): Promise<T> =>

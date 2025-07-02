@@ -121,6 +121,15 @@ RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX_REQUESTS=100
 ```
 
+### File Uploads
+
+```
+MAX_FILE_SIZE=5242880
+UPLOAD_DIR=uploads
+```
+Set `MAX_FILE_SIZE` (in bytes) to control the maximum upload size and
+`UPLOAD_DIR` for the directory where uploaded images are stored.
+
 ## Scripts
 
 - `npm run dev` - Start development server with hot reload

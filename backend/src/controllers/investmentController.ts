@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { InvestmentModel, InvestmentFilters } from '../models/Investment.js';
 import { NotFoundError } from '../utils/errors.js';
-import { CreateInvestmentData } from '../types/index.js';
+import { CreateInvestmentData, Investment } from '../types/index.js';
 
 export class InvestmentController {
   static async getInvestments(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -51,7 +51,12 @@ export class InvestmentController {
 
   static async createInvestment(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const investmentData: CreateInvestmentData = req.body;
+      const files = (req.files as Express.Multer.File[]) || [];
+      const imageUrls = files.map(f => `/uploads/${f.filename}`);
+      const investmentData: CreateInvestmentData = {
+        ...(req.body as any),
+        images: imageUrls
+      };
       const identifier = req.user?.userId ?? req.ip;
       console.log(`New investment submission from ${identifier}`);
       const investment = await InvestmentModel.create(investmentData);
@@ -68,7 +73,16 @@ export class InvestmentController {
   static async updateInvestment(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
-      const updates = req.body;
+      const files = (req.files as Express.Multer.File[]) || [];
+      const newImages = files.map(f => `/uploads/${f.filename}`);
+      const updates: Partial<Investment> = {
+        ...(req.body as any)
+      };
+      if (newImages.length) {
+        updates.images = Array.isArray(updates.images)
+          ? [...updates.images, ...newImages]
+          : newImages;
+      }
 
       const investment = await InvestmentModel.update(id, updates);
 

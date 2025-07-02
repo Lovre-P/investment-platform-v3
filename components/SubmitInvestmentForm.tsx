@@ -94,18 +94,13 @@ const SubmitInvestmentForm: React.FC = () => {
     setSubmitStatus(null);
     setFormErrors({});
 
-    const imageUrls = formData.imageFiles 
-      ? Array.from(formData.imageFiles).map(file => URL.createObjectURL(file)) // temporary local URLs
-      : ['https://picsum.photos/seed/default/400/300'];
-
-    // Map formData to the structure expected by createInvestment
     const newInvestmentData = {
       title: formData.title,
       description: formData.description,
       longDescription: formData.longDescription,
       amountGoal: formData.amountGoal,
       currency: formData.currency,
-      images: imageUrls,
+      imageFiles: formData.imageFiles || undefined,
       category: formData.category,
       submittedBy: formData.submitterName, // Map submitterName to submittedBy
       submitterEmail: formData.submitterEmail, // Pass submitterEmail

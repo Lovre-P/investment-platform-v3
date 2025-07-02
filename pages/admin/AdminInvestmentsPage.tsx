@@ -201,10 +201,8 @@ const AdminInvestmentsPage: React.FC = () => {
         tags: typeof currentInvestment.tags === 'string'
           ? currentInvestment.tags.split(',').map(t => t.trim()).filter(t => t)
           : Array.isArray(currentInvestment.tags) ? currentInvestment.tags : [],
-        // Handle image files - convert to temporary URLs for now (backend integration needed)
-        images: currentInvestment.imageFiles && currentInvestment.imageFiles.length > 0
-          ? Array.from(currentInvestment.imageFiles).map(file => URL.createObjectURL(file))
-          : Array.isArray(currentInvestment.images) ? currentInvestment.images : [],
+        imageFiles: currentInvestment.imageFiles || undefined,
+        images: Array.isArray(currentInvestment.images) ? currentInvestment.images : [],
         // Handle empty email - set to a default if empty for create operations
         submitterEmail: currentInvestment.submitterEmail?.trim() || (isEditing ? currentInvestment.submitterEmail : 'admin@megainvest.com'),
     };
@@ -220,7 +218,7 @@ const AdminInvestmentsPage: React.FC = () => {
         // because `InvestmentFormData` (the type of `currentInvestment`) omits them.
         // Only `id` needs to be destructured out if it's present in `investmentDataForApi`.
         const { id, ...updateData } = investmentDataForApi;
-        await updateInvestment(currentInvestment.id, updateData as Partial<Investment>);
+        await updateInvestment(currentInvestment.id, updateData as any);
       } else {
         // For create, ensure it matches CreateInvestmentData from service
         // The 'id' is already removed. We need to ensure all required fields for create are present.
