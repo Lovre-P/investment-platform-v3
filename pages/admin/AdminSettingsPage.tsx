@@ -13,7 +13,7 @@ interface SettingsData {
 
 const initialSettings: SettingsData = {
   platformName: 'MegaInvest Platform',
-  defaultCurrency: 'USD',
+  defaultCurrency: 'EUR',
   adminEmail: 'admin@megainvest.com',
   maintenanceMode: false,
   enableEmailNotifications: true,

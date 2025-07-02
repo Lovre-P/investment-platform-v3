@@ -160,20 +160,66 @@ const AdminLeadsPage: React.FC = () => {
       {/* View Lead Modal */}
       {selectedLead && (
         <Modal isOpen={isViewModalOpen} onClose={() => setIsViewModalOpen(false)} title={`Lead Details: ${selectedLead.name}`} size="lg">
-          <div className="space-y-4">
-            <p><strong>Name:</strong> {selectedLead.name}</p>
-            <p><strong>Email:</strong> <a href={`mailto:${selectedLead.email}`} className="text-primary-600 hover:underline">{selectedLead.email}</a></p>
-            {selectedLead.phone && <p><strong>Phone:</strong> <a href={`tel:${selectedLead.phone}`} className="text-primary-600 hover:underline">{selectedLead.phone}</a></p>}
-            <p><strong>Submitted:</strong> {new Date(selectedLead.submissionDate).toLocaleString()}</p>
-            <p><strong>Status:</strong> {selectedLead.status}</p>
-            <p><strong>Investment Interest:</strong> {selectedLead.investmentId ? getInvestmentTitle(selectedLead.investmentId) : 'General Inquiry'}</p>
-            <div className="mt-2 pt-2 border-t">
-              <p className="font-semibold">Message:</p>
-              <p className="text-secondary-600 bg-secondary-50 p-3 rounded-md whitespace-pre-wrap">{selectedLead.message}</p>
+          <div className="space-y-6">
+            {/* Contact Information Section */}
+            <div className="bg-primary-50 p-4 rounded-lg border border-primary-200">
+              <h3 className="text-lg font-semibold text-primary-800 mb-3 flex items-center">
+                <span className="w-2 h-2 bg-primary-500 rounded-full mr-3"></span>
+                Contact Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="font-medium text-primary-700">Name:</span>
+                  <span className="ml-2 text-primary-600">{selectedLead.name}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-primary-700">Email:</span>
+                  <a href={`mailto:${selectedLead.email}`} className="ml-2 text-primary-600 hover:underline">{selectedLead.email}</a>
+                </div>
+                {selectedLead.phone && (
+                  <div>
+                    <span className="font-medium text-primary-700">Phone:</span>
+                    <a href={`tel:${selectedLead.phone}`} className="ml-2 text-primary-600 hover:underline">{selectedLead.phone}</a>
+                  </div>
+                )}
+                <div>
+                  <span className="font-medium text-primary-700">Status:</span>
+                  <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
+                    selectedLead.status === 'New' ? 'bg-blue-100 text-blue-800' :
+                    selectedLead.status === 'Contacted' ? 'bg-yellow-100 text-yellow-800' :
+                    selectedLead.status === 'Qualified' ? 'bg-green-100 text-green-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>{selectedLead.status}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Lead Details Section */}
+            <div className="bg-secondary-50 p-4 rounded-lg border border-secondary-200">
+              <h3 className="text-lg font-semibold text-secondary-800 mb-3 flex items-center">
+                <span className="w-2 h-2 bg-secondary-500 rounded-full mr-3"></span>
+                Lead Details
+              </h3>
+              <div className="space-y-3 text-sm">
+                <div>
+                  <span className="font-medium text-secondary-700">Submitted:</span>
+                  <span className="ml-2 text-secondary-600">{new Date(selectedLead.submissionDate).toLocaleString()}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-secondary-700">Investment Interest:</span>
+                  <span className="ml-2 text-secondary-600">{selectedLead.investmentId ? getInvestmentTitle(selectedLead.investmentId) : 'General Inquiry'}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-secondary-700 block mb-2">Message:</span>
+                  <div className="bg-white p-3 rounded-md border border-secondary-200 text-secondary-600 whitespace-pre-wrap">
+                    {selectedLead.message}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-           <div className="pt-5 flex justify-end">
-            <Button variant="outline" onClick={() => setIsViewModalOpen(false)}>Close</Button>
+          <div className="pt-6 border-t border-secondary-200 flex justify-end">
+            <Button variant="primary" onClick={() => setIsViewModalOpen(false)}>Close</Button>
           </div>
         </Modal>
       )}
@@ -181,26 +227,120 @@ const AdminLeadsPage: React.FC = () => {
       {/* Edit Lead Status Modal */}
       {currentLeadForStatusEdit && (
         <Modal isOpen={isEditStatusModalOpen} onClose={() => setIsEditStatusModalOpen(false)} title={`Update Status for ${currentLeadForStatusEdit.name}`} size="md">
-            <div className="space-y-4">
-                 <div>
-                    <label htmlFor="leadStatus" className="block text-sm font-medium text-secondary-700">New Status</label>
-                    <select 
-                        id="leadStatus" 
-                        name="leadStatus"
-                        value={newStatus}
-                        onChange={(e) => setNewStatus(e.target.value as Lead['status'])}
-                        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-secondary-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md shadow-sm"
-                    >
-                        <option value="" disabled>Select new status</option>
-                        {leadStatusOptions.map(statusOpt => (
-                            <option key={statusOpt} value={statusOpt}>{statusOpt}</option>
-                        ))}
-                    </select>
+            <div className="modal-form space-y-6">
+                {/* Status Update Section */}
+                <div className="form-section">
+                    <h3>Status Update</h3>
+                    <div className="space-y-4">
+                        <div>
+                            <label htmlFor="leadStatus">New Status *</label>
+                            <select
+                                id="leadStatus"
+                                name="leadStatus"
+                                value={newStatus}
+                                onChange={(e) => setNewStatus(e.target.value as Lead['status'])}
+                                className="form-select"
+                            >
+                                <option value="" disabled>Select new status</option>
+                                {leadStatusOptions.map(statusOpt => (
+                                    <option key={statusOpt} value={statusOpt}>{statusOpt}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                            <p className="text-sm text-blue-800">
+                                <strong>Current Status:</strong> {currentLeadForStatusEdit.status}
+                            </p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div className="pt-5 flex justify-end space-x-3">
-                <Button variant="outline" onClick={() => setIsEditStatusModalOpen(false)}>Cancel</Button>
-                <Button variant="primary" onClick={handleStatusUpdate} isLoading={isLoading}>Save Status</Button>
+
+                <style dangerouslySetInnerHTML={{ __html: `
+                    .form-input, .form-textarea, .form-select {
+                      width: 100% !important;
+                      max-width: 100% !important;
+                      margin-top: 0.25rem !important;
+                      padding: 0.75rem 1rem !important;
+                      background-color: white !important;
+                      color: #374151 !important;
+                      border: 1px solid #d1d5db !important;
+                      border-radius: 0.5rem !important;
+                      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+                      transition: all 0.2s ease-in-out !important;
+                      font-weight: 400 !important;
+                      font-size: 0.875rem !important;
+                      line-height: 1.25rem !important;
+                      box-sizing: border-box !important;
+                    }
+                    .form-select {
+                      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
+                      background-position: right 0.5rem center !important;
+                      background-repeat: no-repeat !important;
+                      background-size: 1.5em 1.5em !important;
+                      padding-right: 2.5rem !important;
+                      appearance: none !important;
+                    }
+                    .form-select:hover {
+                      border-color: #6b7280 !important;
+                      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+                      transform: translateY(-1px) !important;
+                    }
+                    .form-select:focus {
+                      outline: none !important;
+                      border-color: #3b82f6 !important;
+                      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+                      transform: translateY(-1px) !important;
+                    }
+
+                    /* Enhanced label styling */
+                    .modal-form label {
+                      display: block !important;
+                      font-size: 0.875rem !important;
+                      font-weight: 600 !important;
+                      color: #374151 !important;
+                      margin-bottom: 0.5rem !important;
+                      line-height: 1.25rem !important;
+                    }
+
+                    /* Section styling */
+                    .form-section {
+                      background-color: #f8fafc !important;
+                      padding: 1.5rem !important;
+                      border-radius: 0.75rem !important;
+                      border: 1px solid #e2e8f0 !important;
+                      margin-bottom: 1rem !important;
+                    }
+
+                    .form-section h3 {
+                      font-size: 1rem !important;
+                      font-weight: 600 !important;
+                      color: #1e293b !important;
+                      margin-bottom: 1rem !important;
+                      display: flex !important;
+                      align-items: center !important;
+                    }
+
+                    .form-section h3::before {
+                      content: '' !important;
+                      width: 0.5rem !important;
+                      height: 0.5rem !important;
+                      background-color: #3b82f6 !important;
+                      border-radius: 50% !important;
+                      margin-right: 0.75rem !important;
+                    }
+                `}} />
+
+                {/* Form Actions */}
+                <div className="pt-6 border-t border-secondary-200">
+                    <div className="flex justify-end space-x-3">
+                        <Button variant="outline" onClick={() => setIsEditStatusModalOpen(false)} size="md">
+                            Cancel
+                        </Button>
+                        <Button variant="primary" onClick={handleStatusUpdate} isLoading={isLoading} size="md" className="min-w-[120px]">
+                            {isLoading ? 'Saving...' : 'Save Status'}
+                        </Button>
+                    </div>
+                </div>
             </div>
         </Modal>
       )}

@@ -5,12 +5,17 @@ import { getInvestments, createInvestment, updateInvestment, deleteInvestment } 
 import Button from '../../components/Button';
 import Modal from '../../components/Modal';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import FileUpload from '../../components/FileUpload';
 import { PencilIcon, TrashIcon, PlusCircleIcon, EyeIcon, FunnelIcon, MagnifyingGlassIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import { Link, useSearchParams } from 'react-router-dom';
 import { PUBLIC_ROUTES } from '../../constants';
 
 // InvestmentFormData for the admin modal
-type InvestmentFormData = Omit<Investment, 'id' | 'submissionDate'> & { id?: string };
+type InvestmentFormData = Omit<Investment, 'id' | 'submissionDate' | 'images'> & {
+  id?: string;
+  images?: string[] | string;
+  imageFiles?: FileList | null;
+};
 
 const initialFormData: InvestmentFormData = {
   title: '',
@@ -18,8 +23,9 @@ const initialFormData: InvestmentFormData = {
   longDescription: '',
   amountGoal: 0,
   amountRaised: 0,
-  currency: 'USD',
+  currency: 'EUR',
   images: [], // Should be array of strings (URLs)
+  imageFiles: null,
   category: '',
   status: InvestmentStatus.PENDING,
   submittedBy: 'Admin', // Default for admin created
@@ -158,14 +164,19 @@ const AdminInvestmentsPage: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-     if (type === 'number') {
+    if (type === 'number') {
       setCurrentInvestment(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
-    } else if (name === 'tags' || name === 'images') { // Ensure these are treated as arrays of strings
-        const valArray = value.split(',').map(item => item.trim()).filter(item => item);
-        setCurrentInvestment(prev => ({ ...prev, [name]: valArray as any })); // Cast as any if type struggles
+    } else if (name === 'tags') {
+      // For tags, store the raw string value to allow comma input
+      // The conversion to array will happen during form submission
+      setCurrentInvestment(prev => ({ ...prev, [name]: value }));
     } else {
       setCurrentInvestment(prev => ({ ...prev, [name]: value }));
     }
+  };
+
+  const handleFileChange = (files: FileList | null) => {
+    setCurrentInvestment(prev => ({ ...prev, imageFiles: files }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -179,9 +190,14 @@ const AdminInvestmentsPage: React.FC = () => {
         amountGoal: typeof currentInvestment.amountGoal === 'string' ? parseFloat(currentInvestment.amountGoal) || 0 : currentInvestment.amountGoal,
         amountRaised: typeof currentInvestment.amountRaised === 'string' ? parseFloat(currentInvestment.amountRaised) || 0 : currentInvestment.amountRaised || 0,
         minInvestment: typeof currentInvestment.minInvestment === 'string' ? parseFloat(currentInvestment.minInvestment) || 0 : currentInvestment.minInvestment || 0,
-        // Ensure array fields are arrays
-        tags: Array.isArray(currentInvestment.tags) ? currentInvestment.tags : (currentInvestment.tags as unknown as string)?.split(',').map(t=>t.trim()).filter(t=>t) || [],
-        images: Array.isArray(currentInvestment.images) ? currentInvestment.images : (currentInvestment.images as unknown as string)?.split(',').map(t=>t.trim()).filter(t=>t) || [],
+        // Convert comma-separated strings to arrays for API
+        tags: typeof currentInvestment.tags === 'string'
+          ? currentInvestment.tags.split(',').map(t => t.trim()).filter(t => t)
+          : Array.isArray(currentInvestment.tags) ? currentInvestment.tags : [],
+        // Handle image files - convert to temporary URLs for now (backend integration needed)
+        images: currentInvestment.imageFiles && currentInvestment.imageFiles.length > 0
+          ? Array.from(currentInvestment.imageFiles).map(file => URL.createObjectURL(file))
+          : Array.isArray(currentInvestment.images) ? currentInvestment.images : [],
         // Handle empty email - set to a default if empty for create operations
         submitterEmail: currentInvestment.submitterEmail?.trim() || (isEditing ? currentInvestment.submitterEmail : 'admin@megainvest.com'),
     };
@@ -387,97 +403,237 @@ const AdminInvestmentsPage: React.FC = () => {
       </div>
       
       <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={isEditing ? 'Edit Investment' : 'Add New Investment'} size="xl">
-        <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto p-1"> {/* Added padding for scrollbar */}
-            {/* Basic Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label htmlFor="title-modal" className="block text-sm font-medium text-secondary-700">Title</label>
-                    <input type="text" name="title" id="title-modal" value={currentInvestment.title} onChange={handleChange} required className="form-input"/>
-                </div>
-                <div>
-                    <label htmlFor="category-modal" className="block text-sm font-medium text-secondary-700">Category</label>
-                    <select name="category" id="category-modal" value={currentInvestment.category} onChange={handleChange} required className="form-select">
-                        <option value="">Select Category</option>
-                        <option value="Real Estate">Real Estate</option>
-                        <option value="Technology">Technology</option>
-                        <option value="Renewable Energy">Renewable Energy</option>
-                        <option value="Small Business">Small Business</option>
-                         <option value="Healthcare">Healthcare</option>
-                        <option value="Other">Other</option>
-                    </select>
+        <form onSubmit={handleSubmit} className="modal-form space-y-6 max-h-[70vh] overflow-y-auto p-1">
+            {/* Basic Information Section */}
+            <div className="form-section">
+                <h3>Basic Information</h3>
+                <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label htmlFor="title-modal">Title *</label>
+                            <input type="text" name="title" id="title-modal" value={currentInvestment.title} onChange={handleChange} required className="form-input" placeholder="Enter investment title"/>
+                        </div>
+                        <div>
+                            <label htmlFor="category-modal">Category *</label>
+                            <select name="category" id="category-modal" value={currentInvestment.category} onChange={handleChange} required className="form-select">
+                                <option value="">Select Category</option>
+                                <option value="Real Estate">Real Estate</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Renewable Energy">Renewable Energy</option>
+                                <option value="Small Business">Small Business</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label htmlFor="description-modal">Short Description</label>
+                        <textarea name="description" id="description-modal" value={currentInvestment.description} onChange={handleChange} rows={2} className="form-textarea" placeholder="Brief description of the investment opportunity"></textarea>
+                    </div>
+
+                    <div>
+                        <label htmlFor="longDescription-modal">Detailed Description</label>
+                        <textarea name="longDescription" id="longDescription-modal" value={currentInvestment.longDescription} onChange={handleChange} rows={4} className="form-textarea" placeholder="Comprehensive description including business model, market opportunity, and growth strategy"></textarea>
+                    </div>
                 </div>
             </div>
 
-            <div>
-                <label htmlFor="description-modal" className="block text-sm font-medium text-secondary-700">Short Description</label>
-                <textarea name="description" id="description-modal" value={currentInvestment.description} onChange={handleChange} rows={2} className="form-textarea"></textarea>
-            </div>
-            <div>
-                <label htmlFor="longDescription-modal" className="block text-sm font-medium text-secondary-700">Long Description</label>
-                <textarea name="longDescription" id="longDescription-modal" value={currentInvestment.longDescription} onChange={handleChange} rows={4} className="form-textarea"></textarea>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label htmlFor="amountGoal-modal" className="block text-sm font-medium text-secondary-700">Funding Goal</label>
-                    <input type="number" name="amountGoal" id="amountGoal-modal" value={currentInvestment.amountGoal} onChange={handleChange} required className="form-input"/>
-                </div>
-                <div>
-                    <label htmlFor="currency-modal" className="block text-sm font-medium text-secondary-700">Currency</label>
-                    <input type="text" name="currency" id="currency-modal" value={currentInvestment.currency} onChange={handleChange} required className="form-input" maxLength={3}/>
-                </div>
-                 <div>
-                    <label htmlFor="minInvestment-modal" className="block text-sm font-medium text-secondary-700">Min. Investment</label>
-                    <input type="number" name="minInvestment" id="minInvestment-modal" value={currentInvestment.minInvestment || 0} onChange={handleChange} className="form-input"/>
+            {/* Financial Details Section */}
+            <div className="form-section">
+                <h3>Financial Details</h3>
+                <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label htmlFor="amountGoal-modal">Funding Goal *</label>
+                            <input type="number" name="amountGoal" id="amountGoal-modal" value={currentInvestment.amountGoal} onChange={handleChange} required className="form-input" placeholder="100000" min="1000"/>
+                        </div>
+                        <div>
+                            <label htmlFor="currency-modal">Currency *</label>
+                            <input type="text" name="currency" id="currency-modal" value={currentInvestment.currency} onChange={handleChange} required className="form-input" maxLength={3} placeholder="EUR"/>
+                        </div>
+                        <div>
+                            <label htmlFor="minInvestment-modal">Minimum Investment</label>
+                            <input type="number" name="minInvestment" id="minInvestment-modal" value={currentInvestment.minInvestment || 0} onChange={handleChange} className="form-input" placeholder="10000" min="0"/>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label htmlFor="apyRange-modal">Expected APY Range</label>
+                            <input type="text" name="apyRange" id="apyRange-modal" value={currentInvestment.apyRange || ''} onChange={handleChange} className="form-input" placeholder="5-8%"/>
+                        </div>
+                        <div>
+                            <label htmlFor="term-modal">Investment Term</label>
+                            <input type="text" name="term" id="term-modal" value={currentInvestment.term || ''} onChange={handleChange} className="form-input" placeholder="3 Years"/>
+                        </div>
+                        <div>
+                            <label htmlFor="status-modal">Status *</label>
+                            <select name="status" id="status-modal" value={currentInvestment.status} onChange={handleChange} required className="form-select">
+                                {Object.values(InvestmentStatus).map(s => <option key={s} value={s}>{s}</option>)}
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label htmlFor="apyRange-modal" className="block text-sm font-medium text-secondary-700">APY Range</label>
-                    <input type="text" name="apyRange" id="apyRange-modal" value={currentInvestment.apyRange || ''} onChange={handleChange} className="form-input" placeholder="e.g., 5-8%"/>
-                </div>
-                <div>
-                    <label htmlFor="term-modal" className="block text-sm font-medium text-secondary-700">Term</label>
-                    <input type="text" name="term" id="term-modal" value={currentInvestment.term || ''} onChange={handleChange} className="form-input" placeholder="e.g., 3 Years"/>
-                </div>
-                <div>
-                    <label htmlFor="status-modal" className="block text-sm font-medium text-secondary-700">Status</label>
-                    <select name="status" id="status-modal" value={currentInvestment.status} onChange={handleChange} required className="form-select">
-                        {Object.values(InvestmentStatus).map(s => <option key={s} value={s}>{s}</option>)}
-                    </select>
+            {/* Submitter Information Section */}
+            <div className="form-section">
+                <h3>Submitter Information</h3>
+                <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label htmlFor="submittedBy-modal">Submitted By (Name)</label>
+                            <input type="text" name="submittedBy" id="submittedBy-modal" value={currentInvestment.submittedBy} onChange={handleChange} className="form-input" placeholder="Enter submitter name"/>
+                        </div>
+                        <div>
+                            <label htmlFor="submitterEmail-modal">Submitter Email</label>
+                            <input type="email" name="submitterEmail" id="submitterEmail-modal" value={currentInvestment.submitterEmail || ''} onChange={handleChange} className="form-input" placeholder="submitter@example.com"/>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div>
-                <label htmlFor="submittedBy-modal" className="block text-sm font-medium text-secondary-700">Submitted By (Name)</label>
-                <input type="text" name="submittedBy" id="submittedBy-modal" value={currentInvestment.submittedBy} onChange={handleChange} className="form-input"/>
-            </div>
-            <div>
-                <label htmlFor="submitterEmail-modal" className="block text-sm font-medium text-secondary-700">Submitter Email</label>
-                <input type="email" name="submitterEmail" id="submitterEmail-modal" value={currentInvestment.submitterEmail || ''} onChange={handleChange} className="form-input"/>
-            </div>
-
-            <div>
-                <label htmlFor="images-modal" className="block text-sm font-medium text-secondary-700">Image URLs (comma-separated)</label>
-                <textarea name="images" id="images-modal" value={Array.isArray(currentInvestment.images) ? currentInvestment.images.join(', ') : currentInvestment.images} onChange={handleChange} rows={2} className="form-textarea" placeholder="https://example.com/image1.jpg, ..."></textarea>
-            </div>
-             <div>
-                <label htmlFor="tags-modal" className="block text-sm font-medium text-secondary-700">Tags (comma-separated)</label>
-                <input type="text" name="tags" id="tags-modal" value={Array.isArray(currentInvestment.tags) ? currentInvestment.tags.join(', ') : currentInvestment.tags} onChange={handleChange} className="form-input" placeholder="tech, startup, eco-friendly"/>
+            {/* Additional Details Section */}
+            <div className="form-section">
+                <h3>Additional Details</h3>
+                <div className="space-y-4">
+                    <div>
+                        <FileUpload
+                            id="images-modal"
+                            name="imageFiles"
+                            label="Upload Images"
+                            accept="image/*"
+                            multiple={true}
+                            maxFiles={5}
+                            maxFileSize={5}
+                            value={currentInvestment.imageFiles}
+                            onChange={handleFileChange}
+                        />
+                        {Array.isArray(currentInvestment.images) && currentInvestment.images.length > 0 && (
+                            <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                                <p className="text-sm font-medium text-blue-800 mb-2">Existing Images:</p>
+                                <div className="flex flex-wrap gap-2">
+                                    {currentInvestment.images.map((url, index) => (
+                                        <img
+                                            key={index}
+                                            src={url}
+                                            alt={`Investment image ${index + 1}`}
+                                            className="w-16 h-16 object-cover rounded border border-blue-300"
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    <div>
+                        <label htmlFor="tags-modal">Tags (comma-separated)</label>
+                        <input type="text" name="tags" id="tags-modal" value={Array.isArray(currentInvestment.tags) ? currentInvestment.tags.join(', ') : currentInvestment.tags} onChange={handleChange} className="form-input" placeholder="tech, startup, eco-friendly, real-estate"/>
+                    </div>
+                </div>
             </div>
 
             <style dangerouslySetInnerHTML={{ __html: `
                 .form-input, .form-textarea, .form-select {
-                  @apply w-full mt-1 px-3 py-2 bg-white text-secondary-700 border border-secondary-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 transition-colors placeholder-secondary-400 text-sm;
+                  width: 100% !important;
+                  max-width: 100% !important;
+                  margin-top: 0.25rem !important;
+                  padding: 0.75rem 1rem !important;
+                  background-color: white !important;
+                  color: #374151 !important;
+                  border: 1px solid #d1d5db !important;
+                  border-radius: 0.5rem !important;
+                  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+                  transition: all 0.2s ease-in-out !important;
+                  font-weight: 400 !important;
+                  font-size: 0.875rem !important;
+                  line-height: 1.25rem !important;
+                  box-sizing: border-box !important;
+                }
+                .form-input::placeholder, .form-textarea::placeholder {
+                  color: #9ca3af !important;
+                  opacity: 1 !important;
+                }
+                .form-input:hover, .form-textarea:hover, .form-select:hover {
+                  border-color: #6b7280 !important;
+                  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+                  transform: translateY(-1px) !important;
+                }
+                .form-input:focus, .form-textarea:focus, .form-select:focus {
+                  outline: none !important;
+                  border-color: #3b82f6 !important;
+                  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+                  transform: translateY(-1px) !important;
+                }
+                .form-input.border-red-500, .form-textarea.border-red-500, .form-select.border-red-500 {
+                  border-color: #ef4444 !important;
+                  background-color: #fef2f2 !important;
+                }
+                .form-input.border-red-500:focus, .form-textarea.border-red-500:focus, .form-select.border-red-500:focus {
+                  border-color: #ef4444 !important;
+                  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+                }
+                .form-textarea {
+                  resize: vertical !important;
+                  min-height: 2.5rem !important;
+                }
+                .form-select {
+                  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
+                  background-position: right 0.5rem center !important;
+                  background-repeat: no-repeat !important;
+                  background-size: 1.5em 1.5em !important;
+                  padding-right: 2.5rem !important;
+                  appearance: none !important;
+                }
+
+                /* Enhanced label styling */
+                .modal-form label {
+                  display: block !important;
+                  font-size: 0.875rem !important;
+                  font-weight: 600 !important;
+                  color: #374151 !important;
+                  margin-bottom: 0.5rem !important;
+                  line-height: 1.25rem !important;
+                }
+
+                /* Section styling */
+                .form-section {
+                  background-color: #f8fafc !important;
+                  padding: 1.5rem !important;
+                  border-radius: 0.75rem !important;
+                  border: 1px solid #e2e8f0 !important;
+                  margin-bottom: 1rem !important;
+                }
+
+                .form-section h3 {
+                  font-size: 1rem !important;
+                  font-weight: 600 !important;
+                  color: #1e293b !important;
+                  margin-bottom: 1rem !important;
+                  display: flex !important;
+                  align-items: center !important;
+                }
+
+                .form-section h3::before {
+                  content: '' !important;
+                  width: 0.5rem !important;
+                  height: 0.5rem !important;
+                  background-color: #3b82f6 !important;
+                  border-radius: 50% !important;
+                  margin-right: 0.75rem !important;
                 }
             `}} />
 
-            <div className="pt-4 flex justify-end space-x-2 sticky bottom-0 bg-white pb-1 -mx-1 px-1"> {/* Make buttons sticky */}
-              <Button type="button" variant="outline" onClick={handleCloseModal}>Cancel</Button>
-              <Button type="submit" variant="primary" isLoading={isFormSubmitting}>
-                {isEditing ? 'Save Changes' : 'Create Investment'}
-              </Button>
+            {/* Form Actions */}
+            <div className="pt-6 border-t border-secondary-200 bg-white sticky bottom-0 -mx-1 px-1">
+                <div className="flex justify-end space-x-3">
+                    <Button type="button" variant="outline" onClick={handleCloseModal} size="md">
+                        Cancel
+                    </Button>
+                    <Button type="submit" variant="primary" isLoading={isFormSubmitting} size="md" className="min-w-[140px]">
+                        {isFormSubmitting ? 'Saving...' : (isEditing ? 'Save Changes' : 'Create Investment')}
+                    </Button>
+                </div>
             </div>
         </form>
       </Modal>

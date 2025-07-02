@@ -1,6 +1,6 @@
 
 export const APP_NAME = "MegaInvest";
-export const DEFAULT_CURRENCY = "USD";
+export const DEFAULT_CURRENCY = "EUR";
 
 export const PUBLIC_ROUTES = {
   HOME: '/',

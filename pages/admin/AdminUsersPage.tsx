@@ -217,36 +217,124 @@ const AdminUsersPage: React.FC = () => {
       
       {/* Create/Edit User Modal */}
       <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={isEditing ? 'Edit User' : 'Add New User'} size="md">
-        <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-                <label htmlFor="username" className="block text-sm font-medium text-secondary-700">Username</label>
-                <input type="text" name="username" id="username" value={currentUser.username} onChange={handleChange} required className="form-input"/>
+        <form onSubmit={handleSubmit} className="modal-form space-y-6">
+            {/* User Information Section */}
+            <div className="form-section">
+                <h3>User Information</h3>
+                <div className="space-y-4">
+                    <div>
+                        <label htmlFor="username">Username *</label>
+                        <input type="text" name="username" id="username" value={currentUser.username} onChange={handleChange} required className="form-input" placeholder="Enter username"/>
+                    </div>
+                    <div>
+                        <label htmlFor="email">Email Address *</label>
+                        <input type="email" name="email" id="email" value={currentUser.email} onChange={handleChange} required className="form-input" placeholder="user@example.com"/>
+                    </div>
+                    {!isEditing && ( // Only show password field for new users
+                      <div>
+                          <label htmlFor="password">Password *</label>
+                          <input type="password" name="password" id="password" value={currentUser.password || ''} onChange={handleChange} required={!isEditing} className="form-input" placeholder="Enter secure password"/>
+                      </div>
+                    )}
+                    <div>
+                        <label htmlFor="role">User Role *</label>
+                        <select name="role" id="role" value={currentUser.role} onChange={handleChange} required className="form-select">
+                            <option value={UserRole.USER}>User</option>
+                            <option value={UserRole.ADMIN}>Admin</option>
+                        </select>
+                    </div>
+                </div>
             </div>
-            <div>
-                <label htmlFor="email" className="block text-sm font-medium text-secondary-700">Email</label>
-                <input type="email" name="email" id="email" value={currentUser.email} onChange={handleChange} required className="form-input"/>
-            </div>
-            {!isEditing && ( // Only show password field for new users
-              <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-secondary-700">Password</label>
-                  <input type="password" name="password" id="password" value={currentUser.password || ''} onChange={handleChange} required={!isEditing} className="form-input" placeholder={isEditing ? "Leave blank to keep current" : "Enter password"}/>
-              </div>
-            )}
-            <div>
-                <label htmlFor="role" className="block text-sm font-medium text-secondary-700">Role</label>
-                <select name="role" id="role" value={currentUser.role} onChange={handleChange} required className="form-select">
-                    <option value={UserRole.USER}>User</option>
-                    <option value={UserRole.ADMIN}>Admin</option>
-                </select>
-            </div>
+
             <style dangerouslySetInnerHTML={{ __html: `
-                .form-input, .form-select { @apply w-full mt-1 px-3 py-2 bg-white text-secondary-700 border border-secondary-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 transition-colors placeholder-secondary-400; }
+                .form-input, .form-textarea, .form-select {
+                  width: 100% !important;
+                  max-width: 100% !important;
+                  margin-top: 0.25rem !important;
+                  padding: 0.75rem 1rem !important;
+                  background-color: white !important;
+                  color: #374151 !important;
+                  border: 1px solid #d1d5db !important;
+                  border-radius: 0.5rem !important;
+                  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+                  transition: all 0.2s ease-in-out !important;
+                  font-weight: 400 !important;
+                  font-size: 0.875rem !important;
+                  line-height: 1.25rem !important;
+                  box-sizing: border-box !important;
+                }
+                .form-input::placeholder, .form-textarea::placeholder {
+                  color: #9ca3af !important;
+                  opacity: 1 !important;
+                }
+                .form-input:hover, .form-textarea:hover, .form-select:hover {
+                  border-color: #6b7280 !important;
+                  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+                  transform: translateY(-1px) !important;
+                }
+                .form-input:focus, .form-textarea:focus, .form-select:focus {
+                  outline: none !important;
+                  border-color: #3b82f6 !important;
+                  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+                  transform: translateY(-1px) !important;
+                }
+                .form-select {
+                  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
+                  background-position: right 0.5rem center !important;
+                  background-repeat: no-repeat !important;
+                  background-size: 1.5em 1.5em !important;
+                  padding-right: 2.5rem !important;
+                  appearance: none !important;
+                }
+
+                /* Enhanced label styling */
+                .modal-form label {
+                  display: block !important;
+                  font-size: 0.875rem !important;
+                  font-weight: 600 !important;
+                  color: #374151 !important;
+                  margin-bottom: 0.5rem !important;
+                  line-height: 1.25rem !important;
+                }
+
+                /* Section styling */
+                .form-section {
+                  background-color: #f8fafc !important;
+                  padding: 1.5rem !important;
+                  border-radius: 0.75rem !important;
+                  border: 1px solid #e2e8f0 !important;
+                  margin-bottom: 1rem !important;
+                }
+
+                .form-section h3 {
+                  font-size: 1rem !important;
+                  font-weight: 600 !important;
+                  color: #1e293b !important;
+                  margin-bottom: 1rem !important;
+                  display: flex !important;
+                  align-items: center !important;
+                }
+
+                .form-section h3::before {
+                  content: '' !important;
+                  width: 0.5rem !important;
+                  height: 0.5rem !important;
+                  background-color: #3b82f6 !important;
+                  border-radius: 50% !important;
+                  margin-right: 0.75rem !important;
+                }
             `}} />
-             <div className="pt-4 flex justify-end space-x-2">
-              <Button type="button" variant="outline" onClick={handleCloseModal}>Cancel</Button>
-              <Button type="submit" variant="primary" isLoading={isLoading}> {/* Consider specific loading state */}
-                {isEditing ? 'Save Changes' : 'Create User'}
-              </Button>
+
+            {/* Form Actions */}
+            <div className="pt-6 border-t border-secondary-200">
+                <div className="flex justify-end space-x-3">
+                    <Button type="button" variant="outline" onClick={handleCloseModal} size="md">
+                        Cancel
+                    </Button>
+                    <Button type="submit" variant="primary" isLoading={isLoading} size="md" className="min-w-[120px]">
+                        {isLoading ? 'Saving...' : (isEditing ? 'Save Changes' : 'Create User')}
+                    </Button>
+                </div>
             </div>
         </form>
       </Modal>

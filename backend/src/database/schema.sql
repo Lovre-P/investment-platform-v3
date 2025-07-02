@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS investments (
     long_description TEXT NOT NULL,
     amount_goal DECIMAL(15,2) NOT NULL,
     amount_raised DECIMAL(15,2) DEFAULT 0,
-    currency VARCHAR(10) NOT NULL DEFAULT 'USD',
+    currency VARCHAR(10) NOT NULL DEFAULT 'EUR',
     images JSON DEFAULT ('[]'),
     category VARCHAR(100) NOT NULL,
     status VARCHAR(50) NOT NULL DEFAULT 'Pending Approval',

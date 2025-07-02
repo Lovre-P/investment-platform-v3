@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import Button from './Button';
+import FileUpload from './FileUpload';
 import { Investment } from '../types';
 import { createInvestment } from '../services/investmentService'; // Mock service
 
@@ -17,7 +18,7 @@ const initialFormData: InvestmentFormData = {
   description: '',
   longDescription: '',
   amountGoal: 0,
-  currency: 'USD',
+  currency: 'EUR',
   category: '',
   submitterName: '', // New field
   submitterEmail: '', // New field
@@ -78,8 +79,8 @@ const SubmitInvestmentForm: React.FC = () => {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, imageFiles: e.target.files }));
+  const handleFileChange = (files: FileList | null) => {
+    setFormData(prev => ({ ...prev, imageFiles: files }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -117,8 +118,6 @@ const SubmitInvestmentForm: React.FC = () => {
       await createInvestment(newInvestmentData);
       setSubmitStatus({ type: 'success', message: 'Investment submitted successfully! It will be reviewed by our team.' });
       setFormData(initialFormData);
-      const fileInput = document.getElementById('imageFiles') as HTMLInputElement;
-      if (fileInput) fileInput.value = '';
     } catch (error) {
       console.error("Investment submission error:", error);
       setSubmitStatus({ type: 'error', message: 'Failed to submit investment. Please try again.' });
@@ -262,19 +261,17 @@ const SubmitInvestmentForm: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="imageFiles" className="block text-sm font-semibold text-secondary-700 mb-2">Upload Images (Optional)</label>
-            <div className="border-2 border-dashed border-secondary-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors">
-              <input
-                type="file"
-                name="imageFiles"
-                id="imageFiles"
-                multiple
-                accept="image/*"
-                onChange={handleFileChange}
-                className="block w-full text-sm text-secondary-500 file:mr-4 file:py-3 file:px-6 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-500 file:text-white hover:file:bg-primary-600 file:cursor-pointer cursor-pointer"
-              />
-              {formData.imageFiles && <p className="text-sm text-primary-600 font-medium mt-2">{formData.imageFiles.length} file(s) selected</p>}
-            </div>
+            <FileUpload
+              id="imageFiles"
+              name="imageFiles"
+              label="Upload Images (Optional)"
+              accept="image/*"
+              multiple={true}
+              maxFiles={5}
+              maxFileSize={5}
+              value={formData.imageFiles}
+              onChange={handleFileChange}
+            />
           </div>
         </div>
       </div>
