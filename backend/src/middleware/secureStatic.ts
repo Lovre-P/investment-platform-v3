@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import fs from 'fs';
+import { promises as fsPromises } from 'fs';
 import rateLimit from 'express-rate-limit';
 
 // Rate limiting specifically for file access
@@ -24,20 +25,34 @@ const fileAccessLimiter = rateLimit({
 
 // Security middleware for path traversal protection
 const validateFilePath = (uploadDir: string) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const requestedPath = req.path;
-      
+
+      // Check if path starts with '/' before using substring
+      if (!requestedPath || !requestedPath.startsWith('/')) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            message: 'Access denied: Invalid path format',
+            code: 'INVALID_PATH_FORMAT'
+          }
+        });
+      }
+
       // Decode URI component to handle encoded characters
       const decodedPath = decodeURIComponent(requestedPath);
-      
+
+      // Apply Unicode normalization to prevent bypass attempts
+      const normalizedPath = decodedPath.normalize('NFC');
+
       // Check for path traversal attempts
-      if (decodedPath.includes('..') || 
-          decodedPath.includes('\\') || 
-          decodedPath.includes('\0') ||
-          decodedPath.includes('%2e%2e') ||
-          decodedPath.includes('%2f%2e%2e') ||
-          decodedPath.includes('%5c')) {
+      if (normalizedPath.includes('..') ||
+          normalizedPath.includes('\\') ||
+          normalizedPath.includes('\0') ||
+          normalizedPath.includes('%2e%2e') ||
+          normalizedPath.includes('%2f%2e%2e') ||
+          normalizedPath.includes('%5c')) {
         return res.status(403).json({
           success: false,
           error: {
@@ -48,9 +63,10 @@ const validateFilePath = (uploadDir: string) => {
       }
 
       // Resolve the full path and ensure it's within the upload directory
-      const fullPath = path.resolve(uploadDir, decodedPath.substring(1));
+      // Now safe to use substring(1) since we verified path starts with '/'
+      const fullPath = path.resolve(uploadDir, normalizedPath.substring(1));
       const uploadDirResolved = path.resolve(uploadDir);
-      
+
       if (!fullPath.startsWith(uploadDirResolved)) {
         return res.status(403).json({
           success: false,
@@ -61,9 +77,11 @@ const validateFilePath = (uploadDir: string) => {
         });
       }
 
-      // Check if file exists and is actually a file (not directory)
-      if (fs.existsSync(fullPath)) {
-        const stats = fs.statSync(fullPath);
+      // Use async file system calls to prevent blocking the event loop
+      try {
+        await fsPromises.access(fullPath, fs.constants.F_OK);
+        const stats = await fsPromises.stat(fullPath);
+
         if (!stats.isFile()) {
           return res.status(403).json({
             success: false,
@@ -73,6 +91,9 @@ const validateFilePath = (uploadDir: string) => {
             }
           });
         }
+      } catch (fileError) {
+        // File doesn't exist or can't be accessed - let express.static handle it
+        // This is not necessarily an error, express.static will return 404
       }
 
       next();
