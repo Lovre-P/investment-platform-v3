@@ -201,3 +201,8 @@ The API uses consistent error responses:
 ## License
 
 MIT
+
+## Contributing
+
+Lovre-P
+markobrr
