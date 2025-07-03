@@ -13,7 +13,7 @@ import userRoutes from './routes/users.js';
 
 // Import middleware
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
-import { secureStaticFiles } from './middleware/secureStatic.js';
+// import { secureStaticFiles } from './middleware/secureStatic.js'; // Commented out - using Cloudinary instead
 
 // Import database
 import { testConnection, closePool } from './database/config.js';
@@ -32,7 +32,7 @@ if (
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const uploadDir = process.env.UPLOAD_DIR || 'uploads';
+// const uploadDir = process.env.UPLOAD_DIR || 'uploads'; // No longer needed - using Cloudinary
 
 // Trust proxy for Railway/production deployment
 if (process.env.NODE_ENV === 'production') {
@@ -94,8 +94,8 @@ app.use(generalLimiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Secure static file serving middleware
-app.use(`/${uploadDir}`, secureStaticFiles(uploadDir));
+// Secure static file serving middleware - DISABLED: Using Cloudinary CDN instead
+// app.use(`/${uploadDir}`, secureStaticFiles(uploadDir));
 
 // Logging middleware
 if (process.env.NODE_ENV === 'development') {

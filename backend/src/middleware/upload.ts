@@ -1,22 +1,9 @@
 import multer from 'multer';
-import fs from 'fs';
-import path from 'path';
 import { Request } from 'express';
 
-const uploadDir = process.env.UPLOAD_DIR || 'uploads';
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (_req: Request, _file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
-    cb(null, uploadDir);
-  },
-  filename: (_req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
-});
+// Use memory storage for Cloudinary integration
+// Files will be stored in memory as buffers and uploaded to Cloudinary
+const storage = multer.memoryStorage();
 
 // Validate and parse MAX_FILE_SIZE environment variable
 const parseMaxFileSize = (): number => {

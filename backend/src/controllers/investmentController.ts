@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { InvestmentModel, InvestmentFilters } from '../models/Investment.js';
 import { NotFoundError } from '../utils/errors.js';
 import { CreateInvestmentData } from '../types/index.js';
+import { uploadMultipleToCloudinary, isCloudinaryConfigured } from '../services/cloudinaryService.js';
 
 // Type for handling multer files
 type MulterFiles = Express.Multer.File[] | { [fieldname: string]: Express.Multer.File[] };
@@ -56,9 +57,33 @@ export class InvestmentController {
     try {
       const multerFiles = req.files as MulterFiles;
       const files = Array.isArray(multerFiles) ? multerFiles : [];
-      const baseUrl = `${req.protocol}://${req.get('host')}`;
-      const uploadDir = process.env.UPLOAD_DIR || 'uploads';
-      const images = files.map(f => `${baseUrl}/${uploadDir}/${f.filename}`);
+
+      let images: string[] = [];
+
+      // Upload images to Cloudinary if files are provided
+      if (files.length > 0) {
+        if (!isCloudinaryConfigured()) {
+          throw new Error('Cloudinary is not properly configured. Please check environment variables.');
+        }
+
+        try {
+          const uploadResults = await uploadMultipleToCloudinary(
+            files.map(file => ({
+              buffer: file.buffer,
+              originalname: file.originalname
+            })),
+            {
+              folder: 'mega-invest/investments'
+            }
+          );
+
+          images = uploadResults.map(result => result.secure_url);
+          console.log(`Successfully uploaded ${images.length} images to Cloudinary`);
+        } catch (uploadError) {
+          console.error('Failed to upload images to Cloudinary:', uploadError);
+          throw new Error('Failed to upload images. Please try again.');
+        }
+      }
 
       const investmentData: CreateInvestmentData = {
         ...req.body,
@@ -82,14 +107,34 @@ export class InvestmentController {
       const { id } = req.params;
       const multerFiles = req.files as MulterFiles;
       const files = Array.isArray(multerFiles) ? multerFiles : [];
-      const baseUrl = `${req.protocol}://${req.get('host')}`;
-      const uploadDir = process.env.UPLOAD_DIR || 'uploads';
-      const images = files.map(f => `${baseUrl}/${uploadDir}/${f.filename}`);
 
-      const updates = {
-        ...req.body,
-        ...(images.length > 0 ? { images } : {})
-      };
+      let updates = { ...req.body };
+
+      // Upload new images to Cloudinary if files are provided
+      if (files.length > 0) {
+        if (!isCloudinaryConfigured()) {
+          throw new Error('Cloudinary is not properly configured. Please check environment variables.');
+        }
+
+        try {
+          const uploadResults = await uploadMultipleToCloudinary(
+            files.map(file => ({
+              buffer: file.buffer,
+              originalname: file.originalname
+            })),
+            {
+              folder: 'mega-invest/investments'
+            }
+          );
+
+          const newImages = uploadResults.map(result => result.secure_url);
+          updates.images = newImages;
+          console.log(`Successfully uploaded ${newImages.length} images to Cloudinary for update`);
+        } catch (uploadError) {
+          console.error('Failed to upload images to Cloudinary:', uploadError);
+          throw new Error('Failed to upload images. Please try again.');
+        }
+      }
 
       const investment = await InvestmentModel.update(id, updates);
 
