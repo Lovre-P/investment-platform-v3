@@ -3,6 +3,9 @@ import { InvestmentModel, InvestmentFilters } from '../models/Investment.js';
 import { NotFoundError } from '../utils/errors.js';
 import { CreateInvestmentData } from '../types/index.js';
 
+// Type for handling multer files
+type MulterFiles = Express.Multer.File[] | { [fieldname: string]: Express.Multer.File[] };
+
 export class InvestmentController {
   static async getInvestments(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
@@ -51,7 +54,16 @@ export class InvestmentController {
 
   static async createInvestment(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const investmentData: CreateInvestmentData = req.body;
+      const multerFiles = req.files as MulterFiles;
+      const files = Array.isArray(multerFiles) ? multerFiles : [];
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const uploadDir = process.env.UPLOAD_DIR || 'uploads';
+      const images = files.map(f => `${baseUrl}/${uploadDir}/${f.filename}`);
+
+      const investmentData: CreateInvestmentData = {
+        ...req.body,
+        images
+      };
       const identifier = req.user?.userId ?? req.ip;
       console.log(`New investment submission from ${identifier}`);
       const investment = await InvestmentModel.create(investmentData);
@@ -68,7 +80,16 @@ export class InvestmentController {
   static async updateInvestment(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
-      const updates = req.body;
+      const multerFiles = req.files as MulterFiles;
+      const files = Array.isArray(multerFiles) ? multerFiles : [];
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const uploadDir = process.env.UPLOAD_DIR || 'uploads';
+      const images = files.map(f => `${baseUrl}/${uploadDir}/${f.filename}`);
+
+      const updates = {
+        ...req.body,
+        ...(images.length > 0 ? { images } : {})
+      };
 
       const investment = await InvestmentModel.update(id, updates);
 
