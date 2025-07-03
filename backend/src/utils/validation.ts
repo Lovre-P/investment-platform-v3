@@ -28,34 +28,46 @@ export const createInvestmentSchema = z.object({
   title: z.string().min(1).max(255),
   description: z.string().min(1),
   longDescription: z.string().min(1),
-  amountGoal: z.number().positive(),
+  amountGoal: z.coerce.number().positive(),
   currency: z.string().min(3).max(10),
-  images: z.array(z.string().url()).optional(),
+  images: z.union([
+    z.array(z.string().url()),
+    z.string().transform(val => val ? [val] : [])
+  ]).optional(),
   category: z.string().min(1).max(100),
   submittedBy: z.string().min(1).max(255),
   submitterEmail: z.string().email(),
   apyRange: z.string().optional(),
-  minInvestment: z.number().positive().optional(),
+  minInvestment: z.coerce.number().positive().optional(),
   term: z.string().optional(),
-  tags: z.array(z.string()).optional()
+  tags: z.union([
+    z.array(z.string()),
+    z.string().transform(val => val ? val.split(',').map(t => t.trim()).filter(t => t) : [])
+  ]).optional()
 });
 
 export const updateInvestmentSchema = z.object({
   title: z.string().min(1).max(255).optional(),
   description: z.string().min(1).optional(),
   longDescription: z.string().min(1).optional(),
-  amountGoal: z.number().positive().optional(),
-  amountRaised: z.number().min(0).optional(),
+  amountGoal: z.coerce.number().positive().optional(),
+  amountRaised: z.coerce.number().min(0).optional(),
   currency: z.string().min(3).max(10).optional(),
-  images: z.array(z.string().url()).optional(),
+  images: z.union([
+    z.array(z.string().url()),
+    z.string().transform(val => val ? [val] : [])
+  ]).optional(),
   category: z.string().min(1).max(100).optional(),
   status: z.nativeEnum(InvestmentStatus).optional(),
   submittedBy: z.string().min(1).max(255).optional(),
   submitterEmail: z.string().email().optional(),
   apyRange: z.string().optional(),
-  minInvestment: z.number().positive().optional(),
+  minInvestment: z.coerce.number().positive().optional(),
   term: z.string().optional(),
-  tags: z.array(z.string()).optional()
+  tags: z.union([
+    z.array(z.string()),
+    z.string().transform(val => val ? val.split(',').map(t => t.trim()).filter(t => t) : [])
+  ]).optional()
 });
 
 // Lead validation schemas

@@ -71,14 +71,21 @@ export const updateInvestmentWithFiles = async (
 ): Promise<Investment> => {
   const formData = new FormData();
 
+  // Handle each field properly to avoid validation errors
   Object.entries(investmentData).forEach(([key, value]) => {
-    if (Array.isArray(value)) {
+    if (key === 'tags' && Array.isArray(value)) {
+      // For tags array, append each tag separately
+      value.forEach(tag => formData.append('tags', String(tag)));
+    } else if (Array.isArray(value)) {
+      // For other arrays, append each item separately
       value.forEach(v => formData.append(key, String(v)));
     } else if (value !== undefined && value !== null) {
+      // For all other values, convert to string
       formData.append(key, String(value));
     }
   });
 
+  // Add the image files
   Array.from(imageFiles).forEach(file => {
     formData.append('images', file);
   });
