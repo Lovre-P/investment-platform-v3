@@ -49,9 +49,7 @@ export const uploadToCloudinary = async (
       folder: options.folder || 'mega-invest/investments',
       public_id: publicId,
       resource_type: 'image' as const,
-      format: 'auto',
       quality: 'auto',
-      fetch_format: 'auto',
       ...options.transformation,
     };
 
@@ -118,7 +116,6 @@ export const getOptimizedImageUrl = (
   transformations: object = {}
 ): string => {
   return cloudinary.url(publicId, {
-    fetch_format: 'auto',
     quality: 'auto',
     ...transformations,
   });

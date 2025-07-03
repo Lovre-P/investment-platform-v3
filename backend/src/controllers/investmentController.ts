@@ -81,7 +81,11 @@ export class InvestmentController {
           console.log(`Successfully uploaded ${images.length} images to Cloudinary`);
         } catch (uploadError) {
           console.error('Failed to upload images to Cloudinary:', uploadError);
-          throw new Error('Failed to upload images. Please try again.');
+          res.status(500).json({
+            error: 'Failed to upload images to cloud storage',
+            details: uploadError instanceof Error ? uploadError.message : 'Unknown error'
+          });
+          return;
         }
       }
 
@@ -132,7 +136,11 @@ export class InvestmentController {
           console.log(`Successfully uploaded ${newImages.length} images to Cloudinary for update`);
         } catch (uploadError) {
           console.error('Failed to upload images to Cloudinary:', uploadError);
-          throw new Error('Failed to upload images. Please try again.');
+          res.status(500).json({
+            error: 'Failed to upload images to cloud storage',
+            details: uploadError instanceof Error ? uploadError.message : 'Unknown error'
+          });
+          return;
         }
       }
 
