@@ -64,6 +64,28 @@ export const updateInvestment = async (investmentId: string, updates: Partial<In
   return apiClient.put<Investment>(`/investments/${investmentId}`, updates);
 };
 
+export const updateInvestmentWithFiles = async (
+  investmentId: string,
+  investmentData: Partial<Omit<Investment, 'id' | 'images'>>,
+  imageFiles: FileList
+): Promise<Investment> => {
+  const formData = new FormData();
+
+  Object.entries(investmentData).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      value.forEach(v => formData.append(key, String(v)));
+    } else if (value !== undefined && value !== null) {
+      formData.append(key, String(value));
+    }
+  });
+
+  Array.from(imageFiles).forEach(file => {
+    formData.append('images', file);
+  });
+
+  return apiClient.put<Investment>(`/investments/${investmentId}`, formData);
+};
+
 export const deleteInvestment = async (id: string): Promise<boolean> => {
   try {
     await apiClient.delete<void>(`/investments/${id}`);

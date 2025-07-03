@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Investment, InvestmentStatus } from '../../types';
-import { getInvestments, createInvestment, createInvestmentWithFiles, updateInvestment, deleteInvestment, CreateInvestmentData } from '../../services/investmentService';
+import { getInvestments, createInvestment, createInvestmentWithFiles, updateInvestment, updateInvestmentWithFiles, deleteInvestment, CreateInvestmentData } from '../../services/investmentService';
 import Button from '../../components/Button';
 import Modal from '../../components/Modal';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -132,7 +132,11 @@ const AdminInvestmentsPage: React.FC = () => {
     if (editId) {
       const investmentToEdit = investments.find(inv => inv.id === editId);
       if (investmentToEdit) {
-        setCurrentInvestment({ ...investmentToEdit }); // Investment type has all fields for InvestmentFormData
+        setCurrentInvestment({
+          ...investmentToEdit,
+          tags: Array.isArray(investmentToEdit.tags) ? investmentToEdit.tags.join(', ') : investmentToEdit.tags || '',
+          imageFiles: null
+        });
         setIsEditing(true);
         setIsModalOpen(true);
       }
@@ -201,10 +205,8 @@ const AdminInvestmentsPage: React.FC = () => {
         tags: typeof currentInvestment.tags === 'string'
           ? currentInvestment.tags.split(',').map(t => t.trim()).filter(t => t)
           : Array.isArray(currentInvestment.tags) ? currentInvestment.tags : [],
-        // Handle image files - convert to temporary URLs for now (backend integration needed)
-        images: currentInvestment.imageFiles && currentInvestment.imageFiles.length > 0
-          ? Array.from(currentInvestment.imageFiles).map(file => URL.createObjectURL(file))
-          : Array.isArray(currentInvestment.images) ? currentInvestment.images : [],
+        // For images, keep existing URLs if no new files are selected
+        images: Array.isArray(currentInvestment.images) ? currentInvestment.images : [],
         // Handle empty email - set to a default if empty for create operations
         submitterEmail: currentInvestment.submitterEmail?.trim() || (isEditing ? currentInvestment.submitterEmail : 'admin@megainvest.com'),
     };
@@ -215,12 +217,16 @@ const AdminInvestmentsPage: React.FC = () => {
 
     try {
       if (isEditing && currentInvestment.id) {
-        // For update, ensure we are sending Partial<Investment>
-        // Fix: `submissionDate` and `amountRaised` are not present in `investmentDataForApi`
-        // because `InvestmentFormData` (the type of `currentInvestment`) omits them.
-        // Only `id` needs to be destructured out if it's present in `investmentDataForApi`.
-        const { id, ...updateData } = investmentDataForApi;
-        await updateInvestment(currentInvestment.id, updateData as Partial<Investment>);
+        // For update, handle files properly
+        const { id, imageFiles, ...updateDataBase } = investmentDataForApi;
+
+        if (currentInvestment.imageFiles && currentInvestment.imageFiles.length > 0) {
+          // If new files are selected, use the file upload endpoint
+          await updateInvestmentWithFiles(currentInvestment.id, updateDataBase, currentInvestment.imageFiles);
+        } else {
+          // No new files, use regular update
+          await updateInvestment(currentInvestment.id, updateDataBase as Partial<Investment>);
+        }
       } else {
         // For create, ensure it matches CreateInvestmentData from service
         // The 'id' is already removed. We need to ensure all required fields for create are present.
