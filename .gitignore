@@ -25,3 +25,6 @@ dist-ssr
 backend/.env
 backend/fly.toml
 RENDER_DEPLOYMENT_GUIDE.md
+
+# YoYo AI version control directory
+.yoyo/

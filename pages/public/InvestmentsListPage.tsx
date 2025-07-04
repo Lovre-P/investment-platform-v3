@@ -93,11 +93,23 @@ const InvestmentsListPage: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      <section className="text-center bg-white p-8 rounded-xl shadow-lg">
-        <h1 className="text-4xl md:text-5xl font-bold text-secondary-800 mb-4">Investment Opportunities</h1>
-        <p className="text-lg text-secondary-600 max-w-2xl mx-auto">
-          Explore a diverse range of vetted investment projects. Find your next opportunity and grow your portfolio with MegaInvest.
-        </p>
+      <section className="relative text-center p-8 rounded-xl shadow-lg overflow-hidden bg-cover bg-center"
+               style={{
+                 backgroundImage: 'url(/images/hero/investments-hero.jpg)',
+                 backgroundSize: 'cover',
+                 backgroundPosition: 'center',
+                 backgroundRepeat: 'no-repeat'
+               }}>
+        {/* Dark overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/40"></div>
+
+        {/* Content with relative positioning to appear above overlay */}
+        <div className="relative z-10">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Investment Opportunities</h1>
+          <p className="text-lg text-white/90 max-w-2xl mx-auto">
+            Explore a diverse range of vetted investment projects. Find your next opportunity and grow your portfolio with MegaInvest.
+          </p>
+        </div>
       </section>
 
       {/* Filters and Search Section */}
