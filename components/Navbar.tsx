@@ -180,21 +180,18 @@ const Navbar: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile Menu with enhanced glass morphism and animations */}
+        {/* Mobile Menu with solid background to block content behind */}
         {isOpen && (
           <div
             className="lg:hidden absolute top-20 inset-x-0 z-40 overflow-hidden transition-all duration-700 ease-out transform animate-in slide-in-from-top-5"
             style={{
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.8) 30%, rgba(88,159,241,0.2) 60%, rgba(33,75,139,0.15) 100%)',
-              backdropFilter: 'blur(24px)',
-              border: '1px solid rgba(88,159,241,0.3)',
-              boxShadow: '0 25px 50px rgba(88,159,241,0.3), 0 10px 25px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(88,159,241,0.2)',
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.95) 30%, rgba(88,159,241,0.85) 60%, rgba(33,75,139,0.90) 100%)',
+              backdropFilter: 'blur(60px) saturate(200%)',
+              border: '1px solid rgba(88,159,241,0.4)',
+              boxShadow: '0 25px 50px rgba(88,159,241,0.4), 0 10px 25px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.8), inset 0 -1px 0 rgba(88,159,241,0.3)',
               borderRadius: '0 0 24px 24px'
             }}
           >
-            {/* Decorative top border */}
-            <div className="h-1 bg-gradient-to-r from-primary-400 via-primary-500 to-teal-500 opacity-60" />
-            
             <div className="px-4 pt-6 pb-8 space-y-3">
               {navLinks.map((link, index) => (
                 <NavLink

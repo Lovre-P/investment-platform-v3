@@ -55,7 +55,7 @@ const AdminLayout: React.FC = () => {
   return (
     <div className="flex h-screen bg-secondary-100 font-body">
       {/* Sidebar */}
-      <aside className="w-64 flex-shrink-0 bg-secondary-800 text-secondary-100 flex flex-col">
+      <aside className="w-64 flex-shrink-0 bg-primary-800 text-secondary-100 flex flex-col">
         <div className="h-16 flex items-center justify-center px-4 border-b border-secondary-700">
           <Link to={ADMIN_ROUTES.DASHBOARD} className="text-2xl font-bold text-primary-400">
             {APP_NAME} <span className="text-sm text-secondary-300">Admin</span>
