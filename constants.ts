@@ -24,4 +24,18 @@ export const ADMIN_ROUTES = {
 };
 
 export const PLACEHOLDER_IMAGE_URL = "https://picsum.photos";
+
+// Cookie Consent Configuration
+export const COOKIE_CONSENT = {
+  STORAGE_KEY: 'megaInvestCookieConsent',
+  PREFERENCES_KEY: 'megaInvestCookiePreferences',
+  VERSION: '1.0',
+  EXPIRY_DAYS: 365,
+  CATEGORIES: {
+    STRICTLY_NECESSARY: 'strictly_necessary',
+    ANALYTICS: 'analytics',
+    MARKETING: 'marketing',
+    FUNCTIONAL: 'functional'
+  }
+} as const;
     

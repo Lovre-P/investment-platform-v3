@@ -57,3 +57,12 @@ export interface PlatformMetrics {
   activeUsers: number;
   pendingApprovals: number;
 }
+
+// Re-export cookie consent types for convenience
+export type {
+  CookieCategory,
+  CookieConsentData,
+  CookieConsentPreferences,
+  CookieConsentConfig
+} from './types/cookieConsent';
+export { CookieConsentAction } from './types/cookieConsent';

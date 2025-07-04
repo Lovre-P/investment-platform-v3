@@ -2,6 +2,7 @@
 import React from 'react';
 import { APP_NAME } from '../constants';
 import { Link } from 'react-router-dom';
+import CookiePreferencesButton from './CookiePreferencesButton';
 
 const Footer: React.FC = () => {
   return (
@@ -40,7 +41,11 @@ const Footer: React.FC = () => {
           <p>&copy; {new Date().getFullYear()} {APP_NAME}. All rights reserved.</p>
           <p className="mt-1">
             <Link to="/terms" className="hover:text-accent-400 transition-colors">Terms of Service</Link> |
-            <Link to="/privacy" className="hover:text-accent-400 transition-colors ml-2">Privacy Policy</Link>
+            <Link to="/privacy" className="hover:text-accent-400 transition-colors ml-2">Privacy Policy</Link> |
+            <CookiePreferencesButton
+              variant="link"
+              className="hover:text-accent-400 transition-colors ml-2 text-secondary-200"
+            />
           </p>
         </div>
       </div>
