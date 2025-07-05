@@ -130,7 +130,7 @@ DB_NAME=megainvest
 
 1. Install MySQL locally or use a cloud provider
 2. Create a database named `megainvest`
-3. Run the backend with `npm run backend:dev` to start the server and automatically apply migrations
+3. Run `cd backend && npm run db:migrate` to apply database migrations before starting the server
 4. See [Backend MySQL Setup Guide](./backend/MYSQL_SETUP.md) for details
 
 ## Contributing

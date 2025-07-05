@@ -33,7 +33,7 @@ export const COOKIE_CONSENT = {
   VERSION: '1.0',
   EXPIRY_DAYS: 365,
   CATEGORIES: {
-    STRICTLY_NECESSARY: 'strictly_necessary',
+    STRICTLY_NECESSARY: 'strictlyNecessary',
     ANALYTICS: 'analytics',
     MARKETING: 'marketing',
     FUNCTIONAL: 'functional'

@@ -7,7 +7,7 @@ import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-async function runMigrations() {
+export async function runMigrations(): Promise<void> {
   try {
     console.log('🚀 Starting database migrations...');
 
@@ -47,14 +47,6 @@ async function runMigrations() {
     console.log('✅ Database migrations completed successfully');
   } catch (error) {
     console.error('❌ Migration failed:', error);
-    process.exit(1);
-  } finally {
-    await pool.end();
+    throw error;
   }
 }
-
-// Always run migrations when this file is executed
-console.log('🚀 Migration script started!');
-runMigrations();
-
-export { runMigrations };

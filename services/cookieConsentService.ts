@@ -160,7 +160,7 @@ class CookieConsentService {
       timestamp: Date.now(),
       hasConsented: true,
       categories: {
-        strictly_necessary: true, // Always true
+        strictlyNecessary: true, // Always true
         functional: preferences.functional,
         analytics: preferences.analytics,
         marketing: preferences.marketing
