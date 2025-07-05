@@ -37,6 +37,7 @@ const AdminDashboardPage: React.FC = () => {
   const { isLoggingOut } = useAuth();
   const [metrics, setMetrics] = useState<PlatformMetrics | null>(null);
   const [allInvestments, setAllInvestments] = useState<Investment[]>([]); // Store all for charts
+  const [allLeads, setAllLeads] = useState<Lead[]>([]); // Store all leads for charts
   const [recentInvestments, setRecentInvestments] = useState<Investment[]>([]);
   const [recentLeads, setRecentLeads] = useState<Lead[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -64,6 +65,7 @@ const AdminDashboardPage: React.FC = () => {
         );
 
         setAllInvestments(investmentsData);
+        setAllLeads(leadsData);
 
         setRecentInvestments(
           [...investmentsData]
@@ -120,6 +122,40 @@ const AdminDashboardPage: React.FC = () => {
   }, [] as { name: InvestmentStatus; value: number }[]);
 
   const PIE_COLORS = ['#22c55e', '#3b82f6', '#64748b', '#f59e0b', '#ef4444']; // Added one more for PENDING
+
+  // Process monthly activity data from existing investments and leads
+  const getMonthlyActivityData = () => {
+    const monthlyData: Record<string, { name: string; investments: number; leads: number }> = {};
+
+    // Get last 12 months
+    const now = new Date();
+    for (let i = 11; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthKey = date.toISOString().slice(0, 7); // YYYY-MM format
+      const monthName = date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+      monthlyData[monthKey] = { name: monthName, investments: 0, leads: 0 };
+    }
+
+    // Count investments by month
+    allInvestments.forEach(investment => {
+      const monthKey = investment.submissionDate.slice(0, 7);
+      if (monthlyData[monthKey]) {
+        monthlyData[monthKey].investments++;
+      }
+    });
+
+    // Count leads by month using all leads data
+    allLeads.forEach(lead => {
+      const monthKey = lead.submissionDate.slice(0, 7);
+      if (monthlyData[monthKey]) {
+        monthlyData[monthKey].leads++;
+      }
+    });
+
+    return Object.values(monthlyData);
+  };
+
+  const monthlyActivityData = getMonthlyActivityData();
 
   if (isLoading && !metrics) { // Show full page loader only on initial load
     return <div className="flex justify-center items-center min-h-[60vh]"><LoadingSpinner text="Loading dashboard data..." size="lg"/></div>;
@@ -179,10 +215,10 @@ const AdminDashboardPage: React.FC = () => {
            ) : <p className="text-secondary-500 text-center py-10">No investment data for chart.</p>}
         </div>
         <div className="bg-white p-6 rounded-xl shadow-lg">
-          <h2 className="text-xl font-semibold text-secondary-700 mb-4">Monthly Activity (Placeholder)</h2>
+          <h2 className="text-xl font-semibold text-secondary-700 mb-4">Monthly Activity (Last 12 Months)</h2>
            {isLoading ? <LoadingSpinner/> : (
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={[ {name: 'Jan', investments: 0, leads: 0}, {name: 'Feb', investments: 0, leads: 0}, {name: 'Mar', investments: 0, leads: 0}]}>
+              <BarChart data={monthlyActivityData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
@@ -193,7 +229,11 @@ const AdminDashboardPage: React.FC = () => {
               </BarChart>
             </ResponsiveContainer>
            )}
-           <p className="text-xs text-secondary-400 text-center mt-2">Placeholder data. Real data requires backend aggregation.</p>
+           {monthlyActivityData.length > 0 && (
+             <p className="text-xs text-secondary-400 text-center mt-2">
+               Showing activity for the last 12 months based on submission dates.
+             </p>
+           )}
         </div>
       </div>
 
