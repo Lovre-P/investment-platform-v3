@@ -56,9 +56,12 @@ export class InvestmentModel {
 
       const [rows] = await pool.execute(query, values);
 
-      // Parse JSON fields
+      // Parse JSON fields and ensure numeric fields are numbers
       return (rows as any[]).map(row => ({
         ...row,
+        amountGoal: parseFloat(row.amountGoal) || 0,
+        amountRaised: parseFloat(row.amountRaised) || 0,
+        minInvestment: row.minInvestment ? parseFloat(row.minInvestment) : undefined,
         images: typeof row.images === 'string' ? JSON.parse(row.images) : row.images,
         tags: typeof row.tags === 'string' ? JSON.parse(row.tags) : row.tags
       }));
@@ -89,9 +92,12 @@ export class InvestmentModel {
       const row = (rows as any[])[0];
       if (!row) return null;
 
-      // Parse JSON fields
+      // Parse JSON fields and ensure numeric fields are numbers
       return {
         ...row,
+        amountGoal: parseFloat(row.amountGoal) || 0,
+        amountRaised: parseFloat(row.amountRaised) || 0,
+        minInvestment: row.minInvestment ? parseFloat(row.minInvestment) : undefined,
         images: typeof row.images === 'string' ? JSON.parse(row.images) : row.images,
         tags: typeof row.tags === 'string' ? JSON.parse(row.tags) : row.tags
       };
@@ -148,6 +154,9 @@ export class InvestmentModel {
       const row = (rows as any[])[0];
       return {
         ...row,
+        amountGoal: parseFloat(row.amountGoal) || 0,
+        amountRaised: parseFloat(row.amountRaised) || 0,
+        minInvestment: row.minInvestment ? parseFloat(row.minInvestment) : undefined,
         images: typeof row.images === 'string' ? JSON.parse(row.images) : row.images,
         tags: typeof row.tags === 'string' ? JSON.parse(row.tags) : row.tags
       };
@@ -228,6 +237,9 @@ export class InvestmentModel {
       const updatedRow = (rows as any[])[0];
       return {
         ...updatedRow,
+        amountGoal: parseFloat(updatedRow.amountGoal) || 0,
+        amountRaised: parseFloat(updatedRow.amountRaised) || 0,
+        minInvestment: updatedRow.minInvestment ? parseFloat(updatedRow.minInvestment) : undefined,
         images: typeof updatedRow.images === 'string' ? JSON.parse(updatedRow.images) : updatedRow.images,
         tags: typeof updatedRow.tags === 'string' ? JSON.parse(updatedRow.tags) : updatedRow.tags
       };

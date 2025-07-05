@@ -176,7 +176,9 @@ const AdminInvestmentsPage: React.FC = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     if (type === 'number') {
-      setCurrentInvestment(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
+      // Allow empty string to enable clearing the field, only default to 0 if value is truly empty
+      const numValue = value === '' ? 0 : parseFloat(value);
+      setCurrentInvestment(prev => ({ ...prev, [name]: isNaN(numValue) ? 0 : numValue }));
     } else if (name === 'tags') {
       // For tags, store the raw string value to allow comma input
       // The conversion to array will happen during form submission

@@ -278,11 +278,172 @@ MegaInvest Platform
   }
 
   /**
+   * Send notification for new investment submission
+   */
+  static async sendInvestmentSubmissionNotification(investment: Investment): Promise<boolean> {
+    const subject = `New Investment Submission: ${investment.title}`;
+
+    const emailText = `
+New Investment Submission
+═══════════════════════════════════════
+
+Investment Information:
+• Title: ${investment.title}
+• Category: ${investment.category}
+• Funding Goal: ${investment.currency} ${investment.amountGoal.toLocaleString()}
+• Submitted By: ${investment.submittedBy}
+• Submitter Email: ${investment.submitterEmail || 'Not provided'}
+• Submission Date: ${new Date(investment.submissionDate).toLocaleString()}
+• Status: ${investment.status}
+• Investment ID: ${investment.id}
+
+Description:
+${investment.description}
+
+${investment.apyRange ? `Expected APY Range: ${investment.apyRange}` : ''}
+${investment.minInvestment ? `Minimum Investment: ${investment.currency} ${investment.minInvestment.toLocaleString()}` : ''}
+${investment.term ? `Investment Term: ${investment.term}` : ''}
+
+Action Required:
+• Review the investment submission in the admin panel
+• Approve or reject the investment
+• Contact the submitter if additional information is needed
+
+Admin Panel: ${process.env.FRONTEND_URL || 'http://localhost:5173'}/admin/investments
+    `.trim();
+
+    const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Investment Submission</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #09364D, #214B8B); color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center; }
+        .content { background: #f9f9f9; padding: 20px; border-radius: 0 0 8px 8px; }
+        .info-section { background: white; padding: 15px; margin: 15px 0; border-radius: 6px; border-left: 4px solid #214B8B; }
+        .info-section h3 { margin-top: 0; color: #09364D; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+        .info-item { padding: 8px 0; }
+        .info-label { font-weight: bold; color: #09364D; }
+        .action-box { background: #e8f4f8; padding: 15px; border-radius: 6px; margin: 20px 0; }
+        .action-box h3 { margin-top: 0; color: #09364D; }
+        .button { display: inline-block; background: #214B8B; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 10px 0; }
+        .button:hover { background: #09364D; }
+        .description-box { background: white; padding: 15px; margin: 15px 0; border-radius: 6px; border: 1px solid #ddd; }
+        .status-pending { color: #f89b21; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏢 New Investment Submission</h1>
+        <p>A new investment has been submitted for review</p>
+    </div>
+
+    <div class="content">
+        <div class="info-section">
+            <h3>Investment Details</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Title:</div>
+                    <div>${investment.title}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Category:</div>
+                    <div>${investment.category}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Funding Goal:</div>
+                    <div>${investment.currency} ${investment.amountGoal.toLocaleString()}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Status:</div>
+                    <div class="status-pending">${investment.status}</div>
+                </div>
+            </div>
+
+            ${investment.apyRange ? `
+            <div class="info-item">
+                <div class="info-label">Expected APY Range:</div>
+                <div>${investment.apyRange}</div>
+            </div>
+            ` : ''}
+
+            ${investment.minInvestment ? `
+            <div class="info-item">
+                <div class="info-label">Minimum Investment:</div>
+                <div>${investment.currency} ${investment.minInvestment.toLocaleString()}</div>
+            </div>
+            ` : ''}
+
+            ${investment.term ? `
+            <div class="info-item">
+                <div class="info-label">Investment Term:</div>
+                <div>${investment.term}</div>
+            </div>
+            ` : ''}
+        </div>
+
+        <div class="info-section">
+            <h3>Submitter Information</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Name:</div>
+                    <div>${investment.submittedBy}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Email:</div>
+                    <div>${investment.submitterEmail || 'Not provided'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Submission Date:</div>
+                    <div>${new Date(investment.submissionDate).toLocaleString()}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Investment ID:</div>
+                    <div>${investment.id}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="description-box">
+            <h3>Description</h3>
+            <p>${investment.description}</p>
+        </div>
+
+        <div class="action-box">
+            <h3>Action Required</h3>
+            <ul>
+                <li>Review the investment submission details</li>
+                <li>Approve or reject the investment</li>
+                <li>Contact the submitter if additional information is needed</li>
+                <li>Update investment status in the admin panel</li>
+            </ul>
+            <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/admin/investments" class="button">
+                View in Admin Panel
+            </a>
+        </div>
+    </div>
+</body>
+</html>
+    `.trim();
+
+    return await this.sendEmail({
+      to: this.ADMIN_EMAIL,
+      subject,
+      text: emailText,
+      html: emailHtml
+    });
+  }
+
+  /**
    * Send notification for general contact form leads
    */
   static async sendContactLeadNotification(lead: Lead): Promise<boolean> {
     const subject = 'New Contact Form Submission';
-    
+
     const emailText = `
 New Contact Form Submission
 ═══════════════════════════════════════

@@ -66,7 +66,9 @@ const SubmitInvestmentForm: React.FC = () => {
         const { checked } = e.target as HTMLInputElement;
         setFormData(prev => ({ ...prev, [name]: checked }));
     } else if (type === 'number') {
-      setFormData(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
+      // Allow empty string to enable clearing the field, only default to 0 if value is truly empty
+      const numValue = value === '' ? 0 : parseFloat(value);
+      setFormData(prev => ({ ...prev, [name]: isNaN(numValue) ? 0 : numValue }));
     } else if (name === "tags") {
         // Store tags as string to allow comma input - conversion to array happens during submission
         setFormData(prev => ({ ...prev, tags: value }));

@@ -3,6 +3,7 @@ import { InvestmentModel, InvestmentFilters } from '../models/Investment.js';
 import { NotFoundError } from '../utils/errors.js';
 import { CreateInvestmentData } from '../types/index.js';
 import { uploadMultipleToCloudinary, isCloudinaryConfigured } from '../services/cloudinaryService.js';
+import { EmailService } from '../services/emailService.js';
 
 // Type for handling multer files
 type MulterFiles = Express.Multer.File[] | { [fieldname: string]: Express.Multer.File[] };
@@ -96,6 +97,17 @@ export class InvestmentController {
       const identifier = req.user?.userId ?? req.ip;
       console.log(`New investment submission from ${identifier}`);
       const investment = await InvestmentModel.create(investmentData);
+
+      // Send email notification asynchronously (don't wait for it to complete)
+      setImmediate(async () => {
+        try {
+          await EmailService.sendInvestmentSubmissionNotification(investment);
+          console.log(`📧 Investment submission notification sent for: ${investment.title} (Submitter: ${investment.submittedBy})`);
+        } catch (emailError) {
+          // Log email error but don't fail the investment creation
+          console.error('Failed to send email notification for investment submission:', investment.id, emailError);
+        }
+      });
 
       res.status(201).json({
         success: true,
