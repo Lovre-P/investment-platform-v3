@@ -17,6 +17,21 @@ interface ConsentItem {
 
 interface ConsentAnalyticsResponse {
   consents: ConsentItem[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+  analytics: {
+    totalConsents: number;
+    acceptanceRates: {
+      functional: number;
+      analytics: number;
+      marketing: number;
+    };
+    recentActivity: number;
+  };
 }
 
 const CookieConsentAnalyticsPage: React.FC = () => {

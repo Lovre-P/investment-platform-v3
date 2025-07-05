@@ -101,6 +101,8 @@ The admin login button is hidden from the public navigation for security. To acc
 - `GET /api/admin/users` - Manage users
 - `GET /api/admin/cookie-consents` - Cookie consent analytics
 
+The admin dashboard exposes a **Cookie Consents** page at `/admin/cookie-consents` where these analytics are displayed.
+
 ### Cookie Consent Endpoints (Optional Authentication)
 - `POST /api/cookie-consent` - Store cookie preferences
 - `GET /api/cookie-consent` - Retrieve latest consent for logged-in user
