@@ -45,3 +45,12 @@ export enum CookieConsentAction {
   SAVE_PREFERENCES = 'save_preferences',
   SHOW_PREFERENCES = 'show_preferences'
 }
+
+// Represents the structure of consent data retrieved from the GET /api/cookie-consent endpoint
+export interface CookieConsentAPIResponse {
+  id: string; // The ID of the consent record in the database
+  preferences: CookieConsentPreferences; // The actual consent preferences
+  version: string; // The version of the consent policy agreed to
+  timestamp: number; // The server timestamp (epoch milliseconds) when this consent was recorded or fetched
+  createdAt: string; // ISO string format of creation date
+}

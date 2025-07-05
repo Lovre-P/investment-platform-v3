@@ -58,3 +58,25 @@ CREATE INDEX idx_leads_status ON leads(status);
 CREATE INDEX idx_leads_investment_id ON leads(investment_id);
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_username ON users(username);
+
+-- Cookie Consents table
+CREATE TABLE IF NOT EXISTS cookie_consents (
+  id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  user_id VARCHAR(36) NULL,
+  session_id VARCHAR(255) NULL,
+  strictly_necessary BOOLEAN DEFAULT TRUE NOT NULL,
+  functional BOOLEAN DEFAULT FALSE NOT NULL,
+  analytics BOOLEAN DEFAULT FALSE NOT NULL,
+  marketing BOOLEAN DEFAULT FALSE NOT NULL,
+  consent_version VARCHAR(10) NOT NULL DEFAULT '1.0',
+  ip_address VARCHAR(45) NULL,
+  user_agent TEXT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  INDEX idx_cookie_consents_user_id (user_id),
+  INDEX idx_cookie_consents_session_id (session_id),
+  INDEX idx_cookie_consents_created_at (created_at),
+
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);

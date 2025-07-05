@@ -10,6 +10,8 @@ import authRoutes from './routes/auth.js';
 import investmentRoutes from './routes/investments.js';
 import leadRoutes from './routes/leads.js';
 import userRoutes from './routes/users.js';
+import cookieConsentRoutes from './routes/cookieConsent.js';
+import adminRoutes from './routes/admin.js';
 
 // Import middleware
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
@@ -139,6 +141,8 @@ app.use('/api/auth', authLimiter, authRoutes); // Apply stricter rate limiting t
 app.use('/api/investments', investmentRoutes);
 app.use('/api/leads', leadRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/cookie-consent', cookieConsentRoutes);
+app.use('/api/admin', adminRoutes); // Mount admin routes
 
 // 404 handler
 app.use(notFoundHandler);

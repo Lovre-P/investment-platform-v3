@@ -1,5 +1,6 @@
 import { COOKIE_CONSENT } from '../constants';
 import { CookieConsentData, CookieConsentPreferences, CookieCategory } from '../types/cookieConsent';
+import { apiClient, ApiClientError } from '../utils/apiClient'; // Import apiClient and ApiClientError
 
 /**
  * GDPR-compliant Cookie Consent Service
@@ -10,6 +11,31 @@ class CookieConsentService {
   private readonly preferencesKey = COOKIE_CONSENT.PREFERENCES_KEY;
   private readonly version = COOKIE_CONSENT.VERSION;
   private readonly expiryDays = COOKIE_CONSENT.EXPIRY_DAYS;
+
+  // Session ID for anonymous users - can be a simple timestamp or a more robust solution
+  private sessionId: string | null = null;
+
+  constructor() {
+    this.initializeSessionId();
+  }
+
+  private initializeSessionId(): void {
+    // Attempt to get a session ID from localStorage or generate a new one
+    // This is a very basic session ID, consider a more robust solution if needed for anonymous tracking
+    let sid = localStorage.getItem('megaInvestSessionId');
+    if (!sid) {
+      sid = `anon_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+      localStorage.setItem('megaInvestSessionId', sid);
+    }
+    this.sessionId = sid;
+  }
+
+  private getSessionId(): string | null {
+    if (!this.sessionId) {
+      this.initializeSessionId();
+    }
+    return this.sessionId;
+  }
 
   // Default cookie categories configuration
   private readonly defaultCategories: CookieCategory[] = [
@@ -49,6 +75,26 @@ class CookieConsentService {
   hasConsent(): boolean {
     const consent = this.getConsentData();
     return consent?.hasConsented || false;
+  }
+
+  /**
+   * Delete consent from the server
+   */
+  async deleteConsentFromServer(): Promise<void> {
+    // This assumes that if a user is logged in, their token will be sent by apiClient
+    // If no user is logged in, this request might be denied by the server or do nothing,
+    // which is acceptable as there's no server-side anonymous consent to clear by session_id with DELETE.
+    try {
+      await apiClient.delete('/cookie-consent');
+      console.log('Cookie consent deleted from server successfully.');
+    } catch (error) {
+      // Log error but don't let it break client-side clearing
+      console.error('Error deleting cookie consent from server:', error);
+      // If error is 401 (not authenticated), it's fine, just means nothing to delete for a user.
+      if (error instanceof ApiClientError && error.status === 401) { // Corrected instanceof check
+        console.log('User not authenticated, no server-side consent to delete by user ID.');
+      }
+    }
   }
 
   /**
@@ -98,9 +144,9 @@ class CookieConsentService {
   }
 
   /**
-   * Save consent preferences
+   * Save consent preferences to localStorage and server
    */
-  saveConsent(preferences: CookieConsentPreferences): void {
+  async saveConsent(preferences: CookieConsentPreferences): Promise<void> {
     const consentData: CookieConsentData = {
       version: this.version,
       timestamp: Date.now(),
@@ -109,54 +155,89 @@ class CookieConsentService {
         strictly_necessary: true, // Always true
         functional: preferences.functional,
         analytics: preferences.analytics,
-        marketing: preferences.marketing
-      }
+        marketing: preferences.marketing,
+      },
     };
 
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(consentData));
       localStorage.setItem(this.preferencesKey, JSON.stringify(preferences));
       
+      // Attempt to save to server (fire and forget, or handle errors as needed)
+      await this.saveConsentToServer(preferences);
+
       // Trigger consent change event
       this.triggerConsentChangeEvent(preferences);
     } catch (error) {
-      console.error('Error saving cookie consent:', error);
+      console.error('Error saving cookie consent (local):', error);
+      // Still trigger event even if server save fails, as local consent is set
+      this.triggerConsentChangeEvent(preferences);
+    }
+  }
+
+  /**
+   * Save consent preferences to the server
+   */
+  async saveConsentToServer(preferences: CookieConsentPreferences): Promise<void> {
+    try {
+      const payload = {
+        preferences,
+        version: this.version,
+        timestamp: Date.now(),
+        sessionId: this.getSessionId(),
+      };
+      // apiClient handles auth headers automatically
+      await apiClient.post('/cookie-consent', payload);
+      console.log('Cookie consent saved to server successfully.');
+    } catch (error) {
+      console.error('Error saving cookie consent to server:', error);
+      // Decide on error handling:
+      // - Log and continue (current approach)
+      // - Retry logic
+      // - Inform user (though this is a background task)
     }
   }
 
   /**
    * Accept all cookies
    */
-  acceptAll(): void {
-    this.saveConsent({
+  async acceptAll(): Promise<void> {
+    const newPreferences: CookieConsentPreferences = {
       strictly_necessary: true,
       functional: true,
       analytics: true,
-      marketing: true
-    });
+      marketing: true,
+    };
+    await this.saveConsent(newPreferences);
   }
 
   /**
    * Reject all non-essential cookies
    */
-  rejectAll(): void {
-    this.saveConsent({
+  async rejectAll(): Promise<void> {
+    const newPreferences: CookieConsentPreferences = {
       strictly_necessary: true,
       functional: false,
       analytics: false,
-      marketing: false
-    });
+      marketing: false,
+    };
+    await this.saveConsent(newPreferences);
   }
 
   /**
-   * Clear all consent data
+   * Clear all consent data locally and attempt to clear from server
    */
-  clearConsent(): void {
+  async clearConsent(): Promise<void> {
     try {
       localStorage.removeItem(this.storageKey);
       localStorage.removeItem(this.preferencesKey);
-    } catch (error) {
-      console.error('Error clearing cookie consent:', error);
+      // No need to trigger event here as per original structure, but could be added.
+
+      // Attempt to delete from server
+      await this.deleteConsentFromServer();
+
+    } catch (error) { // This catch is for localStorage errors primarily
+      console.error('Error clearing local cookie consent:', error);
     }
   }
 
