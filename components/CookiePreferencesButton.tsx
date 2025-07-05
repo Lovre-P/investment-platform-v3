@@ -32,18 +32,19 @@ const CookiePreferencesButton: React.FC<CookiePreferencesButtonProps> = ({
   const handleSavePreferences = async () => {
     setIsLoading(true);
     try {
-      const preferences: CookieConsentPreferences = {
-        strictly_necessary: true,
+      const preferencesToSave: CookieConsentPreferences = { // Renamed to avoid conflict
+        strictly_necessary: true, // ensure this is always true
         functional: categories.find(c => c.id === 'functional')?.enabled || false,
         analytics: categories.find(c => c.id === 'analytics')?.enabled || false,
         marketing: categories.find(c => c.id === 'marketing')?.enabled || false
       };
       
-      cookieConsentService.saveConsent(preferences);
-      onConsentChange?.(preferences);
+      await cookieConsentService.saveConsent(preferencesToSave); // Added await
+      onConsentChange?.(preferencesToSave); // Pass the same object
       setShowModal(false);
     } catch (error) {
-      console.error('Error saving preferences:', error);
+      console.error('Error saving preferences in CookiePreferencesButton:', error);
+      // Optionally: set an error message state to display to the user
     } finally {
       setIsLoading(false);
     }

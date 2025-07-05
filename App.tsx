@@ -25,6 +25,7 @@ import AdminLeadsPage from './pages/admin/AdminLeadsPage';
 import AdminPendingInvestmentsPage from './pages/admin/AdminPendingInvestmentsPage';
 import AdminUsersPage from './pages/admin/AdminUsersPage';
 import AdminSettingsPage from './pages/admin/AdminSettingsPage';
+import CookieConsentAnalyticsPage from './pages/admin/CookieConsentAnalyticsPage'; // Import the new page
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -67,6 +68,7 @@ const App: React.FC = () => {
           <Route path="pending-investments" element={<AdminPendingInvestmentsPage />} />
           <Route path="users" element={<AdminUsersPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
+          <Route path="cookie-consents" element={<CookieConsentAnalyticsPage />} /> {/* Add new route */}
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
         

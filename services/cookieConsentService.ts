@@ -1,6 +1,6 @@
 import { COOKIE_CONSENT } from '../constants';
 import { CookieConsentData, CookieConsentPreferences, CookieCategory } from '../types/cookieConsent';
-import { apiClient } from '../utils/apiClient'; // Import apiClient
+import { apiClient, ApiClientError } from '../utils/apiClient'; // Import apiClient and ApiClientError
 
 /**
  * GDPR-compliant Cookie Consent Service
@@ -91,7 +91,7 @@ class CookieConsentService {
       // Log error but don't let it break client-side clearing
       console.error('Error deleting cookie consent from server:', error);
       // If error is 401 (not authenticated), it's fine, just means nothing to delete for a user.
-      if (error instanceof apiClient.ApiClientError && error.status === 401) {
+      if (error instanceof ApiClientError && error.status === 401) { // Corrected instanceof check
         console.log('User not authenticated, no server-side consent to delete by user ID.');
       }
     }
