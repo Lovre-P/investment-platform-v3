@@ -71,10 +71,6 @@ const CookieConsentAnalyticsPage: React.FC = () => {
       const response = await apiClient.get<{ success: boolean, data: ApiResponseData }>(queryString);
       if (response.success) {
         setData(response.data);
-        // Reset to page 1 if filters changed and it's not the initial load for the current page
-        if (page !== currentPage && data !== null) { // A crude check if filters were applied by button
-             setCurrentPage(1); // Reset to page 1 on new filter application
-        }
       } else {
         throw new Error('Failed to fetch cookie consent analytics');
       }

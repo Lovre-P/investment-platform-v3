@@ -3,7 +3,7 @@ import { pool } from '../database/config.js';
 import { StoreCookieConsentInput, GetCookieConsentAnalyticsInput } from '../utils/cookieConsentValidation.js';
 // No explicit AuthenticatedRequest needed due to global namespace augmentation in auth.ts
 import { CookieConsentRecord, CookieConsentAPIResponse, CookieConsentPreferencesDB } from '../models/CookieConsent.js';
-import { RowDataPacket, OkPacket } from 'mysql2';
+import { RowDataPacket, OkPacket, PoolConnection } from 'mysql2/promise'; // Import PoolConnection
 import crypto from 'crypto'; // Import crypto for UUID generation
 
 // Helper to get client IP address
@@ -24,8 +24,10 @@ export const storeCookieConsent = async (req: Request, res: Response) => {
   const ipAddress = getIpAddress(req);
   const userAgent = req.headers['user-agent'];
 
+  let connection: PoolConnection | undefined;
+
   try {
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
     await connection.beginTransaction();
 
     const newConsentId = crypto.randomUUID();
@@ -58,12 +60,22 @@ export const storeCookieConsent = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Error storing cookie consent:', error);
-    if (!res.headersSent) { // Ensure headers aren't already sent
-      await connection.rollback(); // Rollback transaction on error
-      connection.release();
+    if (connection) { // Check if connection was established
+      try {
+        await connection.rollback(); // Rollback transaction on error
+      } catch (rollbackError) {
+        console.error('Error during rollback:', rollbackError);
+      } finally {
+        connection.release(); // Release connection in finally block of catch
+      }
     }
-    res.status(500).json({ success: false, message: 'Failed to store cookie consent preferences.' });
+    // Avoid sending response if headers already sent (though less likely here with early exit on error)
+    if (!res.headersSent) {
+      res.status(500).json({ success: false, message: 'Failed to store cookie consent preferences.' });
+    }
   }
+  // Removed the outer finally block as connection release is handled within try (after commit)
+  // and catch (after rollback attempt).
 };
 
 export const getCookieConsent = async (req: Request, res: Response) => {

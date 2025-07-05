@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback, useRef } from 'react'; // Added useRef
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { cookieConsentService } from '../services/cookieConsentService';
 import { CookieConsentPreferences, CookieConsentAPIResponse } from '../types/cookieConsent';
 import { useAuth } from '../contexts/AuthContext';
 import { apiClient } from '../utils/apiClient';
+import { COOKIE_CONSENT } from '../constants'; // Import COOKIE_CONSENT
 
 /**
  * Custom hook for managing cookie consent state and preferences
@@ -20,74 +21,7 @@ export const useCookieConsent = () => {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const isInitializedRef = useRef(false); // Ref to track initialization
 
-  // Initialize consent state from localStorage and then from server if authenticated
-  useEffect(() => {
-    const initializeConsent = async () => {
-      setIsLoading(true);
-      try {
-        // 1. Load from localStorage first
-        let localConsentExists = cookieConsentService.hasConsent();
-        let currentPreferences = cookieConsentService.getPreferences();
-
-        setHasConsent(localConsentExists);
-        setPreferences(currentPreferences);
-
-        // 2. If authenticated and auth is not loading, try to fetch from server
-        if (isAuthenticated && !isAuthLoading) {
-          try {
-            const serverResponse = await apiClient.get<{ success: boolean, consent: CookieConsentAPIResponse | null }>('/cookie-consent');
-            if (serverResponse.success && serverResponse.consent) {
-              const serverPreferences = serverResponse.consent.preferences;
-              // Update local state and localStorage with server's data
-              setPreferences(serverPreferences);
-              setHasConsent(true); // Assuming server consent means consent is given
-              // Save server preferences to local storage to keep them in sync
-              // Note: cookieConsentService.saveConsent will also try to save to server again, which is fine.
-              await cookieConsentService.saveConsent(serverPreferences);
-              console.log('Cookie consent loaded and synced from server.');
-            } else if (localConsentExists) {
-              // If server has no consent, but local does, try to sync local to server
-              // This is covered by saveConsentToServer in cookieConsentService when consent is next updated
-              // Or we could explicitly call it: await cookieConsentService.saveConsentToServer(currentPreferences);
-            }
-          } catch (error) {
-            console.error('Error fetching cookie consent from server:', error);
-            // Fallback to local storage if server fetch fails
-          }
-        }
-
-        // 3. Determine if banner should be shown based on the final state
-        // Re-check after potential server sync
-        const finalShouldShow = cookieConsentService.shouldShowBanner();
-        setShouldShowBanner(finalShouldShow);
-
-      } catch (error) {
-        console.error('Error initializing cookie consent:', error);
-        setShouldShowBanner(true); // Default to showing banner on error
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    // Only run initialization once auth loading is complete and it hasn't run yet
-    if (!isAuthLoading && !isInitializedRef.current) {
-      initializeConsent().then(() => {
-        isInitializedRef.current = true; // Mark as initialized
-      });
-    }
-  }, [isAuthLoading, isAuthenticated]); // Keep isAuthenticated to re-evaluate if needed after login for server sync
-                                       // but the isInitializedRef check prevents full re-run of all logic.
-                                       // A more nuanced approach might be needed if isAuthenticated changes should trigger specific parts of initializeConsent.
-                                       // For now, this prevents full re-runs that overwrite things.
-                                       // Let's refine: the main goal is to fetch from server if user logs in.
-                                       // So, isAuthenticated IS a valid dependency for the server fetch part.
-                                       // The isInitializedRef should primarily prevent re-running the *local storage* part.
-
-  // Re-thinking the useEffect for initialization:
-  // We want to load from localStorage once.
-  // We want to load from server if/when user becomes authenticated.
-  // The isInitializedRef should guard the entire process from running multiple times unnecessarily.
-
+  // This is the consolidated useEffect for initialization and sync
   useEffect(() => {
     const initializeAndOrSyncConsent = async () => {
       if (isAuthLoading) return; // Wait for auth to settle
@@ -158,7 +92,7 @@ export const useCookieConsent = () => {
 
   }, [isAuthenticated, isAuthLoading]); // Effect runs when auth state settles or user logs in/out
 
-  // Listen for local consent changes (e.g., from banner actions, which also trigger server save)
+  // Listen for local consent changes dispatched by cookieConsentService
   useEffect(() => {
     const handleConsentChange = (event: CustomEvent) => {
       const newPreferences = event.detail.preferences as CookieConsentPreferences;
