@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback, useContext } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react'; // Added useRef
 import { cookieConsentService } from '../services/cookieConsentService';
-import { CookieConsentPreferences, CookieConsentAPIResponse } from '../types/cookieConsent'; // Assuming API response type is in cookieConsent
-import { useAuth } from '../contexts/AuthContext'; // To check auth state
-import { apiClient } from '../utils/apiClient'; // For fetching consent
+import { CookieConsentPreferences, CookieConsentAPIResponse } from '../types/cookieConsent';
+import { useAuth } from '../contexts/AuthContext';
+import { apiClient } from '../utils/apiClient';
 
 /**
  * Custom hook for managing cookie consent state and preferences
@@ -17,7 +17,8 @@ export const useCookieConsent = () => {
   });
   const [shouldShowBanner, setShouldShowBanner] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { isAuthenticated, isLoading: isAuthLoading } = useAuth(); // Get auth status
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const isInitializedRef = useRef(false); // Ref to track initialization
 
   // Initialize consent state from localStorage and then from server if authenticated
   useEffect(() => {
@@ -68,13 +69,96 @@ export const useCookieConsent = () => {
       }
     };
 
-    // Only run initialization once auth loading is complete
-    if (!isAuthLoading) {
-      initializeConsent();
+    // Only run initialization once auth loading is complete and it hasn't run yet
+    if (!isAuthLoading && !isInitializedRef.current) {
+      initializeConsent().then(() => {
+        isInitializedRef.current = true; // Mark as initialized
+      });
     }
-  }, [isAuthenticated, isAuthLoading]); // Re-run if auth state changes
+  }, [isAuthLoading, isAuthenticated]); // Keep isAuthenticated to re-evaluate if needed after login for server sync
+                                       // but the isInitializedRef check prevents full re-run of all logic.
+                                       // A more nuanced approach might be needed if isAuthenticated changes should trigger specific parts of initializeConsent.
+                                       // For now, this prevents full re-runs that overwrite things.
+                                       // Let's refine: the main goal is to fetch from server if user logs in.
+                                       // So, isAuthenticated IS a valid dependency for the server fetch part.
+                                       // The isInitializedRef should primarily prevent re-running the *local storage* part.
 
-  // Listen for local consent changes (e.g., from banner actions)
+  // Re-thinking the useEffect for initialization:
+  // We want to load from localStorage once.
+  // We want to load from server if/when user becomes authenticated.
+  // The isInitializedRef should guard the entire process from running multiple times unnecessarily.
+
+  useEffect(() => {
+    const initializeAndOrSyncConsent = async () => {
+      if (isAuthLoading) return; // Wait for auth to settle
+
+      setIsLoading(true);
+      try {
+        let localPrefs = cookieConsentService.getPreferences();
+        let localConsentGiven = cookieConsentService.hasConsent();
+
+        if (!isInitializedRef.current) { // First time initialization
+          setPreferences(localPrefs);
+          setHasConsent(localConsentGiven);
+          console.log('Initial consent load from local storage.');
+        }
+
+        if (isAuthenticated) {
+          console.log('User is authenticated, attempting to fetch/sync server consent.');
+          try {
+            const serverResponse = await apiClient.get<{ success: boolean, consent: CookieConsentAPIResponse | null }>('/cookie-consent');
+            if (serverResponse.success && serverResponse.consent) {
+              const serverPreferences = serverResponse.consent.preferences;
+              if (JSON.stringify(serverPreferences) !== JSON.stringify(preferences) || !hasConsent) {
+                console.log('Server consent differs or local consent not set, applying server consent.');
+                setPreferences(serverPreferences);
+                setHasConsent(true);
+                // Save server preferences to local storage to keep them in sync, avoid re-triggering server save
+                localStorage.setItem(COOKIE_CONSENT.STORAGE_KEY, JSON.stringify({
+                  version: serverResponse.consent.version,
+                  timestamp: serverResponse.consent.timestamp, // or Date.now() if we want to refresh timestamp
+                  hasConsented: true,
+                  categories: serverPreferences
+                }));
+                localStorage.setItem(COOKIE_CONSENT.PREFERENCES_KEY, JSON.stringify(serverPreferences));
+                // Dispatch event so other parts of app can react if necessary
+                const event = new CustomEvent('cookieConsentChange', { detail: { preferences: serverPreferences } });
+                window.dispatchEvent(event);
+              } else {
+                console.log('Server consent matches local, no update needed from server.');
+              }
+            } else if (localConsentGiven) {
+              // Authenticated user has local consent, but no server consent. Sync local to server.
+              console.log('User authenticated, local consent exists, no server consent. Syncing to server.');
+              await cookieConsentService.saveConsentToServer(localPrefs); // Sync up existing local consent
+            }
+          } catch (error) {
+            console.error('Error fetching/syncing cookie consent from/to server:', error);
+            // Fallback to local storage if server fetch fails, which is already set
+          }
+        }
+
+        // Determine if banner should be shown based on the final state
+        const finalShouldShow = cookieConsentService.shouldShowBanner();
+        setShouldShowBanner(finalShouldShow);
+
+        if (!isInitializedRef.current) {
+          isInitializedRef.current = true;
+        }
+
+      } catch (error) {
+        console.error('Error in initializeAndOrSyncConsent:', error);
+        setShouldShowBanner(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeAndOrSyncConsent();
+
+  }, [isAuthenticated, isAuthLoading]); // Effect runs when auth state settles or user logs in/out
+
+  // Listen for local consent changes (e.g., from banner actions, which also trigger server save)
   useEffect(() => {
     const handleConsentChange = (event: CustomEvent) => {
       const newPreferences = event.detail.preferences as CookieConsentPreferences;
@@ -124,12 +208,10 @@ export const useCookieConsent = () => {
     }
   }, []);
 
-  // Clear all consent data (local only, server impact depends on next consent action)
-  const clearConsent = useCallback(() => {
+  // Clear all consent data (local and attempt server)
+  const clearConsent = useCallback(async () => {
     try {
-      cookieConsentService.clearConsent(); // This is local
-      // Server consent is not explicitly cleared here. It will be overwritten on next consent.
-      // Or, a DELETE /api/cookie-consent endpoint could be implemented.
+      await cookieConsentService.clearConsent(); // This now also calls server delete
       setHasConsent(false);
       setPreferences({
         strictly_necessary: true,
@@ -138,8 +220,10 @@ export const useCookieConsent = () => {
         marketing: false
       });
       setShouldShowBanner(true);
+      // No need to dispatch 'cookieConsentChange' event as consent is removed.
+      // Banner will show again.
     } catch (error) {
-      console.error('Error clearing consent:', error);
+      console.error('Error clearing consent in hook:', error);
     }
   }, []);
 

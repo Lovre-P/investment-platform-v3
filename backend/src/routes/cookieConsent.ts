@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { storeCookieConsent, getCookieConsent } from '../controllers/cookieConsentController.js';
+import { storeCookieConsent, getCookieConsent, deleteCookieConsent } from '../controllers/cookieConsentController.js';
 import { validateRequest } from '../middleware/validation.js';
 import { storeCookieConsentSchema } from '../utils/cookieConsentValidation.js';
 import { authenticate, optionalAuth } from '../middleware/auth.js';
@@ -145,6 +145,38 @@ router.get(
   '/',
   authenticate, // Requires authentication
   getCookieConsent
+);
+
+/**
+ * @swagger
+ * /api/cookie-consent:
+ *   delete:
+ *     summary: Delete all cookie consent records for the authenticated user
+ *     tags: [Cookie Consent]
+ *     security:
+ *       - bearerAuth: [] # Requires bearer token
+ *     responses:
+ *       200:
+ *         description: Successfully deleted consent records or no records found to delete
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                   example: Cookie consent records deleted successfully.
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
+router.delete(
+  '/',
+  authenticate, // Requires authentication to identify the user
+  deleteCookieConsent
 );
 
 export default router;

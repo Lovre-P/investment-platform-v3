@@ -7,10 +7,12 @@ export const cookiePreferencesSchema = z.object({
   marketing: z.boolean().default(false),
 });
 
+import { CONSENT_VERSION } from '../config/constants.js';
+
 export const storeCookieConsentSchema = z.object({
   body: z.object({
     preferences: cookiePreferencesSchema,
-    version: z.string().min(1).max(10).default('1.0'),
+    version: z.string().min(1).max(10).default(CONSENT_VERSION),
     timestamp: z.number().positive().optional(), // Timestamp from client, we'll use server's mostly
     sessionId: z.string().max(255).optional(),
   }),
@@ -20,8 +22,8 @@ export type StoreCookieConsentInput = z.infer<typeof storeCookieConsentSchema>['
 
 export const getCookieConsentAnalyticsSchema = z.object({
   query: z.object({
-    page: z.coerce.number().int().positive().optional().default(1),
-    limit: z.coerce.number().int().positive().optional().default(10),
+    page: z.coerce.number().int().positive().optional().default(1).max(1000, "Page number cannot exceed 1000"),
+    limit: z.coerce.number().int().positive().optional().default(10).max(100, "Limit cannot exceed 100 items per page"),
     startDate: z.string().datetime({ offset: true }).optional(),
     endDate: z.string().datetime({ offset: true }).optional(),
     userId: z.string().uuid().optional(),

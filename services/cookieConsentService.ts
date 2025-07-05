@@ -78,6 +78,26 @@ class CookieConsentService {
   }
 
   /**
+   * Delete consent from the server
+   */
+  async deleteConsentFromServer(): Promise<void> {
+    // This assumes that if a user is logged in, their token will be sent by apiClient
+    // If no user is logged in, this request might be denied by the server or do nothing,
+    // which is acceptable as there's no server-side anonymous consent to clear by session_id with DELETE.
+    try {
+      await apiClient.delete('/cookie-consent');
+      console.log('Cookie consent deleted from server successfully.');
+    } catch (error) {
+      // Log error but don't let it break client-side clearing
+      console.error('Error deleting cookie consent from server:', error);
+      // If error is 401 (not authenticated), it's fine, just means nothing to delete for a user.
+      if (error instanceof apiClient.ApiClientError && error.status === 401) {
+        console.log('User not authenticated, no server-side consent to delete by user ID.');
+      }
+    }
+  }
+
+  /**
    * Check if consent is still valid (not expired)
    */
   isConsentValid(): boolean {
@@ -205,14 +225,19 @@ class CookieConsentService {
   }
 
   /**
-   * Clear all consent data
+   * Clear all consent data locally and attempt to clear from server
    */
-  clearConsent(): void {
+  async clearConsent(): Promise<void> {
     try {
       localStorage.removeItem(this.storageKey);
       localStorage.removeItem(this.preferencesKey);
-    } catch (error) {
-      console.error('Error clearing cookie consent:', error);
+      // No need to trigger event here as per original structure, but could be added.
+
+      // Attempt to delete from server
+      await this.deleteConsentFromServer();
+
+    } catch (error) { // This catch is for localStorage errors primarily
+      console.error('Error clearing local cookie consent:', error);
     }
   }
 

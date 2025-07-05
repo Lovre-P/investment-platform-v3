@@ -47,18 +47,34 @@ const CookieConsentAnalyticsPage: React.FC = () => {
   const [data, setData] = useState<ApiResponseData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Pagination state
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(10);
 
-  const fetchData = async (page: number, pageSize: number) => {
+  // Filter state
+  const [filters, setFilters] = useState({
+    startDate: '',
+    endDate: '',
+    userId: ''
+  });
+
+  const fetchData = async (page: number, pageSize: number, currentFilters: typeof filters) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await apiClient.get<{ success: boolean, data: ApiResponseData }>(
-        `/admin/cookie-consents?page=${page}&limit=${pageSize}`
-      );
+      let queryString = `/admin/cookie-consents?page=${page}&limit=${pageSize}`;
+      if (currentFilters.startDate) queryString += `&startDate=${new Date(currentFilters.startDate).toISOString()}`;
+      if (currentFilters.endDate) queryString += `&endDate=${new Date(currentFilters.endDate).toISOString()}`;
+      if (currentFilters.userId) queryString += `&userId=${currentFilters.userId}`;
+
+      const response = await apiClient.get<{ success: boolean, data: ApiResponseData }>(queryString);
       if (response.success) {
         setData(response.data);
+        // Reset to page 1 if filters changed and it's not the initial load for the current page
+        if (page !== currentPage && data !== null) { // A crude check if filters were applied by button
+             setCurrentPage(1); // Reset to page 1 on new filter application
+        }
       } else {
         throw new Error('Failed to fetch cookie consent analytics');
       }
@@ -71,8 +87,53 @@ const CookieConsentAnalyticsPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchData(currentPage, limit);
-  }, [currentPage, limit]);
+    fetchData(currentPage, limit, filters);
+  }, [currentPage, limit]); // Removed filters from here to prevent re-fetch on every keystroke in filter inputs
+
+  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const applyFilters = () => {
+    setCurrentPage(1); // Reset to page 1 when applying new filters
+    fetchData(1, limit, filters);
+  };
+
+  const exportData = () => {
+    if (!data || !data.consents || data.consents.length === 0) {
+      alert('No data to export.');
+      return;
+    }
+    const headers = [
+      "ID", "User ID", "User Email", "IP Address", "Version", "Created At",
+      "Strictly Necessary", "Functional", "Analytics", "Marketing", "User Agent"
+    ];
+    const rows = data.consents.map(consent => [
+      consent.id,
+      consent.userId || "N/A",
+      consent.userEmail || "N/A",
+      consent.ipAddress || "N/A",
+      consent.version,
+      new Date(consent.createdAt).toLocaleString(),
+      consent.preferences.strictly_necessary ? "Allowed" : "Denied",
+      consent.preferences.functional ? "Allowed" : "Denied",
+      consent.preferences.analytics ? "Allowed" : "Denied",
+      consent.preferences.marketing ? "Allowed" : "Denied",
+      `"${(consent.userAgent || "N/A").replace(/"/g, '""')}"` // Escape quotes in user agent
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8,"
+      + headers.join(",") + "\n"
+      + rows.map(e => e.join(",")).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "cookie_consent_data.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const handlePageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= (data?.pagination.totalPages || 1)) {
@@ -136,24 +197,24 @@ const CookieConsentAnalyticsPage: React.FC = () => {
             <div className="flex flex-wrap gap-4 items-end">
                 <div>
                     <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">Start Date</label>
-                    <input type="date" id="startDate" name="startDate" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm" />
+                    <input type="date" id="startDate" name="startDate" value={filters.startDate} onChange={handleFilterChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm" />
                 </div>
                 <div>
                     <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">End Date</label>
-                    <input type="date" id="endDate" name="endDate" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm" />
+                    <input type="date" id="endDate" name="endDate" value={filters.endDate} onChange={handleFilterChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm" />
                 </div>
                 <div>
                     <label htmlFor="userId" className="block text-sm font-medium text-gray-700">User ID</label>
-                    <input type="text" id="userId" name="userId" placeholder="Enter User ID" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm" />
+                    <input type="text" id="userId" name="userId" placeholder="Enter User ID" value={filters.userId} onChange={handleFilterChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm" />
                 </div>
                 <button
-                    // onClick={() => fetchDataWithFilters()}
+                    onClick={applyFilters}
                     className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                 >
                     Apply Filters
                 </button>
                 <button
-                    // onClick={() => exportData()}
+                    onClick={exportData}
                     className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                 >
                     Export CSV

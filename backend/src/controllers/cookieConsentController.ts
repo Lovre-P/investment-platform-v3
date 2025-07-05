@@ -4,6 +4,7 @@ import { StoreCookieConsentInput, GetCookieConsentAnalyticsInput } from '../util
 // No explicit AuthenticatedRequest needed due to global namespace augmentation in auth.ts
 import { CookieConsentRecord, CookieConsentAPIResponse, CookieConsentPreferencesDB } from '../models/CookieConsent.js';
 import { RowDataPacket, OkPacket } from 'mysql2';
+import crypto from 'crypto'; // Import crypto for UUID generation
 
 // Helper to get client IP address
 const getIpAddress = (req: Request): string | undefined => {
@@ -27,11 +28,14 @@ export const storeCookieConsent = async (req: Request, res: Response) => {
     const connection = await pool.getConnection();
     await connection.beginTransaction();
 
-    // Insert new consent
-    const [result] = await connection.execute<OkPacket>(
-      `INSERT INTO cookie_consents (user_id, session_id, strictly_necessary, functional, analytics, marketing, consent_version, ip_address, user_agent)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    const newConsentId = crypto.randomUUID();
+
+    // Insert new consent with app-generated UUID
+    await connection.execute<OkPacket>(
+      `INSERT INTO cookie_consents (id, user_id, session_id, strictly_necessary, functional, analytics, marketing, consent_version, ip_address, user_agent)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
+        newConsentId,
         userId || null,
         sessionId || null,
         preferences.strictly_necessary,
@@ -44,29 +48,20 @@ export const storeCookieConsent = async (req: Request, res: Response) => {
       ]
     );
 
-    const consentId = result.insertId; // This might not be UUID, depends on AUTO_INCREMENT or if we generate UUID in app
-
-    // If we used DEFAULT (UUID()) in SQL, we'd need to fetch the ID differently or generate it here.
-    // For now, assuming insertId works or we adjust schema for auto-increment int ID for simplicity if UUID generation is an issue.
-    // Let's assume the schema's DEFAULT (UUID()) works and we should generate UUID here if not.
-    // For simplicity with OkPacket, let's assume id is auto-increment or we fetch it.
-    // A better approach for UUIDs: generate it in the app and insert it.
-    // const newId = crypto.randomUUID(); // if we generate it here.
-
-    // For now, we don't have the ID easily from OkPacket if it's UUID.
-    // This part needs refinement based on actual UUID strategy with MySQL.
-    // Let's proceed as if we can get an ID or the client doesn't strictly need the *new* ID back for this call.
-
     await connection.commit();
     connection.release();
 
     res.status(201).json({
       success: true,
-      // consentId: newId, // If generated in app
+      consentId: newConsentId,
       message: 'Cookie consent preferences stored successfully.',
     });
   } catch (error) {
     console.error('Error storing cookie consent:', error);
+    if (!res.headersSent) { // Ensure headers aren't already sent
+      await connection.rollback(); // Rollback transaction on error
+      connection.release();
+    }
     res.status(500).json({ success: false, message: 'Failed to store cookie consent preferences.' });
   }
 };
@@ -148,16 +143,24 @@ export const getCookieConsentAnalytics = async (req: Request, res: Response) => 
 
     query += " ORDER BY cc.created_at DESC";
 
-    // Count total records for pagination
-    const countQuery = `SELECT COUNT(*) as total FROM (${query}) as subquery_for_count`; // params need to be passed here too without limit/offset
-    const [totalResult] = await pool.execute<RowDataPacket[]>(countQuery, params);
+    // Count total records for pagination using CTE
+    const countQuery = `
+      WITH FilteredConsents AS (
+        ${query}
+        -- Parameters for filtering are already part of the 'query' string here
+        -- and will be passed to pool.execute for the count
+      )
+      SELECT COUNT(*) as total FROM FilteredConsents;
+    `;
+    // Note: The 'params' array for countQuery should be the same as for the main query *before* adding LIMIT/OFFSET
+    const [totalResult] = await pool.execute<RowDataPacket[]>(countQuery, [...params]); // Use a copy of params before modification
     const total = totalResult[0].total;
 
     // Add pagination to main query
-    query += " LIMIT ? OFFSET ?";
-    params.push(limit, (page - 1) * limit);
+    const paginatedQuery = `${query} LIMIT ? OFFSET ?`;
+    const queryParamsWithPagination = [...params, limit, (page - 1) * limit];
 
-    const [consentsRows] = await pool.execute<RowDataPacket[]>(query, params);
+    const [consentsRows] = await pool.execute<RowDataPacket[]>(paginatedQuery, queryParamsWithPagination);
 
     const consents = consentsRows.map(row => ({
       id: row.id,
@@ -214,5 +217,38 @@ export const getCookieConsentAnalytics = async (req: Request, res: Response) => 
   } catch (error) {
     console.error('Error fetching cookie consent analytics:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch cookie consent analytics.' });
+  }
+};
+
+export const deleteCookieConsent = async (req: Request, res: Response) => {
+  const userId = req.user?.id; // From JWT token if user is authenticated
+  // const { sessionId } = req.body; // Could be used for anonymous users if needed
+
+  if (!userId) {
+    // For now, we only support deleting consents for authenticated users.
+    // If anonymous user consent deletion is needed, it would typically be by session_id
+    // or the frontend would just clear local storage without a server call.
+    // Alternatively, a specific consent ID could be passed if known.
+    return res.status(401).json({ success: false, message: 'User not authenticated. No consent to delete on server.' });
+  }
+
+  try {
+    const connection = await pool.getConnection();
+    // Delete all consents for the given user_id
+    // We could also opt to "soft delete" or mark as withdrawn if auditability of withdrawal is key
+    const [result] = await connection.execute<OkPacket>(
+      `DELETE FROM cookie_consents WHERE user_id = ?`,
+      [userId]
+    );
+    connection.release();
+
+    if (result.affectedRows > 0) {
+      res.status(200).json({ success: true, message: 'Cookie consent records deleted successfully.' });
+    } else {
+      res.status(200).json({ success: true, message: 'No cookie consent records found for this user to delete.' });
+    }
+  } catch (error) {
+    console.error('Error deleting cookie consent:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete cookie consent records.' });
   }
 };
