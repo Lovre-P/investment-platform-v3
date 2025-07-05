@@ -20,6 +20,22 @@ export interface ConsentAnalyticsFilters {
   userId?: string;
 }
 
+interface CookieConsentRow {
+  id: string;
+  userId: string | null;
+  sessionId: string | null;
+  strictlyNecessary: number;
+  functional: number;
+  analytics: number;
+  marketing: number;
+  version: string;
+  ipAddress: string | null;
+  userAgent: string | null;
+  timestamp: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export class CookieConsentModel {
   static async create(data: CookieConsentInsert): Promise<string> {
     const id = uuidv4();
@@ -28,26 +44,31 @@ export class CookieConsentModel {
       return id;
     }
 
-    await pool.execute(
-      `INSERT INTO cookie_consents (
-        id, user_id, session_id, strictly_necessary,
-        functional, analytics, marketing, consent_version,
-        ip_address, user_agent, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, FROM_UNIXTIME(?/1000))`,
-      [
-        id,
-        data.userId || null,
-        data.sessionId || null,
-        true,
-        data.preferences.functional,
-        data.preferences.analytics,
-        data.preferences.marketing,
-        data.version,
-        data.ipAddress || null,
-        data.userAgent || null,
-        data.timestamp
-      ]
-    );
+    try {
+      await pool.execute(
+        `INSERT INTO cookie_consents (
+          id, user_id, session_id, strictly_necessary,
+          functional, analytics, marketing, consent_version,
+          ip_address, user_agent, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, FROM_UNIXTIME(?/1000))`,
+        [
+          id,
+          data.userId || null,
+          data.sessionId || null,
+          true,
+          data.preferences.functional,
+          data.preferences.analytics,
+          data.preferences.marketing,
+          data.version,
+          data.ipAddress || null,
+          data.userAgent || null,
+          data.timestamp
+        ]
+      );
+    } catch (err) {
+      console.error('Failed to insert cookie consent', err);
+      throw err;
+    }
 
     return id;
   }
@@ -57,21 +78,28 @@ export class CookieConsentModel {
       return null;
     }
 
-    const [rows] = await pool.execute(
-      `SELECT id, user_id as userId, session_id as sessionId,
-              strictly_necessary as strictlyNecessary,
-              functional, analytics, marketing,
-              consent_version as version, ip_address as ipAddress,
-              user_agent as userAgent, UNIX_TIMESTAMP(created_at)*1000 as timestamp,
-              created_at, updated_at
-       FROM cookie_consents
-       WHERE user_id = ?
-       ORDER BY created_at DESC
-       LIMIT 1`,
-      [userId]
-    );
+    let rows: any[];
+    try {
+      const [dbRows] = await pool.execute(
+        `SELECT id, user_id as userId, session_id as sessionId,
+                strictly_necessary as strictlyNecessary,
+                functional, analytics, marketing,
+                consent_version as version, ip_address as ipAddress,
+                user_agent as userAgent, UNIX_TIMESTAMP(created_at)*1000 as timestamp,
+                created_at, updated_at
+         FROM cookie_consents
+         WHERE user_id = ?
+         ORDER BY created_at DESC
+         LIMIT 1`,
+        [userId]
+      ) as any;
+      rows = dbRows as any[];
+    } catch (err) {
+      console.error('Error fetching latest cookie consent', err);
+      throw err;
+    }
 
-    const row = (rows as any[])[0];
+    const row = (rows as CookieConsentRow[])[0];
     if (!row) return null;
     return {
       id: row.id,
@@ -117,35 +145,47 @@ export class CookieConsentModel {
       values.push(filters.endDate);
     }
 
-    const [rows] = await pool.execute(
-      `SELECT id, user_id as userId, session_id as sessionId,
-              strictly_necessary as strictlyNecessary,
-              functional, analytics, marketing,
-              consent_version as version, ip_address as ipAddress,
-              user_agent as userAgent, created_at, updated_at
-       FROM cookie_consents
-       ${where}
-       ORDER BY created_at DESC
-       LIMIT ? OFFSET ?`,
-      [...values, limit, offset]
-    );
+    let rows: any[] = [];
+    let countRows: any[] = [];
+    let rateRows: any[] = [];
+    try {
+      const [r] = await pool.execute(
+        `SELECT id, user_id as userId, session_id as sessionId,
+                strictly_necessary as strictlyNecessary,
+                functional, analytics, marketing,
+                consent_version as version, ip_address as ipAddress,
+                user_agent as userAgent, created_at, updated_at
+         FROM cookie_consents
+         ${where}
+         ORDER BY created_at DESC
+         LIMIT ? OFFSET ?`,
+        [...values, limit, offset]
+      ) as any;
+      rows = r as any[];
 
-    const [countRows] = await pool.execute(`SELECT COUNT(*) as count FROM cookie_consents ${where}`, values);
+      const [count] = await pool.execute(`SELECT COUNT(*) as count FROM cookie_consents ${where}`, values) as any;
+      countRows = count as any[];
+
+      const [rate] = await pool.execute(
+        `SELECT COUNT(*) as total,
+                AVG(functional) as functionalRate,
+                AVG(analytics) as analyticsRate,
+                AVG(marketing) as marketingRate,
+                SUM(created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) as recentActivity
+         FROM cookie_consents ${where}`,
+        values
+      ) as any;
+      rateRows = rate as any[];
+    } catch (err) {
+      console.error('Error fetching cookie consent analytics', err);
+      throw err;
+    }
+
     const total = (countRows as any[])[0].count as number;
-
-    const [rateRows] = await pool.execute(
-      `SELECT COUNT(*) as total,
-              AVG(functional) as functionalRate,
-              AVG(analytics) as analyticsRate,
-              AVG(marketing) as marketingRate,
-              SUM(created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) as recentActivity
-       FROM cookie_consents ${where}`,
-      values
-    );
 
     const rate = (rateRows as any[])[0];
 
-    const consents = (rows as any[]).map(r => ({
+    const consents = (rows as CookieConsentRow[]).map(r => ({
       id: r.id,
       userId: r.userId,
       sessionId: r.sessionId,

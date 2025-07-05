@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const cookieConsentSchema = z.object({
   preferences: z.object({
-    strictly_necessary: z.boolean(),
+    strictlyNecessary: z.boolean(),
     functional: z.boolean(),
     analytics: z.boolean(),
     marketing: z.boolean()

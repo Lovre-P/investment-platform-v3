@@ -22,8 +22,12 @@ async function runMigrations() {
         .filter(stmt => stmt.length > 0);
 
       for (const statement of statements) {
-        if (statement.trim()) {
+        if (!statement.trim()) continue;
+        try {
           await pool.execute(statement);
+        } catch (err) {
+          console.error('Error executing SQL statement:', statement);
+          throw err;
         }
       }
     };

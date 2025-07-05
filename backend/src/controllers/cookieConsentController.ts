@@ -1,11 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 import CookieConsentModel, { ConsentAnalyticsFilters, CookieConsentInsert } from '../models/CookieConsent.js';
 import { cookieConsentSchema } from '../utils/cookieConsentValidation.js';
+import { JWTPayload } from '../types/index.js';
 
-export const storeCookieConsent = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+interface AuthRequest extends Request {
+  user?: JWTPayload;
+}
+
+export const storeCookieConsent = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const data = cookieConsentSchema.parse(req.body);
-    const userId = (req as any).user?.userId;
+    const userId = req.user?.userId;
     const ip = req.ip;
     const userAgent = req.get('user-agent') || undefined;
 
@@ -13,7 +18,7 @@ export const storeCookieConsent = async (req: Request, res: Response, next: Next
       userId,
       sessionId: data.sessionId,
       preferences: {
-        strictlyNecessary: data.preferences.strictly_necessary,
+        strictlyNecessary: data.preferences.strictlyNecessary,
         functional: data.preferences.functional,
         analytics: data.preferences.analytics,
         marketing: data.preferences.marketing
@@ -32,9 +37,9 @@ export const storeCookieConsent = async (req: Request, res: Response, next: Next
   }
 };
 
-export const getCookieConsent = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getCookieConsent = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const userId = (req as any).user?.userId;
+    const userId = req.user?.userId;
     if (!userId) {
       res.status(200).json({ success: true, consent: null });
       return;
@@ -46,18 +51,24 @@ export const getCookieConsent = async (req: Request, res: Response, next: NextFu
   }
 };
 
-export const getCookieConsentAnalytics = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getCookieConsentAnalytics = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
+    let page = req.query.page ? parseInt(String(req.query.page)) : 1;
+    let limit = req.query.limit ? parseInt(String(req.query.limit)) : 20;
+
+    if (isNaN(page) || page < 1) page = 1;
+    if (isNaN(limit) || limit < 1 || limit > 100) limit = 20;
+
     const filters: ConsentAnalyticsFilters = {
-      page: req.query.page ? parseInt(String(req.query.page)) : 1,
-      limit: req.query.limit ? parseInt(String(req.query.limit)) : 20,
+      page,
+      limit,
       startDate: req.query.startDate as string | undefined,
       endDate: req.query.endDate as string | undefined,
       userId: req.query.userId as string | undefined
     };
 
     const data = await CookieConsentModel.getAnalytics(filters);
-    res.status(200).json({ success: true, data });
+    res.status(200).json({ success: true, data: { consents: data } });
   } catch (error) {
     next(error);
   }

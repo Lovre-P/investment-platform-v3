@@ -15,18 +15,41 @@ interface ConsentItem {
   createdAt: string;
 }
 
+interface ConsentAnalyticsResponse {
+  consents: ConsentItem[];
+}
+
 const CookieConsentAnalyticsPage: React.FC = () => {
   const [consents, setConsents] = useState<ConsentItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    apiClient.get<any>('/admin/cookie-consents')
-      .then(data => setConsents(data.consents || []))
-      .catch(err => console.error('Failed to fetch consent analytics', err));
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await apiClient.get<ConsentAnalyticsResponse>('/admin/cookie-consents');
+        if (Array.isArray(data.consents)) {
+          setConsents(data.consents);
+        } else {
+          throw new Error('Invalid response');
+        }
+      } catch (err) {
+        console.error('Failed to fetch consent analytics', err);
+        setError('Failed to load cookie consents');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
   return (
     <AdminLayout>
       <h1 className="text-2xl font-semibold mb-4">Cookie Consent Analytics</h1>
+      {loading && <p>Loading...</p>}
+      {error && <p className="text-red-600">{error}</p>}
       <table className="min-w-full bg-white shadow rounded">
         <thead>
           <tr>
