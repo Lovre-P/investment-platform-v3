@@ -120,6 +120,20 @@ export const useCookieConsent = () => {
     return cookieConsentService.getCategories();
   }, []);
 
+  const syncWithServer = useCallback(async () => {
+    if (hasConsent) {
+      try {
+        await cookieConsentService.saveConsentToServer(preferences);
+      } catch (error) {
+        console.error('Failed to sync consent with server:', error);
+      }
+    }
+  }, [hasConsent, preferences]);
+
+  useEffect(() => {
+    syncWithServer();
+  }, [syncWithServer]);
+
   return {
     // State
     hasConsent,

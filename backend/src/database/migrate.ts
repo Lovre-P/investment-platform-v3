@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import { pool } from './config.js';
 import { fileURLToPath } from 'url';
@@ -11,19 +11,32 @@ async function runMigrations() {
   try {
     console.log('🚀 Starting database migrations...');
 
-    // Read and execute schema.sql
+    // Read and execute base schema.sql
     const schemaPath = join(__dirname, 'schema.sql');
     const schema = readFileSync(schemaPath, 'utf8');
 
-    // Split schema into individual statements for MySQL
-    const statements = schema
-      .split(';')
-      .map(stmt => stmt.trim())
-      .filter(stmt => stmt.length > 0);
+    const executeStatements = async (sql: string) => {
+      const statements = sql
+        .split(';')
+        .map(stmt => stmt.trim())
+        .filter(stmt => stmt.length > 0);
 
-    for (const statement of statements) {
-      if (statement.trim()) {
-        await pool.execute(statement);
+      for (const statement of statements) {
+        if (statement.trim()) {
+          await pool.execute(statement);
+        }
+      }
+    };
+
+    await executeStatements(schema);
+
+    // Execute additional migration files if present
+    const migrationsDir = join(__dirname, 'migrations');
+    if (existsSync(migrationsDir)) {
+      const files = readdirSync(migrationsDir).filter(f => f.endsWith('.sql')).sort();
+      for (const file of files) {
+        const sql = readFileSync(join(migrationsDir, file), 'utf8');
+        await executeStatements(sql);
       }
     }
 

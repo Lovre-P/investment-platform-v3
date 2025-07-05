@@ -99,6 +99,26 @@ export interface DatabaseLead extends Lead {
   updatedAt: Date;
 }
 
+export interface CookieConsentPreferences {
+  strictlyNecessary: boolean;
+  functional: boolean;
+  analytics: boolean;
+  marketing: boolean;
+}
+
+export interface CookieConsentRecord {
+  id: string;
+  userId: string | null;
+  sessionId: string | null;
+  preferences: CookieConsentPreferences;
+  version: string;
+  timestamp: number;
+  ipAddress: string | null;
+  userAgent: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // JWT Payload
 export interface JWTPayload {
   userId: string;

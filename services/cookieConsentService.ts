@@ -10,6 +10,7 @@ class CookieConsentService {
   private readonly preferencesKey = COOKIE_CONSENT.PREFERENCES_KEY;
   private readonly version = COOKIE_CONSENT.VERSION;
   private readonly expiryDays = COOKIE_CONSENT.EXPIRY_DAYS;
+  private readonly sessionKey = 'megaInvestSessionId';
 
   // Default cookie categories configuration
   private readonly defaultCategories: CookieCategory[] = [
@@ -76,6 +77,41 @@ class CookieConsentService {
   }
 
   /**
+   * Retrieve or generate a session identifier
+   */
+  private getSessionId(): string {
+    let id = localStorage.getItem(this.sessionKey);
+    if (!id) {
+      id = crypto.randomUUID();
+      localStorage.setItem(this.sessionKey, id);
+    }
+    return id;
+  }
+
+  /**
+   * Persist consent to backend API
+   */
+  async saveConsentToServer(preferences: CookieConsentPreferences): Promise<void> {
+    try {
+      await fetch('/api/cookie-consent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(localStorage.getItem('megaInvestToken') ? { 'Authorization': `Bearer ${localStorage.getItem('megaInvestToken')}` } : {})
+        },
+        body: JSON.stringify({
+          preferences,
+          version: this.version,
+          timestamp: Date.now(),
+          sessionId: this.getSessionId()
+        })
+      });
+    } catch (error) {
+      console.error('Error saving consent to server:', error);
+    }
+  }
+
+  /**
    * Get current cookie preferences
    */
   getPreferences(): CookieConsentPreferences {
@@ -116,9 +152,14 @@ class CookieConsentService {
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(consentData));
       localStorage.setItem(this.preferencesKey, JSON.stringify(preferences));
-      
+
       // Trigger consent change event
       this.triggerConsentChangeEvent(preferences);
+
+      // Attempt to persist to server asynchronously
+      this.saveConsentToServer(preferences).catch((err) => {
+        console.error('Failed to sync consent with server:', err);
+      });
     } catch (error) {
       console.error('Error saving cookie consent:', error);
     }

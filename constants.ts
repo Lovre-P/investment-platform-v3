@@ -21,6 +21,7 @@ export const ADMIN_ROUTES = {
   PENDING_INVESTMENTS: '/admin/pending-investments',
   USERS: '/admin/users',
   SETTINGS: '/admin/settings',
+  COOKIE_CONSENTS: '/admin/cookie-consents',
 };
 
 export const PLACEHOLDER_IMAGE_URL = "https://picsum.photos";
