@@ -1,5 +1,6 @@
 import { pool, isMockMode } from '../database/config.js';
 import { v4 as uuidv4 } from 'uuid';
+import { RowDataPacket } from 'mysql2/promise';
 import { CookieConsentPreferences, CookieConsentRecord } from '../types/index.js';
 
 export interface CookieConsentInsert {
@@ -20,7 +21,7 @@ export interface ConsentAnalyticsFilters {
   userId?: string;
 }
 
-interface CookieConsentRow {
+interface CookieConsentRow extends RowDataPacket {
   id: string;
   userId: string | null;
   sessionId: string | null;
@@ -36,8 +37,7 @@ interface CookieConsentRow {
   updated_at: string;
 }
 
-export class CookieConsentModel {
-  static async create(data: CookieConsentInsert): Promise<string> {
+export async function createCookieConsent(data: CookieConsentInsert): Promise<string> {
     const id = uuidv4();
 
     if (isMockMode()) {
@@ -73,34 +73,29 @@ export class CookieConsentModel {
     return id;
   }
 
-  static async findLatestByUserId(userId: string): Promise<CookieConsentRecord | null> {
-    if (isMockMode()) {
-      return null;
-    }
+export async function findLatestCookieConsentByUserId(userId: string): Promise<CookieConsentRecord | null> {
+  if (isMockMode()) {
+    return null;
+  }
 
-    let rows: any[];
-    try {
-      const [dbRows] = await pool.execute(
-        `SELECT id, user_id as userId, session_id as sessionId,
-                strictly_necessary as strictlyNecessary,
-                functional, analytics, marketing,
-                consent_version as version, ip_address as ipAddress,
-                user_agent as userAgent, UNIX_TIMESTAMP(created_at)*1000 as timestamp,
-                created_at, updated_at
-         FROM cookie_consents
-         WHERE user_id = ?
-         ORDER BY created_at DESC
-         LIMIT 1`,
-        [userId]
-      ) as any;
-      rows = dbRows as any[];
-    } catch (err) {
-      console.error('Error fetching latest cookie consent', err);
-      throw err;
-    }
+  try {
+    const [rows] = await pool.execute<CookieConsentRow[]>(
+      `SELECT id, user_id as userId, session_id as sessionId,
+              strictly_necessary as strictlyNecessary,
+              functional, analytics, marketing,
+              consent_version as version, ip_address as ipAddress,
+              user_agent as userAgent, UNIX_TIMESTAMP(created_at)*1000 as timestamp,
+              created_at, updated_at
+       FROM cookie_consents
+       WHERE user_id = ?
+       ORDER BY created_at DESC
+       LIMIT 1`,
+      [userId]
+    );
 
-    const row = (rows as CookieConsentRow[])[0];
+    const row = rows[0];
     if (!row) return null;
+
     return {
       id: row.id,
       userId: row.userId,
@@ -118,74 +113,88 @@ export class CookieConsentModel {
       createdAt: row.created_at,
       updatedAt: row.updated_at
     };
+  } catch (err) {
+    console.error('Error fetching latest cookie consent', err);
+    throw err;
+  }
+}
+
+async function getConsentCount(where: string, values: any[]): Promise<number> {
+  interface CountRow extends RowDataPacket { count: number }
+  const [rows] = await pool.execute<CountRow[]>(
+    `SELECT COUNT(*) as count FROM cookie_consents ${where}`,
+    values
+  );
+  return rows[0]?.count || 0;
+}
+
+async function getConsentRates(where: string, values: any[]) {
+  interface RateRow extends RowDataPacket {
+    total: number;
+    functionalRate: string;
+    analyticsRate: string;
+    marketingRate: string;
+    recentActivity: number;
+  }
+  const [rows] = await pool.execute<RateRow[]>(
+    `SELECT COUNT(*) as total,
+            AVG(functional) as functionalRate,
+            AVG(analytics) as analyticsRate,
+            AVG(marketing) as marketingRate,
+            SUM(created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) as recentActivity
+     FROM cookie_consents ${where}`,
+    values
+  );
+  return rows[0];
+}
+
+export async function getCookieConsentAnalytics(filters: ConsentAnalyticsFilters) {
+  if (isMockMode()) {
+    return {
+      consents: [],
+      pagination: { page: 1, limit: 0, total: 0, totalPages: 0 },
+      analytics: { totalConsents: 0, acceptanceRates: { functional: 0, analytics: 0, marketing: 0 }, recentActivity: 0 }
+    };
   }
 
-  static async getAnalytics(filters: ConsentAnalyticsFilters) {
-    if (isMockMode()) {
-      return { consents: [], pagination: { page: 1, limit: 0, total: 0, totalPages: 0 }, analytics: { totalConsents: 0, acceptanceRates: { functional: 0, analytics: 0, marketing: 0 }, recentActivity: 0 } };
-    }
+  const page = filters.page || 1;
+  const limit = filters.limit || 20;
+  const offset = (page - 1) * limit;
 
-    const page = filters.page || 1;
-    const limit = filters.limit || 20;
-    const offset = (page - 1) * limit;
+  let where = 'WHERE 1=1';
+  const values: any[] = [];
 
-    let where = 'WHERE 1=1';
-    const values: any[] = [];
+  if (filters.userId) {
+    where += ' AND user_id = ?';
+    values.push(filters.userId);
+  }
+  if (filters.startDate) {
+    where += ' AND created_at >= ?';
+    values.push(filters.startDate);
+  }
+  if (filters.endDate) {
+    where += ' AND created_at <= ?';
+    values.push(filters.endDate);
+  }
 
-    if (filters.userId) {
-      where += ' AND user_id = ?';
-      values.push(filters.userId);
-    }
-    if (filters.startDate) {
-      where += ' AND created_at >= ?';
-      values.push(filters.startDate);
-    }
-    if (filters.endDate) {
-      where += ' AND created_at <= ?';
-      values.push(filters.endDate);
-    }
+  try {
+    const [rows] = await pool.execute<CookieConsentRow[]>(
+      `SELECT id, user_id as userId, session_id as sessionId,
+              strictly_necessary as strictlyNecessary,
+              functional, analytics, marketing,
+              consent_version as version, ip_address as ipAddress,
+              user_agent as userAgent, created_at, updated_at
+       FROM cookie_consents
+       ${where}
+       ORDER BY created_at DESC
+       LIMIT ? OFFSET ?`,
+      [...values, limit, offset]
+    );
 
-    let rows: any[] = [];
-    let countRows: any[] = [];
-    let rateRows: any[] = [];
-    try {
-      const [r] = await pool.execute(
-        `SELECT id, user_id as userId, session_id as sessionId,
-                strictly_necessary as strictlyNecessary,
-                functional, analytics, marketing,
-                consent_version as version, ip_address as ipAddress,
-                user_agent as userAgent, created_at, updated_at
-         FROM cookie_consents
-         ${where}
-         ORDER BY created_at DESC
-         LIMIT ? OFFSET ?`,
-        [...values, limit, offset]
-      ) as any;
-      rows = r as any[];
+    const total = await getConsentCount(where, values);
+    const rate = await getConsentRates(where, values);
 
-      const [count] = await pool.execute(`SELECT COUNT(*) as count FROM cookie_consents ${where}`, values) as any;
-      countRows = count as any[];
-
-      const [rate] = await pool.execute(
-        `SELECT COUNT(*) as total,
-                AVG(functional) as functionalRate,
-                AVG(analytics) as analyticsRate,
-                AVG(marketing) as marketingRate,
-                SUM(created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) as recentActivity
-         FROM cookie_consents ${where}`,
-        values
-      ) as any;
-      rateRows = rate as any[];
-    } catch (err) {
-      console.error('Error fetching cookie consent analytics', err);
-      throw err;
-    }
-
-    const total = (countRows as any[])[0].count as number;
-
-    const rate = (rateRows as any[])[0];
-
-    const consents = (rows as CookieConsentRow[]).map(r => ({
+    const consents = rows.map(r => ({
       id: r.id,
       userId: r.userId,
       sessionId: r.sessionId,
@@ -220,7 +229,9 @@ export class CookieConsentModel {
         recentActivity: rate.recentActivity || 0
       }
     };
+  } catch (err) {
+    console.error('Error fetching cookie consent analytics', err);
+    throw err;
   }
 }
 
-export default CookieConsentModel;

@@ -1,5 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import CookieConsentModel, { ConsentAnalyticsFilters, CookieConsentInsert } from '../models/CookieConsent.js';
+import {
+  createCookieConsent,
+  findLatestCookieConsentByUserId,
+  getCookieConsentAnalytics as fetchCookieConsentAnalytics,
+  ConsentAnalyticsFilters,
+  CookieConsentInsert
+} from '../models/CookieConsent.js';
 import { cookieConsentSchema } from '../utils/cookieConsentValidation.js';
 import { JWTPayload } from '../types/index.js';
 
@@ -29,7 +35,7 @@ export const storeCookieConsent = async (req: AuthRequest, res: Response, next: 
       userAgent
     };
 
-    const consentId = await CookieConsentModel.create(insert);
+    const consentId = await createCookieConsent(insert);
 
     res.status(201).json({ success: true, consentId, message: 'Consent stored' });
   } catch (error) {
@@ -44,7 +50,7 @@ export const getCookieConsent = async (req: AuthRequest, res: Response, next: Ne
       res.status(200).json({ success: true, consent: null });
       return;
     }
-    const consent = await CookieConsentModel.findLatestByUserId(userId);
+    const consent = await findLatestCookieConsentByUserId(userId);
     res.status(200).json({ success: true, consent });
   } catch (error) {
     next(error);
@@ -67,7 +73,7 @@ export const getCookieConsentAnalytics = async (req: AuthRequest, res: Response,
       userId: req.query.userId as string | undefined
     };
 
-    const data = await CookieConsentModel.getAnalytics(filters);
+    const data = await fetchCookieConsentAnalytics(filters);
     res.status(200).json({ success: true, data: { consents: data } });
   } catch (error) {
     next(error);

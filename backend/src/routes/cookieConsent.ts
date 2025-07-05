@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { storeCookieConsent, getCookieConsent, getCookieConsentAnalytics } from '../controllers/cookieConsentController.js';
-import { authenticate, requireAdmin } from '../middleware/auth.js';
+import { storeCookieConsent, getCookieConsent } from '../controllers/cookieConsentController.js';
+import { authenticate } from '../middleware/auth.js';
 import { validateBody } from '../middleware/validation.js';
 import { cookieConsentSchema } from '../utils/cookieConsentValidation.js';
 
