@@ -100,8 +100,10 @@ The admin login button is hidden from the public navigation for security. To acc
 - `GET /api/admin/leads` - Manage leads
 - `GET /api/admin/users` - Manage users
 - `GET /api/admin/cookie-consents` - Cookie consent analytics
-- `POST /api/cookie-consent` - Store cookie preferences (authentication optional)
-- `GET /api/cookie-consent` - Retrieve latest consent for logged in user
+
+### Cookie Consent Endpoints (Optional Authentication)
+- `POST /api/cookie-consent` - Store cookie preferences
+- `GET /api/cookie-consent` - Retrieve latest consent for logged-in user
 
 ## Development
 
@@ -128,7 +130,7 @@ DB_NAME=megainvest
 
 1. Install MySQL locally or use a cloud provider
 2. Create a database named `megainvest`
-3. Run the backend; migrations will run automatically to create tables
+3. Run the backend with `npm run backend:dev` to start the server and automatically apply migrations
 4. See [Backend MySQL Setup Guide](./backend/MYSQL_SETUP.md) for details
 
 ## Contributing
