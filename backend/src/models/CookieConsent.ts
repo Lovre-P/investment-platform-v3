@@ -37,6 +37,8 @@ interface CookieConsentRow extends RowDataPacket {
   updated_at: string;
 }
 
+type SqlValue = string | number | boolean | null | Date;
+
 export async function createCookieConsent(data: CookieConsentInsert): Promise<string> {
     const id = uuidv4();
 
@@ -119,7 +121,7 @@ export async function findLatestCookieConsentByUserId(userId: string): Promise<C
   }
 }
 
-async function getConsentCount(where: string, values: any[]): Promise<number> {
+async function getConsentCount(where: string, values: SqlValue[]): Promise<number> {
   interface CountRow extends RowDataPacket { count: number }
   const [rows] = await pool.execute<CountRow[]>(
     `SELECT COUNT(*) as count FROM cookie_consents ${where}`,
@@ -128,7 +130,7 @@ async function getConsentCount(where: string, values: any[]): Promise<number> {
   return rows[0]?.count || 0;
 }
 
-async function getConsentRates(where: string, values: any[]) {
+async function getConsentRates(where: string, values: SqlValue[]) {
   interface RateRow extends RowDataPacket {
     total: number;
     functionalRate: string;
@@ -162,7 +164,7 @@ export async function getCookieConsentAnalytics(filters: ConsentAnalyticsFilters
   const offset = (page - 1) * limit;
 
   let where = 'WHERE 1=1';
-  const values: any[] = [];
+  const values: SqlValue[] = [];
 
   if (filters.userId) {
     where += ' AND user_id = ?';
@@ -183,7 +185,9 @@ export async function getCookieConsentAnalytics(filters: ConsentAnalyticsFilters
               strictly_necessary as strictlyNecessary,
               functional, analytics, marketing,
               consent_version as version, ip_address as ipAddress,
-              user_agent as userAgent, created_at, updated_at
+              user_agent as userAgent,
+              UNIX_TIMESTAMP(created_at)*1000 as timestamp,
+              created_at, updated_at
        FROM cookie_consents
        ${where}
        ORDER BY created_at DESC
@@ -205,6 +209,7 @@ export async function getCookieConsentAnalytics(filters: ConsentAnalyticsFilters
         marketing: !!r.marketing
       },
       version: r.version,
+      timestamp: r.timestamp,
       ipAddress: r.ipAddress,
       userAgent: r.userAgent,
       createdAt: r.created_at,
