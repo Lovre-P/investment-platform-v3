@@ -49,6 +49,7 @@ const AdminLayout: React.FC = () => {
     { to: ADMIN_ROUTES.PENDING_INVESTMENTS, icon: InboxArrowDownIcon, label: 'Pending' },
     { to: ADMIN_ROUTES.LEADS, icon: DocumentTextIcon, label: 'Leads' },
     { to: ADMIN_ROUTES.USERS, icon: UserGroupIcon, label: 'Users' },
+    { to: ADMIN_ROUTES.COOKIE_CONSENTS, icon: DocumentTextIcon, label: 'Cookie Consents' },
     { to: ADMIN_ROUTES.SETTINGS, icon: CogIcon, label: 'Settings' },
   ];
 

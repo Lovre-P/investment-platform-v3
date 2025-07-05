@@ -19,6 +19,7 @@ import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 
 // Import database
 import { testConnection, closePool } from './database/config.js';
+import { runMigrations } from './database/migrate.js';
 
 // Load environment variables
 dotenv.config();
@@ -153,6 +154,7 @@ app.use(errorHandler);
 // Start server
 const startServer = async () => {
   try {
+    await runMigrations();
     // Test database connection
     const dbConnected = await testConnection();
     if (!dbConnected) {

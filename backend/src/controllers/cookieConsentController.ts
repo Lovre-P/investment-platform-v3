@@ -74,7 +74,7 @@ export const getCookieConsentAnalytics = async (req: AuthRequest, res: Response,
     };
 
     const data = await fetchCookieConsentAnalytics(filters);
-    res.status(200).json({ success: true, data: { consents: data } });
+    res.status(200).json({ success: true, data });
   } catch (error) {
     next(error);
   }

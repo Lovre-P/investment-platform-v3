@@ -114,7 +114,7 @@ class CookieConsentService {
         },
         body: JSON.stringify({
           preferences: {
-            strictlyNecessary: preferences.strictly_necessary,
+            strictlyNecessary: preferences.strictlyNecessary,
             functional: preferences.functional,
             analytics: preferences.analytics,
             marketing: preferences.marketing
@@ -136,7 +136,7 @@ class CookieConsentService {
     const consent = this.getConsentData();
     if (!consent) {
       return {
-        strictly_necessary: true,
+        strictlyNecessary: true,
         functional: false,
         analytics: false,
         marketing: false
@@ -144,7 +144,7 @@ class CookieConsentService {
     }
 
     return {
-      strictly_necessary: true, // Always true
+      strictlyNecessary: true, // Always true
       functional: consent.categories.functional || false,
       analytics: consent.categories.analytics || false,
       marketing: consent.categories.marketing || false
@@ -188,7 +188,7 @@ class CookieConsentService {
    */
   acceptAll(): void {
     this.saveConsent({
-      strictly_necessary: true,
+      strictlyNecessary: true,
       functional: true,
       analytics: true,
       marketing: true
@@ -200,7 +200,7 @@ class CookieConsentService {
    */
   rejectAll(): void {
     this.saveConsent({
-      strictly_necessary: true,
+      strictlyNecessary: true,
       functional: false,
       analytics: false,
       marketing: false

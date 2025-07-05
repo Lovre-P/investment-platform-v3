@@ -54,7 +54,7 @@ const CookieConsentBanner: React.FC<CookieConsentBannerProps> = ({ onConsentChan
     setIsLoading(true);
     try {
       const preferences: CookieConsentPreferences = {
-        strictly_necessary: true,
+        strictlyNecessary: true,
         functional: categories.find(c => c.id === 'functional')?.enabled || false,
         analytics: categories.find(c => c.id === 'analytics')?.enabled || false,
         marketing: categories.find(c => c.id === 'marketing')?.enabled || false

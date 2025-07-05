@@ -8,7 +8,7 @@ import { CookieConsentPreferences } from '../types/cookieConsent';
 export const useCookieConsent = () => {
   const [hasConsent, setHasConsent] = useState<boolean>(false);
   const [preferences, setPreferences] = useState<CookieConsentPreferences>({
-    strictly_necessary: true,
+    strictlyNecessary: true,
     functional: false,
     analytics: false,
     marketing: false
@@ -99,7 +99,7 @@ export const useCookieConsent = () => {
       cookieConsentService.clearConsent();
       setHasConsent(false);
       setPreferences({
-        strictly_necessary: true,
+        strictlyNecessary: true,
         functional: false,
         analytics: false,
         marketing: false
