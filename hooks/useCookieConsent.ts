@@ -8,7 +8,7 @@ import { CookieConsentPreferences } from '../types/cookieConsent';
 export const useCookieConsent = () => {
   const [hasConsent, setHasConsent] = useState<boolean>(false);
   const [preferences, setPreferences] = useState<CookieConsentPreferences>({
-    strictly_necessary: true,
+    strictlyNecessary: true,
     functional: false,
     analytics: false,
     marketing: false
@@ -99,7 +99,7 @@ export const useCookieConsent = () => {
       cookieConsentService.clearConsent();
       setHasConsent(false);
       setPreferences({
-        strictly_necessary: true,
+        strictlyNecessary: true,
         functional: false,
         analytics: false,
         marketing: false
@@ -119,6 +119,20 @@ export const useCookieConsent = () => {
   const getCategories = useCallback(() => {
     return cookieConsentService.getCategories();
   }, []);
+
+  const syncWithServer = useCallback(async () => {
+    if (hasConsent) {
+      try {
+        await cookieConsentService.saveConsentToServer(preferences);
+      } catch (error) {
+        console.error('Failed to sync consent with server:', error);
+      }
+    }
+  }, [hasConsent, preferences]);
+
+  useEffect(() => {
+    syncWithServer();
+  }, [syncWithServer]);
 
   return {
     // State

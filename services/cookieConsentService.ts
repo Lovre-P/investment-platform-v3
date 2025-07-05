@@ -10,6 +10,7 @@ class CookieConsentService {
   private readonly preferencesKey = COOKIE_CONSENT.PREFERENCES_KEY;
   private readonly version = COOKIE_CONSENT.VERSION;
   private readonly expiryDays = COOKIE_CONSENT.EXPIRY_DAYS;
+  private readonly sessionKey = 'megaInvestSessionId';
 
   // Default cookie categories configuration
   private readonly defaultCategories: CookieCategory[] = [
@@ -76,13 +77,66 @@ class CookieConsentService {
   }
 
   /**
+   * Retrieve or generate a session identifier
+   */
+  private getSessionId(): string {
+    let id = localStorage.getItem(this.sessionKey);
+    if (!id) {
+      id = this.generateUUID();
+      localStorage.setItem(this.sessionKey, id);
+    }
+    return id;
+  }
+
+  /** Generate UUID with fallback for older browsers */
+  private generateUUID(): string {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+    // Fallback RFC4122 version 4
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  }
+
+  /**
+   * Persist consent to backend API
+   */
+  async saveConsentToServer(preferences: CookieConsentPreferences): Promise<void> {
+    try {
+      await fetch('/api/cookie-consent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(localStorage.getItem('megaInvestToken') ? { 'Authorization': `Bearer ${localStorage.getItem('megaInvestToken')}` } : {})
+        },
+        body: JSON.stringify({
+          preferences: {
+            strictlyNecessary: preferences.strictlyNecessary,
+            functional: preferences.functional,
+            analytics: preferences.analytics,
+            marketing: preferences.marketing
+          },
+          version: this.version,
+          timestamp: Date.now(),
+          sessionId: this.getSessionId()
+        })
+      });
+    } catch (error) {
+      console.error('Error saving consent to server:', error);
+    }
+  }
+
+  /**
    * Get current cookie preferences
    */
   getPreferences(): CookieConsentPreferences {
     const consent = this.getConsentData();
     if (!consent) {
       return {
-        strictly_necessary: true,
+        strictlyNecessary: true,
         functional: false,
         analytics: false,
         marketing: false
@@ -90,7 +144,7 @@ class CookieConsentService {
     }
 
     return {
-      strictly_necessary: true, // Always true
+      strictlyNecessary: true, // Always true
       functional: consent.categories.functional || false,
       analytics: consent.categories.analytics || false,
       marketing: consent.categories.marketing || false
@@ -106,7 +160,7 @@ class CookieConsentService {
       timestamp: Date.now(),
       hasConsented: true,
       categories: {
-        strictly_necessary: true, // Always true
+        strictlyNecessary: true, // Always true
         functional: preferences.functional,
         analytics: preferences.analytics,
         marketing: preferences.marketing
@@ -116,9 +170,14 @@ class CookieConsentService {
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(consentData));
       localStorage.setItem(this.preferencesKey, JSON.stringify(preferences));
-      
+
       // Trigger consent change event
       this.triggerConsentChangeEvent(preferences);
+
+      // Attempt to persist to server asynchronously
+      this.saveConsentToServer(preferences).catch((err) => {
+        console.error('Failed to sync consent with server:', err);
+      });
     } catch (error) {
       console.error('Error saving cookie consent:', error);
     }
@@ -129,7 +188,7 @@ class CookieConsentService {
    */
   acceptAll(): void {
     this.saveConsent({
-      strictly_necessary: true,
+      strictlyNecessary: true,
       functional: true,
       analytics: true,
       marketing: true
@@ -141,7 +200,7 @@ class CookieConsentService {
    */
   rejectAll(): void {
     this.saveConsent({
-      strictly_necessary: true,
+      strictlyNecessary: true,
       functional: false,
       analytics: false,
       marketing: false

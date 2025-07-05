@@ -33,7 +33,7 @@ const CookiePreferencesButton: React.FC<CookiePreferencesButtonProps> = ({
     setIsLoading(true);
     try {
       const preferences: CookieConsentPreferences = {
-        strictly_necessary: true,
+        strictlyNecessary: true,
         functional: categories.find(c => c.id === 'functional')?.enabled || false,
         analytics: categories.find(c => c.id === 'analytics')?.enabled || false,
         marketing: categories.find(c => c.id === 'marketing')?.enabled || false

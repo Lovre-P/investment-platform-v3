@@ -21,6 +21,7 @@ export const ADMIN_ROUTES = {
   PENDING_INVESTMENTS: '/admin/pending-investments',
   USERS: '/admin/users',
   SETTINGS: '/admin/settings',
+  COOKIE_CONSENTS: '/admin/cookie-consents',
 };
 
 export const PLACEHOLDER_IMAGE_URL = "https://picsum.photos";
@@ -32,7 +33,7 @@ export const COOKIE_CONSENT = {
   VERSION: '1.0',
   EXPIRY_DAYS: 365,
   CATEGORIES: {
-    STRICTLY_NECESSARY: 'strictly_necessary',
+    STRICTLY_NECESSARY: 'strictlyNecessary',
     ANALYTICS: 'analytics',
     MARKETING: 'marketing',
     FUNCTIONAL: 'functional'

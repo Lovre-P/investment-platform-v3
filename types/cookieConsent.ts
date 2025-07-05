@@ -15,7 +15,7 @@ export interface CookieConsentData {
 }
 
 export interface CookieConsentPreferences {
-  strictly_necessary: boolean;
+  strictlyNecessary: boolean;
   analytics: boolean;
   marketing: boolean;
   functional: boolean;
