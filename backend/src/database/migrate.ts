@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join } from 'path';
-import { pool } from './config.js';
+import { pool, closePool } from './config.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -13,6 +13,9 @@ export async function runMigrations(): Promise<void> {
 
     // Read and execute base schema.sql
     const schemaPath = join(__dirname, 'schema.sql');
+    if (!existsSync(schemaPath)) {
+      throw new Error(`Schema file not found: ${schemaPath}`);
+    }
     const schema = readFileSync(schemaPath, 'utf8');
 
     const executeStatements = async (sql: string) => {
@@ -25,8 +28,9 @@ export async function runMigrations(): Promise<void> {
         if (!statement.trim()) continue;
         try {
           await pool.execute(statement);
+          console.log(`✅ Executed statement: ${statement.substring(0, 50)}...`);
         } catch (err) {
-          console.error('Error executing SQL statement:', statement);
+          console.error(`❌ Failed to execute statement: ${statement.substring(0, 50)}...`);
           throw err;
         }
       }
@@ -39,6 +43,7 @@ export async function runMigrations(): Promise<void> {
     if (existsSync(migrationsDir)) {
       const files = readdirSync(migrationsDir).filter(f => f.endsWith('.sql')).sort();
       for (const file of files) {
+        console.log(`📄 Processing migration: ${file}`);
         const sql = readFileSync(join(migrationsDir, file), 'utf8');
         await executeStatements(sql);
       }
@@ -49,4 +54,14 @@ export async function runMigrations(): Promise<void> {
     console.error('❌ Migration failed:', error);
     throw error;
   }
+}
+
+// If this file is run directly via `tsx src/database/migrate.ts`, execute migrations
+if (import.meta.url === `file://${process.argv[1]}`) {
+  runMigrations()
+    .then(() => closePool())
+    .catch(err => {
+      console.error('Migration script failed:', err);
+      process.exit(1);
+    });
 }
