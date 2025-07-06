@@ -3,9 +3,9 @@ import React, { useState, useEffect } from 'react';
 import Button from '../../components/Button';
 import {
   CogIcon, ServerIcon, ShieldCheckIcon, BellIcon, TagIcon,
-  PlusIcon, PencilIcon, TrashIcon, ExclamationTriangleIcon
+  PlusIcon, PencilIcon, TrashIcon
 } from '@heroicons/react/24/outline';
-import { InvestmentCategory, PlatformSetting } from '../../types';
+import { InvestmentCategory } from '../../types';
 import { getCategories, createCategory, updateCategory, deleteCategory, getCategoryUsage } from '../../services/categoryService';
 import { getSettings, bulkUpdateSettings } from '../../services/settingsService';
 import { useAuth } from '../../contexts/AuthContext';
@@ -121,8 +121,9 @@ const AdminSettingsPage: React.FC = () => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type, checked } = e.target as HTMLInputElement;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
     setSettings(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : (type === 'number' ? parseFloat(value) || 0 : value),
