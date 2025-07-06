@@ -59,7 +59,7 @@ const CookiePreferencesButton: React.FC<CookiePreferencesButtonProps> = ({
 
   const ButtonComponent = variant === 'link' ? 'button' : 'button';
   const buttonClasses = variant === 'link' 
-    ? `text-sm text-gray-600 hover:text-gray-800 underline ${className}`
+    ? `text-sm text-accent-300 hover:text-accent-400 underline ${className}`
     : `inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors duration-200 ${className}`;
 
   return (
