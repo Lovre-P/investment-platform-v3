@@ -164,7 +164,7 @@ const HomePage: React.FC = () => {
       {/* Call to Action - Submit Project */}
       <section className="bg-white py-16 px-6 rounded-xl shadow-xl text-center">
         <h2 className="text-3xl font-bold text-primary-800 mb-4">Have a Groundbreaking Project?</h2>
-        <p className="text-lg text-secondary-500 mb-8 max-w-2xl mx-auto">
+        <p className="text-lg text-primary-500 mb-8 max-w-2xl mx-auto">
           MegaInvest is always looking for innovative projects and promising businesses seeking funding. If you have a vision, we want to hear about it.
         </p>
         <Button

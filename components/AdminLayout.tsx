@@ -5,7 +5,7 @@ import { APP_NAME, ADMIN_ROUTES } from '../constants';
 import { useAuth } from '../contexts/AuthContext';
 import {
   CogIcon, BriefcaseIcon, UserGroupIcon,
-  DocumentTextIcon, InboxArrowDownIcon, ArrowLeftOnRectangleIcon, PresentationChartLineIcon
+  DocumentTextIcon, InboxArrowDownIcon, ArrowLeftOnRectangleIcon, PresentationChartLineIcon, HomeIcon
 } from '@heroicons/react/24/outline';
 
 interface NavItemProps {
@@ -64,8 +64,15 @@ const AdminLayout: React.FC = () => {
         <nav className="flex-grow p-4 space-y-2">
           {navItems.map(item => <NavItem key={item.to} {...item} />)}
         </nav>
-        <div className="p-4 border-t border-secondary-700">
+        <div className="p-4 border-t border-secondary-700 space-y-3">
            {user && <p className="text-xs text-secondary-400 mb-2">Logged in as: {user.email}</p>}
+          <Link
+            to="/"
+            className="w-full flex items-center justify-center px-4 py-3 text-sm font-medium rounded-lg bg-primary-600 hover:bg-primary-700 text-white transition-colors duration-150"
+          >
+            <HomeIcon className="h-5 w-5 mr-2" />
+            Go to Home Page
+          </Link>
           <button
             onClick={handleLogout}
             className="w-full flex items-center justify-center px-4 py-3 text-sm font-medium rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors duration-150"

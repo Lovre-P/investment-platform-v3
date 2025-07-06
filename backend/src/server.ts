@@ -10,6 +10,8 @@ import authRoutes from './routes/auth.js';
 import investmentRoutes from './routes/investments.js';
 import leadRoutes from './routes/leads.js';
 import userRoutes from './routes/users.js';
+import categoryRoutes from './routes/categories.js';
+import settingsRoutes from './routes/settings.js';
 
 // Import middleware
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
@@ -134,11 +136,15 @@ app.get('/health', (_req, res) => {
   });
 });
 
+
+
 // API routes with specific rate limiting
 app.use('/api/auth', authLimiter, authRoutes); // Apply stricter rate limiting to auth routes
 app.use('/api/investments', investmentRoutes);
 app.use('/api/leads', leadRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // 404 handler
 app.use(notFoundHandler);

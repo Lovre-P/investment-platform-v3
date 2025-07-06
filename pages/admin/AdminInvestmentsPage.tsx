@@ -1,7 +1,8 @@
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { Investment, InvestmentStatus } from '../../types';
+import { Investment, InvestmentStatus, InvestmentCategory } from '../../types';
 import { getInvestments, createInvestment, createInvestmentWithFiles, updateInvestment, updateInvestmentWithFiles, deleteInvestment, CreateInvestmentData } from '../../services/investmentService';
+import { getCategories } from '../../services/categoryService';
 import Button from '../../components/Button';
 import Modal from '../../components/Modal';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -56,10 +57,9 @@ const AdminInvestmentsPage: React.FC = () => {
   const [categoryFilter, setCategoryFilter] = useState<string>('');
   const [sortBy, setSortBy] = useState<'date_desc' | 'date_asc' | 'goal_desc' | 'goal_asc' | 'title_asc' | 'title_desc'>('date_desc');
 
-  const categories = useMemo(() => {
-    const uniqueCategories = new Set(investments.map(inv => inv.category));
-    return Array.from(uniqueCategories).sort();
-  }, [investments]);
+  // Categories state
+  const [categories, setCategories] = useState<InvestmentCategory[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
   const fetchInvestments = useCallback(async () => {
     setIsLoading(true);
@@ -75,9 +75,31 @@ const AdminInvestmentsPage: React.FC = () => {
     }
   }, []);
 
+  const fetchCategories = useCallback(async () => {
+    setCategoriesLoading(true);
+    try {
+      const data = await getCategories(true); // Include inactive for admin
+      setCategories(data);
+    } catch (err) {
+      console.error("Failed to fetch categories:", err);
+      // Fallback to hardcoded categories if API fails
+      setCategories([
+        { id: '1', name: 'Real Estate', description: '', isActive: true, sortOrder: 1, createdAt: '', updatedAt: '' },
+        { id: '2', name: 'Technology', description: '', isActive: true, sortOrder: 2, createdAt: '', updatedAt: '' },
+        { id: '3', name: 'Renewable Energy', description: '', isActive: true, sortOrder: 3, createdAt: '', updatedAt: '' },
+        { id: '4', name: 'Small Business', description: '', isActive: true, sortOrder: 4, createdAt: '', updatedAt: '' },
+        { id: '5', name: 'Healthcare', description: '', isActive: true, sortOrder: 5, createdAt: '', updatedAt: '' },
+        { id: '6', name: 'Other', description: '', isActive: true, sortOrder: 99, createdAt: '', updatedAt: '' }
+      ]);
+    } finally {
+      setCategoriesLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchInvestments();
-  }, [fetchInvestments]);
+    fetchCategories();
+  }, [fetchInvestments, fetchCategories]);
 
   const filteredAndSortedInvestments = useMemo(() => {
     let filtered = [...investments];
@@ -343,9 +365,14 @@ const AdminInvestmentsPage: React.FC = () => {
             className="w-full appearance-none pl-3 pr-8 py-2 border border-secondary-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 bg-white text-sm"
           >
             <option value="">All Categories</option>
-            {categories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
+            {categories
+              .sort((a, b) => a.sortOrder - b.sortOrder)
+              .map(cat => (
+                <option key={cat.id} value={cat.name}>
+                  {cat.name} {!cat.isActive ? '(Inactive)' : ''}
+                </option>
+              ))
+            }
           </select>
            <ChevronDownIcon className="h-4 w-4 text-secondary-400 absolute right-2.5 top-1/2 transform translate-y-[0.1rem] pointer-events-none"/>
         </div>
@@ -454,14 +481,27 @@ const AdminInvestmentsPage: React.FC = () => {
                         </div>
                         <div>
                             <label htmlFor="category-modal">Category *</label>
-                            <select name="category" id="category-modal" value={currentInvestment.category} onChange={handleChange} required className="form-select">
-                                <option value="">Select Category</option>
-                                <option value="Real Estate">Real Estate</option>
-                                <option value="Technology">Technology</option>
-                                <option value="Renewable Energy">Renewable Energy</option>
-                                <option value="Small Business">Small Business</option>
-                                <option value="Healthcare">Healthcare</option>
-                                <option value="Other">Other</option>
+                            <select
+                              name="category"
+                              id="category-modal"
+                              value={currentInvestment.category}
+                              onChange={handleChange}
+                              required
+                              className="form-select"
+                              disabled={categoriesLoading}
+                            >
+                              <option value="">
+                                {categoriesLoading ? 'Loading categories...' : 'Select Category'}
+                              </option>
+                              {categories
+                                .filter(cat => cat.isActive) // Only show active categories in form
+                                .sort((a, b) => a.sortOrder - b.sortOrder)
+                                .map(cat => (
+                                  <option key={cat.id} value={cat.name}>
+                                    {cat.name}
+                                  </option>
+                                ))
+                              }
                             </select>
                         </div>
                     </div>

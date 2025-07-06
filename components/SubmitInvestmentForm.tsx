@@ -1,9 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from './Button';
 import FileUpload from './FileUpload';
-import { Investment } from '../types';
+import { Investment, InvestmentCategory } from '../types';
 import { createInvestment, createInvestmentWithFiles } from '../services/investmentService';
+import { getCategories } from '../services/categoryService';
 
 // Updated form data type
 type InvestmentFormData = Omit<Investment, 'id' | 'status' | 'submissionDate' | 'amountRaised' | 'images' | 'submittedBy' | 'submitterEmail' | 'tags'> & {
@@ -36,6 +37,32 @@ const SubmitInvestmentForm: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof InvestmentFormData, string>>>({});
+  const [categories, setCategories] = useState<InvestmentCategory[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+
+  // Load categories on component mount
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const categoriesData = await getCategories(false); // Only active categories
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error('Failed to load categories:', error);
+        // Fallback to hardcoded categories if API fails
+        setCategories([
+          { id: '1', name: 'Real Estate', description: '', isActive: true, sortOrder: 1, createdAt: '', updatedAt: '' },
+          { id: '2', name: 'Technology', description: '', isActive: true, sortOrder: 2, createdAt: '', updatedAt: '' },
+          { id: '3', name: 'Renewable Energy', description: '', isActive: true, sortOrder: 3, createdAt: '', updatedAt: '' },
+          { id: '4', name: 'Small Business', description: '', isActive: true, sortOrder: 4, createdAt: '', updatedAt: '' },
+          { id: '5', name: 'Other', description: '', isActive: true, sortOrder: 99, createdAt: '', updatedAt: '' }
+        ]);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+
+    loadCategories();
+  }, []);
 
 
   const validateForm = (): boolean => {
@@ -180,13 +207,25 @@ const SubmitInvestmentForm: React.FC = () => {
           </div>
           <div>
             <label htmlFor="category" className="block text-sm font-semibold text-secondary-700 mb-2">Category *</label>
-            <select name="category" id="category" value={formData.category} onChange={handleChange} className="form-select">
-              <option value="">Select Category</option>
-              <option value="Real Estate">Real Estate</option>
-              <option value="Technology">Technology</option>
-              <option value="Renewable Energy">Renewable Energy</option>
-              <option value="Small Business">Small Business</option>
-              <option value="Other">Other</option>
+            <select
+              name="category"
+              id="category"
+              value={formData.category}
+              onChange={handleChange}
+              className="form-select"
+              disabled={categoriesLoading}
+            >
+              <option value="">
+                {categoriesLoading ? 'Loading categories...' : 'Select Category'}
+              </option>
+              {categories
+                .sort((a, b) => a.sortOrder - b.sortOrder)
+                .map((category) => (
+                  <option key={category.id} value={category.name}>
+                    {category.name}
+                  </option>
+                ))
+              }
             </select>
             {renderError('category')}
           </div>

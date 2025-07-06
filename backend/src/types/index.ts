@@ -50,6 +50,56 @@ export interface User {
   password?: string;
 }
 
+export interface InvestmentCategory {
+  id: string;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateInvestmentCategoryData {
+  name: string;
+  description?: string;
+  isActive?: boolean;
+  sortOrder?: number;
+}
+
+export interface UpdateInvestmentCategoryData {
+  name?: string;
+  description?: string;
+  isActive?: boolean;
+  sortOrder?: number;
+}
+
+export interface PlatformSetting {
+  id: string;
+  settingKey: string;
+  settingValue: string;
+  settingType: 'string' | 'number' | 'boolean' | 'json';
+  description?: string;
+  isPublic: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreatePlatformSettingData {
+  settingKey: string;
+  settingValue: string;
+  settingType?: 'string' | 'number' | 'boolean' | 'json';
+  description?: string;
+  isPublic?: boolean;
+}
+
+export interface UpdatePlatformSettingData {
+  settingValue?: string;
+  settingType?: 'string' | 'number' | 'boolean' | 'json';
+  description?: string;
+  isPublic?: boolean;
+}
+
 export interface PlatformMetrics {
   totalInvestments: number;
   totalValueLocked: number;

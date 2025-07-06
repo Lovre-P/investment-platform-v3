@@ -100,6 +100,45 @@ export const investmentFiltersSchema = z.object({
   limit: z.coerce.number().min(1).max(100).default(10).optional()
 });
 
+// Investment Category validation schemas
+export const createInvestmentCategorySchema = z.object({
+  name: z.string().min(1).max(100),
+  description: z.string().optional(),
+  isActive: z.boolean().default(true).optional(),
+  sortOrder: z.number().int().min(0).default(0).optional()
+});
+
+export const updateInvestmentCategorySchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  description: z.string().optional(),
+  isActive: z.boolean().optional(),
+  sortOrder: z.number().int().min(0).optional()
+});
+
+// Platform Settings validation schemas
+export const createPlatformSettingSchema = z.object({
+  settingKey: z.string().min(1).max(100),
+  settingValue: z.string(),
+  settingType: z.enum(['string', 'number', 'boolean', 'json']).default('string').optional(),
+  description: z.string().optional(),
+  isPublic: z.boolean().default(false).optional()
+});
+
+export const updatePlatformSettingSchema = z.object({
+  settingValue: z.string().optional(),
+  settingType: z.enum(['string', 'number', 'boolean', 'json']).optional(),
+  description: z.string().optional(),
+  isPublic: z.boolean().optional()
+});
+
+export const updateSettingValueSchema = z.object({
+  value: z.union([z.string(), z.number(), z.boolean()])
+});
+
+export const bulkUpdateSettingsSchema = z.object({
+  settings: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()]))
+});
+
 // Utility function to validate request body
 export const validateRequestBody = <T>(schema: z.ZodSchema<T>, data: unknown): T => {
   try {

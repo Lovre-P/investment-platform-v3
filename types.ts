@@ -58,6 +58,27 @@ export interface PlatformMetrics {
   pendingApprovals: number;
 }
 
+export interface InvestmentCategory {
+  id: string;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PlatformSetting {
+  id: string;
+  settingKey: string;
+  settingValue: string;
+  settingType: 'string' | 'number' | 'boolean' | 'json';
+  description?: string;
+  isPublic: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Re-export cookie consent types for convenience
 export type {
   CookieCategory,
