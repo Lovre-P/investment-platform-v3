@@ -164,7 +164,7 @@ Action Required:
 2. Update lead status in the admin panel
 3. Schedule follow-up if needed
 
-Admin Panel: ${process.env.FRONTEND_URL || 'http://localhost:5173'}/admin/leads
+Admin Panel: ${process.env.FRONTEND_URL || 'http://localhost:5173'}/#/admin/leads
 
 Best regards,
 MegaInvest Platform
@@ -259,7 +259,7 @@ MegaInvest Platform
                     <li>Update lead status in the admin panel</li>
                     <li>Schedule follow-up if needed</li>
                 </ul>
-                <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/admin/leads" class="button">
+                <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/#/admin/leads" class="button">
                     View in Admin Panel
                 </a>
             </div>
@@ -309,7 +309,7 @@ Action Required:
 • Approve or reject the investment
 • Contact the submitter if additional information is needed
 
-Admin Panel: ${process.env.FRONTEND_URL || 'http://localhost:5173'}/admin/investments
+Admin Panel: ${process.env.FRONTEND_URL || 'http://localhost:5173'}/#/admin/investments
     `.trim();
 
     const emailHtml = `
@@ -421,7 +421,7 @@ Admin Panel: ${process.env.FRONTEND_URL || 'http://localhost:5173'}/admin/invest
                 <li>Contact the submitter if additional information is needed</li>
                 <li>Update investment status in the admin panel</li>
             </ul>
-            <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/admin/investments" class="button">
+            <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/#/admin/investments" class="button">
                 View in Admin Panel
             </a>
         </div>
@@ -464,7 +464,7 @@ Action Required:
 1. Respond to the inquiry within 24 hours
 2. Update lead status in the admin panel
 
-Admin Panel: ${process.env.FRONTEND_URL || 'http://localhost:5173'}/admin/leads
+Admin Panel: ${process.env.FRONTEND_URL || 'http://localhost:5173'}/#/admin/leads
 
 Best regards,
 MegaInvest Platform
