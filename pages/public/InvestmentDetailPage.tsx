@@ -157,7 +157,9 @@ const InvestmentDetailPage: React.FC = () => {
       <section>
         <h2 className="text-2xl font-semibold text-secondary-800 mb-4">About this Investment</h2>
         <div className="prose prose-lg max-w-none text-secondary-600">
-          <p>{longDescription}</p>
+          <div className="whitespace-pre-wrap break-words leading-relaxed text-base">
+            {longDescription}
+          </div>
         </div>
       </section>
 
