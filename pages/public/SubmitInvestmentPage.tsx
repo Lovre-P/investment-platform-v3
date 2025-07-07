@@ -66,9 +66,9 @@ const SubmitInvestmentPage: React.FC = () => {
             </div>
 
             {/* Image */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden border-2 border-gray-200 hover:shadow-2xl hover:border-primary-600 transition-all duration-300 cursor-pointer transform hover:-translate-y-1">
+            <div className="bg-white border-2 border-primary-600 rounded-xl overflow-hidden border-2 border-gray-200 hover:border-primary-600 transition-all duration-300 cursor-pointer transform hover:-translate-y-1" style={{ boxShadow: '0 4px 6px -1px rgba(252, 208, 137, 0.4), 0 2px 4px -1px rgba(252, 208, 137, 0.2)' }} onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 25px 50px -12px rgba(252, 208, 137, 0.5), 0 10px 20px -5px rgba(252, 208, 137, 0.3)'} onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(252, 208, 137, 0.4), 0 2px 4px -1px rgba(252, 208, 137, 0.2)'}>
               <img
-                src="https://picsum.photos/400/300?random=business"
+                src="/images/submit-investment.jpg"
                 alt="Business Process"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
               />
