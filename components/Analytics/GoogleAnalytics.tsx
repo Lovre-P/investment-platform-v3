@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { SITE_CONFIG } from '../../config/siteConfig';
 
 interface GoogleAnalyticsProps {
   measurementId?: string;
@@ -14,7 +15,7 @@ declare global {
 }
 
 const GoogleAnalytics: React.FC<GoogleAnalyticsProps> = ({
-  measurementId = 'G-XXXXXXXXXX' // Replace with your actual GA4 Measurement ID
+  measurementId = SITE_CONFIG.analytics.googleAnalyticsId
 }) => {
   const location = useLocation();
 

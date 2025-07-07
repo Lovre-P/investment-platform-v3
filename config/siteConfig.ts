@@ -35,7 +35,7 @@ export const SITE_CONFIG = {
     defaultDescription: "Discover exclusive investment opportunities in real estate, technology, and renewable energy. Join Croatia's leading investment platform for verified, high-return projects.",
     defaultKeywords: [
       "investment opportunities",
-      "Croatia investment", 
+      "Croatia investment",
       "real estate investment",
       "technology funding",
       "renewable energy projects",
@@ -43,6 +43,12 @@ export const SITE_CONFIG = {
       "venture capital",
       "investment platform"
     ]
+  },
+
+  // Analytics Configuration (use environment variables in production)
+  analytics: {
+    googleAnalyticsId: import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-XXXXXXXXXX',
+    searchConsoleVerification: import.meta.env.VITE_SEARCH_CONSOLE_VERIFICATION || 'your-google-search-console-verification-code'
   }
 };
 

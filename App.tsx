@@ -1,7 +1,6 @@
 
 import React, { useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { HelmetProvider } from 'react-helmet-async';
 import { useAuth } from './contexts/AuthContext';
 import ScrollToTop from './components/ScrollToTop';
 import GoogleAnalytics from './components/Analytics/GoogleAnalytics';
@@ -50,7 +49,7 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <HelmetProvider>
+    <>
       <SearchConsoleVerification />
       <GoogleAnalytics />
       <HashRouter>
@@ -91,7 +90,7 @@ const App: React.FC = () => {
         <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </HashRouter>
-    </HelmetProvider>
+    </>
   );
 };
 

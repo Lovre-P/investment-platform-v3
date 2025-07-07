@@ -31,11 +31,24 @@ export const preloadFonts = () => {
   ];
 
   fonts.forEach(fontUrl => {
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'style';
-    link.href = fontUrl;
-    document.head.appendChild(link);
+    // First preload the CSS
+    const preloadLink = document.createElement('link');
+    preloadLink.rel = 'preload';
+    preloadLink.as = 'style';
+    preloadLink.href = fontUrl;
+    document.head.appendChild(preloadLink);
+
+    // Then load it as a stylesheet
+    const styleLink = document.createElement('link');
+    styleLink.rel = 'stylesheet';
+    styleLink.href = fontUrl;
+    styleLink.onload = () => {
+      // Remove preload link once stylesheet is loaded
+      if (preloadLink.parentNode) {
+        preloadLink.parentNode.removeChild(preloadLink);
+      }
+    };
+    document.head.appendChild(styleLink);
   });
 };
 

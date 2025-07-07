@@ -1,5 +1,4 @@
-import React from 'react';
-import { Helmet } from 'react-helmet-async';
+import React, { useEffect } from 'react';
 
 interface SEOHeadProps {
   title?: string;
@@ -25,52 +24,85 @@ const SEOHead: React.FC<SEOHeadProps> = ({
   const fullTitle = title.includes('MegaInvest') ? title : `${title} | MegaInvest`;
   const canonicalUrl = url.startsWith('http') ? url : `https://www.mega-invest.hr${url}`;
 
-  return (
-    <Helmet>
-      {/* Basic Meta Tags */}
-      <title>{fullTitle}</title>
-      <meta name="description" content={description} />
-      <meta name="keywords" content={keywords.join(', ')} />
-      
-      {/* Canonical URL */}
-      <link rel="canonical" href={canonicalUrl} />
-      
-      {/* Robots */}
-      {noIndex ? (
-        <meta name="robots" content="noindex, nofollow" />
-      ) : (
-        <meta name="robots" content="index, follow" />
-      )}
-      
-      {/* Open Graph Tags */}
-      <meta property="og:title" content={fullTitle} />
-      <meta property="og:description" content={description} />
-      <meta property="og:image" content={image} />
-      <meta property="og:url" content={canonicalUrl} />
-      <meta property="og:type" content={type} />
-      <meta property="og:site_name" content="MegaInvest" />
-      <meta property="og:locale" content="en_US" />
-      
-      {/* Twitter Card Tags */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={fullTitle} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={image} />
-      
-      {/* Additional Meta Tags */}
-      <meta name="author" content="MegaInvest" />
-      <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
-      <meta name="language" content="English" />
-      <meta name="revisit-after" content="7 days" />
-      
-      {/* Structured Data */}
-      {structuredData && (
-        <script type="application/ld+json">
-          {JSON.stringify(structuredData)}
-        </script>
-      )}
-    </Helmet>
-  );
+  useEffect(() => {
+    // Set document title
+    document.title = fullTitle;
+
+    // Helper function to set or update meta tags
+    const setMetaTag = (name: string, content: string, property = false) => {
+      const selector = property ? `meta[property="${name}"]` : `meta[name="${name}"]`;
+      let meta = document.querySelector(selector) as HTMLMetaElement;
+
+      if (!meta) {
+        meta = document.createElement('meta');
+        if (property) {
+          meta.setAttribute('property', name);
+        } else {
+          meta.setAttribute('name', name);
+        }
+        document.head.appendChild(meta);
+      }
+      meta.setAttribute('content', content);
+    };
+
+    // Helper function to set link tags
+    const setLinkTag = (rel: string, href: string) => {
+      let link = document.querySelector(`link[rel="${rel}"]`) as HTMLLinkElement;
+      if (!link) {
+        link = document.createElement('link');
+        link.setAttribute('rel', rel);
+        document.head.appendChild(link);
+      }
+      link.setAttribute('href', href);
+    };
+
+    // Basic Meta Tags
+    setMetaTag('description', description);
+    setMetaTag('keywords', keywords.join(', '));
+    setMetaTag('author', 'MegaInvest');
+    setMetaTag('language', 'English');
+    setMetaTag('revisit-after', '7 days');
+
+    // Robots
+    setMetaTag('robots', noIndex ? 'noindex, nofollow' : 'index, follow');
+
+    // Canonical URL
+    setLinkTag('canonical', canonicalUrl);
+
+    // Open Graph Tags
+    setMetaTag('og:title', fullTitle, true);
+    setMetaTag('og:description', description, true);
+    setMetaTag('og:image', image, true);
+    setMetaTag('og:url', canonicalUrl, true);
+    setMetaTag('og:type', type, true);
+    setMetaTag('og:site_name', 'MegaInvest', true);
+    setMetaTag('og:locale', 'en_US', true);
+
+    // Twitter Card Tags
+    setMetaTag('twitter:card', 'summary_large_image');
+    setMetaTag('twitter:title', fullTitle);
+    setMetaTag('twitter:description', description);
+    setMetaTag('twitter:image', image);
+
+    // Structured Data
+    if (structuredData) {
+      let script = document.querySelector('script[type="application/ld+json"]') as HTMLScriptElement;
+      if (!script) {
+        script = document.createElement('script');
+        script.type = 'application/ld+json';
+        document.head.appendChild(script);
+      }
+      script.textContent = JSON.stringify(structuredData);
+    }
+
+    // Cleanup function to remove meta tags when component unmounts
+    return () => {
+      // Note: We don't remove meta tags on unmount as they should persist
+      // This is different from react-helmet behavior but more appropriate for SEO
+    };
+  }, [fullTitle, description, keywords, image, canonicalUrl, type, structuredData, noIndex]);
+
+  return null; // This component doesn't render anything visible
 };
 
 export default SEOHead;
