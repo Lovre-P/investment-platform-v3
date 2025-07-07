@@ -11,6 +11,21 @@ import { EyeIcon, PencilIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import { PUBLIC_ROUTES } from '../../constants';
 
+// Utility function for consistent status styling
+const getStatusStyles = (status: Lead['status']): string => {
+  switch (status) {
+    case 'New':
+      return 'bg-blue-100 text-blue-800';
+    case 'Contacted':
+      return 'bg-yellow-100 text-yellow-800';
+    case 'Converted':
+      return 'bg-green-100 text-green-800';
+    case 'Rejected':
+      return 'bg-red-100 text-red-800';
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
+};
 
 const AdminLeadsPage: React.FC = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -130,11 +145,7 @@ const AdminLeadsPage: React.FC = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-600">{new Date(lead.submissionDate).toLocaleDateString()}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      lead.status === 'New' ? 'bg-blue-100 text-blue-800' :
-                      lead.status === 'Contacted' ? 'bg-yellow-100 text-yellow-800' :
-                      lead.status === 'Converted' ? 'bg-green-100 text-green-800' :
-                      'bg-red-100 text-red-800'}`}>{lead.status}</span>
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusStyles(lead.status)}`}>{lead.status}</span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                   <Button variant="ghost" size="sm" onClick={() => handleViewLead(lead)} className="text-indigo-600 hover:text-indigo-900" title="View Details">
@@ -184,13 +195,7 @@ const AdminLeadsPage: React.FC = () => {
                 )}
                 <div>
                   <span className="font-medium text-primary-700">Status:</span>
-                  <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
-                    selectedLead.status === 'New' ? 'bg-blue-100 text-blue-800' :
-                    selectedLead.status === 'Contacted' ? 'bg-yellow-100 text-yellow-800' :
-                    selectedLead.status === 'Converted' ? 'bg-green-100 text-green-800' :
-                    selectedLead.status === 'Rejected' ? 'bg-red-100 text-red-800' :
-                    'bg-gray-100 text-gray-800'
-                  }`}>{selectedLead.status}</span>
+                  <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${getStatusStyles(selectedLead.status)}`}>{selectedLead.status}</span>
                 </div>
               </div>
             </div>

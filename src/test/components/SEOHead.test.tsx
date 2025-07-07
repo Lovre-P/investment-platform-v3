@@ -71,8 +71,26 @@ describe('SEOHead Component', () => {
 
   it('should set index robots tag when noIndex is false', () => {
     render(<SEOHead noIndex={false} />);
-    
+
     const robots = document.querySelector('meta[name="robots"]');
     expect(robots?.getAttribute('content')).toBe('index, follow');
+  });
+
+  it('should set default robots tag when noIndex is undefined', () => {
+    render(<SEOHead />);
+
+    const robots = document.querySelector('meta[name="robots"]');
+    expect(robots?.getAttribute('content')).toBe('index, follow');
+  });
+
+  it('should validate structured data JSON', () => {
+    const testStructuredData = { '@type': 'Organization', name: 'Test' };
+    render(<SEOHead structuredData={testStructuredData} />);
+
+    const script = document.querySelector('script[type="application/ld+json"]');
+    expect(script?.textContent).toBe(JSON.stringify(testStructuredData));
+
+    // Validate it's parseable JSON
+    expect(() => JSON.parse(script?.textContent || '')).not.toThrow();
   });
 });

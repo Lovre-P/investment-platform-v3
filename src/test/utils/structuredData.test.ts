@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { createInvestmentSchema, createBreadcrumbSchema, organizationSchema } from '../../../utils/structuredData';
-import type { Investment } from '../../../types';
+import { Investment, InvestmentStatus } from '../../../types';
 
 describe('Structured Data Utils', () => {
   describe('createInvestmentSchema', () => {
@@ -12,7 +12,7 @@ describe('Structured Data Utils', () => {
       amountRaised: 50000,
       currency: 'EUR',
       category: 'Real Estate',
-      status: 'Open',
+      status: InvestmentStatus.OPEN,
       submissionDate: '2024-01-01',
       submittedBy: 'test@example.com',
       apyRange: '8-12%',
@@ -32,9 +32,14 @@ describe('Structured Data Utils', () => {
     });
 
     it('should return null for invalid investment data', () => {
-      const invalidInvestment = { id: '1' } as Investment;
+      const invalidInvestment = {
+        id: '1',
+        title: '', // Empty title
+        description: '', // Empty description
+        // Missing required fields
+      } as unknown as Investment;
       const schema = createInvestmentSchema(invalidInvestment);
-      
+
       expect(schema).toBeNull();
     });
 
@@ -63,6 +68,18 @@ describe('Structured Data Utils', () => {
       expect(schema.itemListElement).toHaveLength(3);
       expect(schema.itemListElement[0].position).toBe(1);
       expect(schema.itemListElement[0].name).toBe('Home');
+    });
+
+    it('should handle empty breadcrumb array', () => {
+      const schema = createBreadcrumbSchema([]);
+      expect(schema.itemListElement).toHaveLength(0);
+    });
+
+    it('should handle single breadcrumb item', () => {
+      const breadcrumbs = [{ name: 'Home', url: '/' }];
+      const schema = createBreadcrumbSchema(breadcrumbs);
+      expect(schema.itemListElement).toHaveLength(1);
+      expect(schema.itemListElement[0].position).toBe(1);
     });
   });
 
