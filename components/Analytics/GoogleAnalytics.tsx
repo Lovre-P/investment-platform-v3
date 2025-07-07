@@ -27,7 +27,7 @@ const GoogleAnalytics: React.FC<GoogleAnalyticsProps> = ({
     }
 
     // Skip if measurement ID is placeholder or invalid
-    if (!measurementId || measurementId === 'G-XXXXXXXXXX' || !measurementId.startsWith('G-')) {
+    if (!measurementId || measurementId === 'G-2BLXD97DBY' || !measurementId.startsWith('G-')) {
       if (import.meta.env.PROD) {
         console.error('🚨 Google Analytics: Invalid measurement ID in production!');
       } else {
@@ -89,7 +89,7 @@ const GoogleAnalytics: React.FC<GoogleAnalyticsProps> = ({
     // Skip if in development or invalid measurement ID
     if (process.env.NODE_ENV === 'development' ||
         !measurementId ||
-        measurementId === 'G-XXXXXXXXXX' ||
+        measurementId === 'G-2BLXD97DBY' ||
         !measurementId.startsWith('G-')) {
       return;
     }
