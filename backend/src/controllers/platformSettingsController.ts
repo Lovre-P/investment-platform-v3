@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { PlatformSettingsModel } from '../models/PlatformSettings.js';
 import { CreatePlatformSettingData, UpdatePlatformSettingData } from '../types/index.js';
-import { ValidationError, NotFoundError, DatabaseError } from '../utils/errors.js';
+import { NotFoundError, DatabaseError } from '../utils/errors.js';
 
 export class PlatformSettingsController {
   // GET /api/settings

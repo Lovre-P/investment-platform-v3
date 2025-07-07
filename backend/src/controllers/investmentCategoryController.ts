@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { InvestmentCategoryModel } from '../models/InvestmentCategory.js';
 import { CreateInvestmentCategoryData, UpdateInvestmentCategoryData } from '../types/index.js';
-import { ValidationError, NotFoundError, DatabaseError } from '../utils/errors.js';
+import { NotFoundError, DatabaseError } from '../utils/errors.js';
 
 export class InvestmentCategoryController {
   // GET /api/categories

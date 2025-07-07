@@ -70,8 +70,8 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
     onError: handleError,
     ...(width && { width }),
     ...(height && { height }),
-    loading: priority ? 'eager' : 'lazy',
-    decoding: 'async'
+    loading: priority ? 'eager' as const : 'lazy' as const,
+    decoding: 'async' as const
   };
 
   if (hasError) {

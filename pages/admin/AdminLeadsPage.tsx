@@ -187,7 +187,8 @@ const AdminLeadsPage: React.FC = () => {
                   <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
                     selectedLead.status === 'New' ? 'bg-blue-100 text-blue-800' :
                     selectedLead.status === 'Contacted' ? 'bg-yellow-100 text-yellow-800' :
-                    selectedLead.status === 'Qualified' ? 'bg-green-100 text-green-800' :
+                    selectedLead.status === 'Converted' ? 'bg-green-100 text-green-800' :
+                    selectedLead.status === 'Rejected' ? 'bg-red-100 text-red-800' :
                     'bg-gray-100 text-gray-800'
                   }`}>{selectedLead.status}</span>
                 </div>
