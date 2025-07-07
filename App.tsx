@@ -51,8 +51,8 @@ const App: React.FC = () => {
   return (
     <>
       <SearchConsoleVerification />
-      <GoogleAnalytics />
       <HashRouter>
+        <GoogleAnalytics />
         <ScrollToTop />
         <Routes>
         {/* Public Routes */}
