@@ -1,23 +1,25 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { DocumentTextIcon, ScaleIcon, ShieldCheckIcon, BookOpenIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import SEOHead from '../../components/SEO/SEOHead';
+import { createBreadcrumbSchema } from '../../utils/structuredData';
 
 const TermsOfServicePage: React.FC = () => {
-  useEffect(() => {
-    // Set page title and meta description
-    document.title = 'Terms of Service - MegaInvest | Investment Platform Legal Terms';
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.setAttribute('content', 'Read MegaInvest\'s Terms of Service covering platform usage, user responsibilities, investment risks, and legal compliance for our investment platform.');
-    } else {
-      const meta = document.createElement('meta');
-      meta.name = 'description';
-      meta.content = 'Read MegaInvest\'s Terms of Service covering platform usage, user responsibilities, investment risks, and legal compliance for our investment platform.';
-      document.head.appendChild(meta);
-    }
-  }, []);
+  // Generate SEO data
+  const breadcrumbSchema = createBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Terms of Service', url: '/terms' }
+  ]);
 
   return (
-    <div className="bg-white p-4 sm:p-6 md:p-10 rounded-xl shadow-2xl space-y-8 sm:space-y-12">
+    <>
+      <SEOHead
+        title="Terms of Service - MegaInvest | Investment Platform Legal Terms"
+        description="Read MegaInvest's Terms of Service covering platform usage, user responsibilities, investment risks, and legal compliance for our investment platform."
+        keywords={['terms of service', 'MegaInvest legal', 'investment platform terms', 'user agreement', 'legal compliance', 'investment risks', 'platform usage']}
+        url="/terms"
+        structuredData={breadcrumbSchema}
+      />
+      <div className="bg-white p-4 sm:p-6 md:p-10 rounded-xl shadow-2xl space-y-8 sm:space-y-12">
       {/* Header Section */}
       <section className="text-center">
         <DocumentTextIcon className="h-20 w-20 mx-auto text-primary-600 mb-4" />
@@ -297,7 +299,8 @@ const TermsOfServicePage: React.FC = () => {
           If you do not agree with any part of these terms, you must not use our platform.
         </p>
       </section>
-    </div>
+      </div>
+    </>
   );
 };
 

@@ -1,11 +1,27 @@
 
 import React from 'react';
 import SubmitInvestmentForm from '../../components/SubmitInvestmentForm';
+import SEOHead from '../../components/SEO/SEOHead';
+import { createBreadcrumbSchema } from '../../utils/structuredData';
 import { LightBulbIcon } from '@heroicons/react/24/outline';
 
 const SubmitInvestmentPage: React.FC = () => {
+  // Generate SEO data
+  const breadcrumbSchema = createBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Submit Investment', url: '/submit-investment' }
+  ]);
+
   return (
-    <div className="max-w-4xl mx-auto space-y-10">
+    <>
+      <SEOHead
+        title="Submit Your Investment Opportunity - Get Funding | MegaInvest"
+        description="Submit your investment opportunity to MegaInvest and connect with potential investors. Our platform helps entrepreneurs and businesses secure funding for real estate, technology, and renewable energy projects in Croatia."
+        keywords={['submit investment', 'get funding', 'investment opportunity', 'entrepreneur funding', 'business funding', 'startup capital', 'Croatia investment', 'venture capital', 'project funding', 'investment platform']}
+        url="/submit-investment"
+        structuredData={breadcrumbSchema}
+      />
+      <div className="max-w-4xl mx-auto space-y-10">
       <section className="text-center">
         <LightBulbIcon className="h-16 w-16 mx-auto text-primary-600 mb-4" />
         <h1 className="text-4xl md:text-5xl font-bold text-secondary-800 mb-4">Submit Your Investment Idea</h1>
@@ -63,7 +79,8 @@ const SubmitInvestmentPage: React.FC = () => {
         {/* Investment Form */}
         <SubmitInvestmentForm />
       </section>
-    </div>
+      </div>
+    </>
   );
 };
 

@@ -4,6 +4,8 @@ import { Investment, InvestmentStatus } from '../../types';
 import { getInvestments } from '../../services/investmentService';
 import InvestmentCard from '../../components/InvestmentCard';
 import { InvestmentCardSkeleton } from '../../components/SkeletonLoader';
+import SEOHead from '../../components/SEO/SEOHead';
+import { createBreadcrumbSchema } from '../../utils/structuredData';
 import { FunnelIcon, MagnifyingGlassIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 
 const InvestmentsListPage: React.FC = () => {
@@ -90,9 +92,22 @@ const InvestmentsListPage: React.FC = () => {
     setSortBy('date_desc');
   };
 
+  // Generate SEO data
+  const breadcrumbSchema = createBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Investments', url: '/investments' }
+  ]);
 
   return (
-    <div className="space-y-8">
+    <>
+      <SEOHead
+        title="Investment Opportunities - Browse Verified Projects | MegaInvest"
+        description="Explore verified investment opportunities in real estate, technology, renewable energy, and startups. Find high-return projects with transparent terms and professional due diligence on Croatia's leading investment platform."
+        keywords={['investment opportunities', 'verified projects', 'real estate investment', 'technology funding', 'renewable energy', 'startup investment', 'Croatia investments', 'high returns', 'due diligence', 'investment platform']}
+        url="/investments"
+        structuredData={breadcrumbSchema}
+      />
+      <div className="space-y-8">
       <section className="relative text-center p-8 rounded-xl shadow-lg overflow-hidden bg-cover bg-center"
                style={{
                  backgroundImage: 'url(/images/hero/investments-hero.jpg)',
@@ -208,7 +223,8 @@ const InvestmentsListPage: React.FC = () => {
           </button>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 };
 

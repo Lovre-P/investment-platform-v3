@@ -1,6 +1,8 @@
 
 import React, { useState } from 'react';
 import ContactForm from '../../components/ContactForm';
+import SEOHead from '../../components/SEO/SEOHead';
+import { createBreadcrumbSchema, createFAQSchema, organizationSchema } from '../../utils/structuredData';
 import { MapPinIcon, EnvelopeIcon, PhoneIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 
 const ContactPage: React.FC = () => {
@@ -63,8 +65,27 @@ const ContactPage: React.FC = () => {
     }
   ];
 
+  // Generate SEO data
+  const breadcrumbSchema = createBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Contact', url: '/contact' }
+  ]);
+
+  const faqSchema = createFAQSchema(faqData.map(faq => ({
+    question: faq.question,
+    answer: faq.answer
+  })));
+
   return (
-    <div className="space-y-12">
+    <>
+      <SEOHead
+        title="Contact MegaInvest - Get Support & Investment Information"
+        description="Contact MegaInvest for investment support, platform questions, or business inquiries. Located in Šibenik, Croatia. Email: info@mega-invest.hr, Phone: +385 91 310 1512. Find answers to common questions about our investment platform."
+        keywords={['contact MegaInvest', 'investment support', 'Croatia investment platform', 'Šibenik office', 'investment questions', 'platform support', 'business inquiries', 'investment help']}
+        url="/contact"
+        structuredData={[organizationSchema, breadcrumbSchema, faqSchema]}
+      />
+      <div className="space-y-12">
       <section className="text-center">
         <h1 className="text-4xl md:text-5xl font-bold text-secondary-800 mb-4">Get In Touch</h1>
         <p className="text-lg md:text-xl text-secondary-600 max-w-2xl mx-auto">
@@ -139,7 +160,7 @@ const ContactPage: React.FC = () => {
       </div>
 
       {/* FAQ Section */}
-      <section className="bg-white p-8 rounded-xl shadow-xl">
+      <section id="faq" className="bg-white p-8 rounded-xl shadow-xl">
         <h2 className="text-2xl font-semibold text-secondary-800 mb-4 text-center">Frequently Asked Questions</h2>
         <p className="text-secondary-600 text-center mb-8">
           Find answers to common questions about using MegaInvest, data protection, and investment processes.
@@ -206,7 +227,8 @@ const ContactPage: React.FC = () => {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 };
 

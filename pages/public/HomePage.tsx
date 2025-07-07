@@ -6,6 +6,8 @@ import { getInvestments } from '../../services/investmentService';
 import InvestmentCard from '../../components/InvestmentCard';
 import { InvestmentCardSkeleton } from '../../components/SkeletonLoader';
 import Button from '../../components/Button';
+import SEOHead from '../../components/SEO/SEOHead';
+import { organizationSchema, websiteSchema } from '../../utils/structuredData';
 import { ArrowRightIcon, PresentationChartLineIcon, LightBulbIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 
 const HomePage: React.FC = () => {
@@ -38,8 +40,18 @@ const HomePage: React.FC = () => {
     fetchFeatured();
   }, []);
 
+  // Combine organization and website schemas
+  const combinedSchema = [organizationSchema, websiteSchema];
+
   return (
     <>
+      <SEOHead
+        title="MegaInvest - Premium Investment Opportunities Platform"
+        description="Discover exclusive investment opportunities in real estate, technology, and renewable energy. Join Croatia's leading investment platform for verified, high-return projects with transparent terms and professional due diligence."
+        keywords={['investment opportunities', 'Croatia investment', 'real estate investment', 'technology funding', 'renewable energy projects', 'startup funding', 'venture capital', 'investment platform', 'high return investments', 'verified projects']}
+        url="/"
+        structuredData={combinedSchema}
+      />
       {/* Hero Section - Full Page */}
       <section className="relative bg-gradient-to-br from-primary-800 via-primary-500 to-teal-600 text-white overflow-hidden h-screen flex items-center w-full">
         {/* Background Image with Zoom Animation */}

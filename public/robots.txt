@@ -1,0 +1,37 @@
+User-agent: *
+Allow: /
+
+# Allow all search engines to crawl the site
+Allow: /investments
+Allow: /about
+Allow: /contact
+Allow: /submit-investment
+Allow: /terms
+Allow: /privacy
+
+# Disallow admin areas for security
+Disallow: /admin
+Disallow: /api
+
+# Disallow temporary or development files
+Disallow: /*.json$
+Disallow: /node_modules
+Disallow: /src
+Disallow: /backend
+
+# Allow important assets
+Allow: /images/
+Allow: /assets/
+Allow: /*.css
+Allow: /*.js
+Allow: /*.svg
+Allow: /*.png
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.webp
+
+# Sitemap location
+Sitemap: https://www.mega-invest.hr/sitemap.xml
+
+# Crawl delay (optional - helps prevent server overload)
+Crawl-delay: 1
