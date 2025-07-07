@@ -40,30 +40,59 @@ This guide covers the complete SEO implementation for your investment platform a
 
 ## 🔧 Required Setup Steps
 
-### 1. Google Analytics 4
+### 1. Environment Variables Configuration (CRITICAL)
+
+**For Production Deployment**, you MUST set these environment variables:
+
+```bash
+# Google Analytics 4 Measurement ID
+VITE_GA_MEASUREMENT_ID=G-YOUR-ACTUAL-ID
+
+# Google Search Console Verification Code
+VITE_SEARCH_CONSOLE_VERIFICATION=your-actual-verification-code
+
+# Production Site URL (for sitemap generation)
+VITE_SITE_URL=https://www.mega-invest.hr
+```
+
+#### How to Set Environment Variables:
+
+**Railway Deployment:**
+1. Go to your Railway project dashboard
+2. Navigate to Variables tab
+3. Add each variable with its value
+4. Redeploy your application
+
+**Local Development:**
+1. Copy `.env.example` to `.env`
+2. Update the values in `.env` file
+3. Restart your development server
+
+**Other Hosting Providers:**
+- **Vercel**: Add in Project Settings → Environment Variables
+- **Netlify**: Add in Site Settings → Environment Variables
+- **Render**: Add in Environment tab of your service
+
+### 2. Google Analytics 4 Setup
 1. Create a GA4 property at https://analytics.google.com
 2. Get your Measurement ID (format: G-XXXXXXXXXX)
-3. Update `components/Analytics/GoogleAnalytics.tsx`:
-   ```typescript
-   measurementId = 'G-YOUR-ACTUAL-ID' // Replace this line
-   ```
+3. Set the `VITE_GA_MEASUREMENT_ID` environment variable
+4. **Important**: Analytics will NOT work without this environment variable!
 
-### 2. Google Search Console
+### 3. Google Search Console Setup
 1. Go to https://search.google.com/search-console
 2. Add property for www.mega-invest.hr
-3. Get verification code
-4. Update `components/Analytics/SearchConsoleVerification.tsx`:
-   ```typescript
-   verificationCode = 'your-actual-verification-code' // Replace this
-   ```
+3. Get verification code (long string of letters/numbers)
+4. Set the `VITE_SEARCH_CONSOLE_VERIFICATION` environment variable
+5. **Important**: Search Console verification will NOT work without this!
 
-### 3. Sitemap Submission
+### 4. Sitemap Submission
 1. Build and deploy your site to generate sitemap
 2. Submit https://www.mega-invest.hr/sitemap.xml to:
    - Google Search Console
    - Bing Webmaster Tools (optional)
 
-### 4. Social Media Setup
+### 5. Social Media Setup
 Update `utils/structuredData.ts` with your actual social media profiles:
 ```typescript
 "sameAs": [
@@ -145,11 +174,42 @@ Update `utils/structuredData.ts` with your actual social media profiles:
 - Monitor investment page performance
 - Identify popular content and features
 
+## ⚠️ Troubleshooting Environment Variables
+
+### How to Check if Environment Variables are Set
+
+**In Browser Console (Production):**
+```javascript
+// Check if GA is working
+console.log('GA ID:', window.gtag ? 'Loaded' : 'Not loaded');
+
+// Check for warnings
+// Look for: "⚠️ Google Analytics ID not configured for production"
+// Look for: "⚠️ Search Console verification not configured for production"
+```
+
+**Common Issues:**
+- **Analytics not tracking**: `VITE_GA_MEASUREMENT_ID` not set or still placeholder
+- **Search Console not verified**: `VITE_SEARCH_CONSOLE_VERIFICATION` not set
+- **Sitemap generation fails**: `VITE_SITE_URL` not set correctly
+
+### Environment Variable Format Examples:
+```bash
+# ✅ Correct format
+VITE_GA_MEASUREMENT_ID=G-ABC123DEF4
+VITE_SEARCH_CONSOLE_VERIFICATION=abc123def456ghi789jkl012mno345pqr678stu
+VITE_SITE_URL=https://www.mega-invest.hr
+
+# ❌ Wrong - still placeholders
+VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+VITE_SEARCH_CONSOLE_VERIFICATION=your-google-search-console-verification-code
+```
+
 ## 🔍 Next Steps
 
-1. **Set up analytics accounts** (GA4 & Search Console)
-2. **Update verification codes** in the components
-3. **Deploy to production** and test all features
+1. **Set environment variables** (CRITICAL - see above)
+2. **Set up analytics accounts** (GA4 & Search Console)
+3. **Deploy to production** and verify environment variables work
 4. **Submit sitemap** to search engines
 5. **Monitor performance** and rankings
 
