@@ -1,77 +1,93 @@
 import { Investment } from '../types';
+import { SITE_CONFIG } from '../config/siteConfig';
 
 // Organization Schema for MegaInvest
 export const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "MegaInvest",
-  "url": "https://www.mega-invest.hr",
-  "logo": "https://www.mega-invest.hr/images/logo.svg",
-  "description": "Croatia's leading investment platform for verified, high-return projects in real estate, technology, and renewable energy.",
+  "name": SITE_CONFIG.name,
+  "url": SITE_CONFIG.url,
+  "logo": SITE_CONFIG.logo,
+  "description": SITE_CONFIG.description,
   "address": {
     "@type": "PostalAddress",
-    "addressCountry": "HR",
-    "addressLocality": "Zagreb"
+    "addressCountry": SITE_CONFIG.contact.address.country,
+    "addressLocality": SITE_CONFIG.contact.address.locality,
+    "addressRegion": SITE_CONFIG.contact.address.region
   },
   "contactPoint": {
     "@type": "ContactPoint",
-    "telephone": "+385-1-234-5678",
+    "telephone": SITE_CONFIG.contact.phone,
     "contactType": "customer service",
-    "email": "info@mega-invest.hr"
+    "email": SITE_CONFIG.contact.email
   },
-  "sameAs": [
-    "https://www.linkedin.com/company/megainvest",
-    "https://www.facebook.com/megainvest"
-  ]
+  "sameAs": SITE_CONFIG.socialLinks
 };
 
 // Website Schema
 export const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "MegaInvest",
-  "url": "https://www.mega-invest.hr",
-  "description": "Discover exclusive investment opportunities in real estate, technology, and renewable energy.",
+  "name": SITE_CONFIG.name,
+  "url": SITE_CONFIG.url,
+  "description": SITE_CONFIG.seo.defaultDescription,
   "publisher": {
     "@type": "Organization",
-    "name": "MegaInvest"
+    "name": SITE_CONFIG.name
   },
   "potentialAction": {
     "@type": "SearchAction",
-    "target": "https://www.mega-invest.hr/investments?search={search_term_string}",
+    "target": `${SITE_CONFIG.url}/investments?search={search_term_string}`,
     "query-input": "required name=search_term_string"
   }
 };
 
 // Investment Opportunity Schema
 export const createInvestmentSchema = (investment: Investment) => {
+  if (!investment || !investment.title || !investment.description) {
+    console.warn('Invalid investment data: title and description are required');
+    return null;
+  }
+
   return {
     "@context": "https://schema.org",
-    "@type": "InvestmentOrOpportunity",
+    "@type": "Service",
+    "@id": `https://www.mega-invest.hr/investments/${investment.id}`,
     "name": investment.title,
     "description": investment.description,
-    "url": `https://www.mega-invest.hr/investments/${investment.id}`,
-    "image": investment.images?.[0] || "https://www.mega-invest.hr/images/logo.svg",
+    "url": `${SITE_CONFIG.url}/investments/${investment.id}`,
+    "image": investment.images?.[0] || SITE_CONFIG.logo,
     "category": investment.category,
-    "investmentAmount": {
-      "@type": "MonetaryAmount",
-      "currency": investment.currency,
-      "value": investment.amountGoal
+    "serviceType": "Investment Opportunity",
+    "offers": {
+      "@type": "Offer",
+      "price": investment.amountGoal,
+      "priceCurrency": investment.currency,
+      "availability": investment.status === 'Open' ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
     },
-    "minimumInvestment": {
-      "@type": "MonetaryAmount", 
-      "currency": investment.currency,
-      "value": investment.minInvestment || 1000
-    },
-    "expectedReturn": investment.apyRange,
-    "investmentTerm": investment.term,
-    "riskLevel": "Medium", // You can make this dynamic based on category
+    "additionalProperty": [
+      {
+        "@type": "PropertyValue",
+        "name": "Minimum Investment",
+        "value": investment.minInvestment || 1000,
+        "unitCode": investment.currency
+      },
+      {
+        "@type": "PropertyValue",
+        "name": "Expected Return",
+        "value": investment.apyRange || "Contact for details"
+      },
+      {
+        "@type": "PropertyValue",
+        "name": "Investment Term",
+        "value": investment.term || "Contact for details"
+      }
+    ],
     "provider": {
       "@type": "Organization",
-      "name": "MegaInvest"
+      "name": SITE_CONFIG.name
     },
-    "datePublished": investment.submissionDate,
-    "status": investment.status
+    "datePublished": investment.submissionDate
   };
 };
 
@@ -84,7 +100,7 @@ export const createBreadcrumbSchema = (breadcrumbs: Array<{name: string, url: st
       "@type": "ListItem",
       "position": index + 1,
       "name": crumb.name,
-      "item": `https://www.mega-invest.hr${crumb.url}`
+      "item": `${SITE_CONFIG.url}${crumb.url}`
     }))
   };
 };
@@ -112,19 +128,19 @@ export const createArticleSchema = (title: string, description: string, url: str
     "@type": "Article",
     "headline": title,
     "description": description,
-    "url": `https://www.mega-invest.hr${url}`,
-    "image": image || "https://www.mega-invest.hr/images/logo.svg",
+    "url": `${SITE_CONFIG.url}${url}`,
+    "image": image || SITE_CONFIG.logo,
     "datePublished": datePublished || new Date().toISOString(),
     "author": {
       "@type": "Organization",
-      "name": "MegaInvest"
+      "name": SITE_CONFIG.name
     },
     "publisher": {
       "@type": "Organization",
-      "name": "MegaInvest",
+      "name": SITE_CONFIG.name,
       "logo": {
         "@type": "ImageObject",
-        "url": "https://www.mega-invest.hr/images/logo.svg"
+        "url": SITE_CONFIG.logo
       }
     }
   };

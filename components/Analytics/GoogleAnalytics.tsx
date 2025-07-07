@@ -9,18 +9,30 @@ declare global {
   interface Window {
     gtag: (...args: any[]) => void;
     dataLayer: any[];
+    __GA_INITIALIZED__?: boolean;
   }
 }
 
-const GoogleAnalytics: React.FC<GoogleAnalyticsProps> = ({ 
+const GoogleAnalytics: React.FC<GoogleAnalyticsProps> = ({
   measurementId = 'G-XXXXXXXXXX' // Replace with your actual GA4 Measurement ID
 }) => {
   const location = useLocation();
 
   useEffect(() => {
-    // Only load in production or when measurement ID is provided
-    if (process.env.NODE_ENV !== 'production' && measurementId === 'G-XXXXXXXXXX') {
+    // Skip loading in development mode
+    if (process.env.NODE_ENV === 'development') {
       console.log('Google Analytics: Skipping in development mode');
+      return;
+    }
+
+    // Skip if measurement ID is placeholder or invalid
+    if (!measurementId || measurementId === 'G-XXXXXXXXXX' || !measurementId.startsWith('G-')) {
+      console.warn('Google Analytics: Invalid measurement ID');
+      return;
+    }
+
+    // Prevent multiple initializations
+    if (window.__GA_INITIALIZED__) {
       return;
     }
 
@@ -28,13 +40,24 @@ const GoogleAnalytics: React.FC<GoogleAnalyticsProps> = ({
     const script = document.createElement('script');
     script.async = true;
     script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+
+    script.onload = () => {
+      console.log('Google Analytics script loaded successfully');
+    };
+
+    script.onerror = () => {
+      console.error('Failed to load Google Analytics script');
+    };
+
     document.head.appendChild(script);
 
-    // Initialize dataLayer and gtag
+    // Initialize dataLayer and gtag only if not already defined
     window.dataLayer = window.dataLayer || [];
-    window.gtag = function gtag() {
-      window.dataLayer.push(arguments);
-    };
+    if (!window.gtag) {
+      window.gtag = function gtag() {
+        window.dataLayer.push(arguments);
+      };
+    }
 
     // Configure Google Analytics
     window.gtag('js', new Date());
@@ -44,17 +67,28 @@ const GoogleAnalytics: React.FC<GoogleAnalyticsProps> = ({
       send_page_view: true
     });
 
+    window.__GA_INITIALIZED__ = true;
+
     return () => {
       // Cleanup script on unmount
       const existingScript = document.querySelector(`script[src*="${measurementId}"]`);
       if (existingScript) {
         existingScript.remove();
       }
+      window.__GA_INITIALIZED__ = false;
     };
   }, [measurementId]);
 
   // Track page views on route changes
   useEffect(() => {
+    // Skip if in development or invalid measurement ID
+    if (process.env.NODE_ENV === 'development' ||
+        !measurementId ||
+        measurementId === 'G-XXXXXXXXXX' ||
+        !measurementId.startsWith('G-')) {
+      return;
+    }
+
     if (typeof window.gtag === 'function') {
       window.gtag('config', measurementId, {
         page_title: document.title,

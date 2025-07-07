@@ -60,9 +60,27 @@ const staticPages = [
 // Function to fetch investments from API (for dynamic sitemap generation)
 async function fetchInvestments() {
   try {
-    // In production, this would make an API call
-    // For now, we'll return sample investment IDs
-    // You can modify this to fetch from your actual API
+    // Try to fetch from API if available
+    const apiUrl = process.env.VITE_API_URL || 'http://localhost:3001';
+
+    try {
+      const response = await fetch(`${apiUrl}/api/investments`);
+      if (response.ok) {
+        const data = await response.json();
+        const investments = data.data || data; // Handle different response formats
+
+        if (Array.isArray(investments)) {
+          return investments.map(inv => ({
+            id: inv.id,
+            lastmod: inv.updated_at || inv.submissionDate || new Date().toISOString().split('T')[0]
+          }));
+        }
+      }
+    } catch (apiError) {
+      console.warn('API not available, using fallback data for sitemap');
+    }
+
+    // Fallback to sample data if API is not available
     return [
       { id: '1', lastmod: new Date().toISOString().split('T')[0] },
       { id: '2', lastmod: new Date().toISOString().split('T')[0] }

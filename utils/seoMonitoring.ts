@@ -47,14 +47,15 @@ export const analyzePage = (): SEOMetrics => {
   const links = document.querySelectorAll('a[href]');
   let internalLinks = 0;
   let externalLinks = 0;
-  
+
   Array.from(links).forEach(link => {
     const href = link.getAttribute('href') || '';
     if (href.startsWith('http') && !href.includes(window.location.hostname)) {
       externalLinks++;
-    } else if (href.startsWith('/') || href.startsWith('#') || href.includes(window.location.hostname)) {
+    } else if (href.startsWith('/') || href.includes(window.location.hostname)) {
       internalLinks++;
     }
+    // Skip fragment-only links (#) as they don't count as navigation links
   });
   
   return {
@@ -133,31 +134,39 @@ export const validateSEO = (metrics: SEOMetrics): { score: number; issues: strin
 
 export const measurePagePerformance = (): Promise<PerformanceMetrics> => {
   return new Promise((resolve) => {
+    const defaultMetrics = {
+      loadTime: 0,
+      domContentLoaded: 0,
+      firstPaint: 0,
+      firstContentfulPaint: 0,
+      timeToInteractive: 0
+    };
+
     if ('performance' in window) {
       window.addEventListener('load', () => {
         setTimeout(() => {
-          const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+          const navigationEntries = performance.getEntriesByType('navigation');
+          const navigation = navigationEntries[0] as PerformanceNavigationTiming;
           const paint = performance.getEntriesByType('paint');
-          
+
+          if (!navigation) {
+            resolve(defaultMetrics);
+            return;
+          }
+
           const metrics: PerformanceMetrics = {
-            loadTime: navigation.loadEventEnd - navigation.loadEventStart,
-            domContentLoaded: navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
+            loadTime: Math.max(0, navigation.loadEventEnd - navigation.loadEventStart),
+            domContentLoaded: Math.max(0, navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart),
             firstPaint: paint.find(p => p.name === 'first-paint')?.startTime || 0,
             firstContentfulPaint: paint.find(p => p.name === 'first-contentful-paint')?.startTime || 0,
-            timeToInteractive: navigation.loadEventEnd - navigation.fetchStart
+            timeToInteractive: Math.max(0, navigation.loadEventEnd - navigation.fetchStart)
           };
-          
+
           resolve(metrics);
         }, 0);
       });
     } else {
-      resolve({
-        loadTime: 0,
-        domContentLoaded: 0,
-        firstPaint: 0,
-        firstContentfulPaint: 0,
-        timeToInteractive: 0
-      });
+      resolve(defaultMetrics);
     }
   });
 };

@@ -15,11 +15,13 @@ export const preloadCriticalImages = async () => {
     '/images/logo.svg'
   ];
 
-  try {
-    await Promise.all(criticalImages.map(preloadImage));
-  } catch (error) {
-    console.warn('Failed to preload some critical images:', error);
-  }
+  const results = await Promise.allSettled(criticalImages.map(preloadImage));
+
+  results.forEach((result, index) => {
+    if (result.status === 'rejected') {
+      console.warn(`Failed to preload image: ${criticalImages[index]}`, result.reason);
+    }
+  });
 };
 
 // Preload fonts
@@ -31,9 +33,7 @@ export const preloadFonts = () => {
   fonts.forEach(fontUrl => {
     const link = document.createElement('link');
     link.rel = 'preload';
-    link.as = 'font';
-    link.type = 'font/woff2';
-    link.crossOrigin = 'anonymous';
+    link.as = 'style';
     link.href = fontUrl;
     document.head.appendChild(link);
   });

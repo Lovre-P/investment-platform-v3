@@ -99,7 +99,7 @@ const InvestmentDetailPage: React.FC = () => {
     { name: 'Investments', url: '/investments' },
     { name: title, url: `/investments/${investment.id}` }
   ]);
-  const combinedSchema = [investmentSchema, breadcrumbSchema];
+  const combinedSchema = [investmentSchema, breadcrumbSchema].filter(Boolean);
 
   const getStatusBadgeStyle = (status: InvestmentStatus) => {
     switch (status) {
