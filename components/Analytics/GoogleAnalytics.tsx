@@ -28,7 +28,11 @@ const GoogleAnalytics: React.FC<GoogleAnalyticsProps> = ({
 
     // Skip if measurement ID is placeholder or invalid
     if (!measurementId || measurementId === 'G-XXXXXXXXXX' || !measurementId.startsWith('G-')) {
-      console.warn('Google Analytics: Invalid measurement ID');
+      if (import.meta.env.PROD) {
+        console.error('🚨 Google Analytics: Invalid measurement ID in production!');
+      } else {
+        console.warn('Google Analytics: Invalid measurement ID');
+      }
       return;
     }
 

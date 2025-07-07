@@ -11,8 +11,7 @@ const SearchConsoleVerification: React.FC<SearchConsoleVerificationProps> = ({
   useEffect(() => {
     // Only add verification meta tag if it's not a placeholder
     if (verificationCode &&
-        verificationCode !== 'your-google-search-console-verification-code' &&
-        verificationCode !== SITE_CONFIG.analytics.searchConsoleVerification) {
+        verificationCode !== 'your-google-search-console-verification-code') {
       let meta = document.querySelector('meta[name="google-site-verification"]') as HTMLMetaElement;
       if (!meta) {
         meta = document.createElement('meta');

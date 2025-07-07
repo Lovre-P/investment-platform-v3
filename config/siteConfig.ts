@@ -47,8 +47,20 @@ export const SITE_CONFIG = {
 
   // Analytics Configuration (use environment variables in production)
   analytics: {
-    googleAnalyticsId: import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-XXXXXXXXXX',
-    searchConsoleVerification: import.meta.env.VITE_SEARCH_CONSOLE_VERIFICATION || 'your-google-search-console-verification-code'
+    googleAnalyticsId: (() => {
+      const gaId = import.meta.env.VITE_GA_MEASUREMENT_ID;
+      if (!gaId && import.meta.env.PROD) {
+        console.warn('⚠️ Google Analytics ID not configured for production');
+      }
+      return gaId || 'G-XXXXXXXXXX';
+    })(),
+    searchConsoleVerification: (() => {
+      const verification = import.meta.env.VITE_SEARCH_CONSOLE_VERIFICATION;
+      if (!verification && import.meta.env.PROD) {
+        console.warn('⚠️ Search Console verification not configured for production');
+      }
+      return verification || 'your-google-search-console-verification-code';
+    })()
   }
 };
 
