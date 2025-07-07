@@ -5,14 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run sitemap:generate && vite build",
     "start": "vite preview",
     "preview": "vite preview",
     "backend:dev": "cd backend && npm run dev",
     "backend:build": "cd backend && npm run build",
     "backend:start": "cd backend && npm start",
     "deploy:check": "node deploy-check.js",
-    "railway:setup": "node railway-setup.js"
+    "railway:setup": "node railway-setup.js",
+    "sitemap:generate": "node scripts/generate-sitemap.js"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -23,6 +24,7 @@
     "nodemailer": "^7.0.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-helmet-async": "^2.0.5",
     "react-router-dom": "^7.6.0",
     "recharts": "^2.15.3"
   },

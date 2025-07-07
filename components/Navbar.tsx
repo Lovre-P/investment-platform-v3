@@ -13,6 +13,7 @@ const Navbar: React.FC = () => {
     { name: 'Submit Investment', path: PUBLIC_ROUTES.SUBMIT_INVESTMENT },
     { name: 'About Us', path: PUBLIC_ROUTES.ABOUT },
     { name: 'Contact', path: PUBLIC_ROUTES.CONTACT },
+    { name: 'FAQ', path: PUBLIC_ROUTES.CONTACT + '#faq' },
   ];
 
   // Handle scroll effect for enhanced backdrop blur

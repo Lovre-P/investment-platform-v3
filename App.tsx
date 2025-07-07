@@ -1,8 +1,13 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import { useAuth } from './contexts/AuthContext';
 import ScrollToTop from './components/ScrollToTop';
+import GoogleAnalytics from './components/Analytics/GoogleAnalytics';
+import SearchConsoleVerification from './components/Analytics/SearchConsoleVerification';
+import { initPerformanceOptimizations } from './utils/preload';
+import { logSEOReport } from './utils/seoMonitoring';
 
 import Layout from './components/Layout';
 import AdminLayout from './components/AdminLayout';
@@ -35,10 +40,22 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 };
 
 const App: React.FC = () => {
+  useEffect(() => {
+    initPerformanceOptimizations();
+
+    // Log SEO report in development
+    if (process.env.NODE_ENV === 'development') {
+      setTimeout(logSEOReport, 2000); // Wait for page to fully load
+    }
+  }, []);
+
   return (
-    <HashRouter>
-      <ScrollToTop />
-      <Routes>
+    <HelmetProvider>
+      <SearchConsoleVerification />
+      <GoogleAnalytics />
+      <HashRouter>
+        <ScrollToTop />
+        <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Layout />}>
           <Route index element={<HomePage />} />
@@ -72,8 +89,9 @@ const App: React.FC = () => {
         
         {/* Fallback for any other route */}
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </HashRouter>
+        </Routes>
+      </HashRouter>
+    </HelmetProvider>
   );
 };
 

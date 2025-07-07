@@ -6,6 +6,8 @@ import { getInvestmentById } from '../../services/investmentService';
 import ImageGallery from '../../components/ImageGallery';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import InvestmentModal from '../../components/InvestmentModal';
+import SEOHead from '../../components/SEO/SEOHead';
+import { createInvestmentSchema, createBreadcrumbSchema } from '../../utils/structuredData';
 import { DEFAULT_CURRENCY } from '../../constants';
 import {
   CalendarDaysIcon, BanknotesIcon, ArrowTrendingUpIcon, TagIcon, UserCircleIcon, InformationCircleIcon, ClockIcon
@@ -69,12 +71,35 @@ const InvestmentDetailPage: React.FC = () => {
     return <div className="text-center py-10">Investment not found.</div>;
   }
 
-  const { 
-    title, longDescription, amountGoal, amountRaised, currency, images, category, 
-    status, submittedBy, submissionDate, apyRange, minInvestment, term, tags 
+  const {
+    title, longDescription, amountGoal, amountRaised, currency, images, category,
+    status, submittedBy, submissionDate, apyRange, minInvestment, term, tags
   } = investment;
   const progress = (amountRaised / amountGoal) * 100;
   const displayCurrency = currency || DEFAULT_CURRENCY;
+
+  // Generate SEO data
+  const seoTitle = `${title} - Investment Opportunity | MegaInvest`;
+  const seoDescription = `${investment.description} Minimum investment: ${displayCurrency} ${minInvestment?.toLocaleString() || 'N/A'}. Expected returns: ${apyRange || 'Contact for details'}. Category: ${category}.`;
+  const seoKeywords = [
+    'investment opportunity',
+    category.toLowerCase(),
+    ...(tags || []),
+    'Croatia investment',
+    'funding',
+    'returns',
+    displayCurrency.toLowerCase()
+  ];
+  const seoImage = images?.[0] || 'https://www.mega-invest.hr/images/logo.svg';
+
+  // Generate structured data
+  const investmentSchema = createInvestmentSchema(investment);
+  const breadcrumbSchema = createBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Investments', url: '/investments' },
+    { name: title, url: `/investments/${investment.id}` }
+  ]);
+  const combinedSchema = [investmentSchema, breadcrumbSchema];
 
   const getStatusBadgeStyle = (status: InvestmentStatus) => {
     switch (status) {
@@ -87,7 +112,17 @@ const InvestmentDetailPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-white p-6 md:p-10 rounded-xl shadow-2xl space-y-8">
+    <>
+      <SEOHead
+        title={seoTitle}
+        description={seoDescription}
+        keywords={seoKeywords}
+        image={seoImage}
+        url={`/investments/${investment.id}`}
+        type="article"
+        structuredData={combinedSchema}
+      />
+      <div className="bg-white p-6 md:p-10 rounded-xl shadow-2xl space-y-8">
       {/* Header: Title and Status */}
       <div className="md:flex md:justify-between md:items-start pb-6 border-b border-secondary-200">
         <h1 className="text-3xl md:text-4xl font-bold text-secondary-800 mb-3 md:mb-0">
@@ -213,7 +248,8 @@ const InvestmentDetailPage: React.FC = () => {
           investment={investment}
         />
       )}
-    </div>
+      </div>
+    </>
   );
 };
 

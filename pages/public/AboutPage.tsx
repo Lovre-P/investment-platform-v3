@@ -1,10 +1,26 @@
 
 import React from 'react';
 import { BuildingOffice2Icon, UsersIcon, SparklesIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import SEOHead from '../../components/SEO/SEOHead';
+import { createBreadcrumbSchema, organizationSchema } from '../../utils/structuredData';
 
 const AboutPage: React.FC = () => {
+  // Generate SEO data
+  const breadcrumbSchema = createBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'About Us', url: '/about' }
+  ]);
+
   return (
-    <div className="bg-white p-4 sm:p-6 md:p-10 rounded-xl shadow-2xl space-y-8 sm:space-y-12">
+    <>
+      <SEOHead
+        title="About MegaInvest - Croatia's Leading Investment Platform"
+        description="Learn about MegaInvest's mission to democratize investment opportunities in Croatia. Discover our values of innovation, integrity, and community-driven growth in real estate, technology, and renewable energy sectors."
+        keywords={['about MegaInvest', 'investment platform Croatia', 'company mission', 'investment values', 'Croatian investment company', 'venture capital Croatia', 'startup funding', 'real estate investment', 'technology funding']}
+        url="/about"
+        structuredData={[organizationSchema, breadcrumbSchema]}
+      />
+      <div className="bg-white p-4 sm:p-6 md:p-10 rounded-xl shadow-2xl space-y-8 sm:space-y-12">
       {/* Header Section */}
       <section className="text-center">
         <BuildingOffice2Icon className="h-20 w-20 mx-auto text-primary-600 mb-4" />
@@ -101,7 +117,8 @@ const AboutPage: React.FC = () => {
         <div className="mt-6 text-secondary-600">
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 };
 

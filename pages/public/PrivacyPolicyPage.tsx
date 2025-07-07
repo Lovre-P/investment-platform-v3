@@ -1,23 +1,25 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { ShieldCheckIcon, EyeIcon, LockClosedIcon, UserGroupIcon, BookOpenIcon, ExclamationCircleIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
+import SEOHead from '../../components/SEO/SEOHead';
+import { createBreadcrumbSchema } from '../../utils/structuredData';
 
 const PrivacyPolicyPage: React.FC = () => {
-  useEffect(() => {
-    // Set page title and meta description
-    document.title = 'Privacy Policy - MegaInvest | Data Protection & Privacy Rights';
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.setAttribute('content', 'Learn how MegaInvest protects your privacy and personal data. Comprehensive privacy policy covering data collection, usage, rights, and GDPR compliance.');
-    } else {
-      const meta = document.createElement('meta');
-      meta.name = 'description';
-      meta.content = 'Learn how MegaInvest protects your privacy and personal data. Comprehensive privacy policy covering data collection, usage, rights, and GDPR compliance.';
-      document.head.appendChild(meta);
-    }
-  }, []);
+  // Generate SEO data
+  const breadcrumbSchema = createBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Privacy Policy', url: '/privacy' }
+  ]);
 
   return (
-    <div className="bg-white p-4 sm:p-6 md:p-10 rounded-xl shadow-2xl space-y-8 sm:space-y-12">
+    <>
+      <SEOHead
+        title="Privacy Policy - MegaInvest | Data Protection & Privacy Rights"
+        description="Learn how MegaInvest protects your privacy and personal data. Comprehensive privacy policy covering data collection, usage, rights, and GDPR compliance."
+        keywords={['privacy policy', 'data protection', 'GDPR compliance', 'personal data', 'privacy rights', 'MegaInvest privacy', 'data security']}
+        url="/privacy"
+        structuredData={breadcrumbSchema}
+      />
+      <div className="bg-white p-4 sm:p-6 md:p-10 rounded-xl shadow-2xl space-y-8 sm:space-y-12">
       {/* Header Section */}
       <section className="text-center">
         <ShieldCheckIcon className="h-20 w-20 mx-auto text-primary-600 mb-4" />
@@ -344,7 +346,8 @@ const PrivacyPolicyPage: React.FC = () => {
           periodically to stay informed about how we protect your information.
         </p>
       </section>
-    </div>
+      </div>
+    </>
   );
 };
 
