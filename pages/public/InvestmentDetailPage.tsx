@@ -194,13 +194,81 @@ const InvestmentDetailPage: React.FC = () => {
         <h2 className="text-2xl font-semibold text-secondary-800 mb-4">About this Investment</h2>
         <div className="prose prose-lg max-w-none text-secondary-600">
           <div
-            className="leading-relaxed text-base"
+            className="leading-relaxed text-base investment-content"
             dangerouslySetInnerHTML={{
               __html: sanitizeHtml(textToHtml(longDescription))
             }}
           />
         </div>
       </section>
+
+      {/* CSS for investment content formatting */}
+      <style jsx>{`
+        .investment-content {
+          line-height: 1.6;
+          white-space: pre-wrap;
+        }
+
+        .investment-content p {
+          margin: 0.5em 0;
+          line-height: 1.6;
+        }
+
+        .investment-content ul,
+        .investment-content ol {
+          margin: 0.5em 0;
+          padding-left: 1.5em;
+        }
+
+        .investment-content li {
+          margin: 0.25em 0;
+          line-height: 1.6;
+        }
+
+        .investment-content a {
+          color: #2563eb;
+          text-decoration: underline;
+        }
+
+        .investment-content strong,
+        .investment-content b {
+          font-weight: 600;
+        }
+
+        .investment-content em,
+        .investment-content i {
+          font-style: italic;
+        }
+
+        .investment-content u {
+          text-decoration: underline;
+        }
+
+        /* Custom indentation classes */
+        .investment-content .indent-normal {
+          margin-left: 1.5em;
+        }
+
+        .investment-content .indent-deep {
+          margin-left: 3em;
+        }
+
+        .investment-content .bullet-item {
+          margin-left: 0;
+          padding-left: 0;
+        }
+
+        .investment-content .numbered-item {
+          margin-left: 0;
+          padding-left: 0;
+        }
+
+        /* Dynamic indentation based on pixel values */
+        .investment-content .indent-20 { margin-left: 1.25em; }
+        .investment-content .indent-40 { margin-left: 2.5em; }
+        .investment-content .indent-60 { margin-left: 3.75em; }
+        .investment-content .indent-80 { margin-left: 5em; }
+      `}</style>
 
       {/* Additional Information Section */}
       <section className="grid md:grid-cols-2 gap-6 pt-6 border-t border-secondary-200">

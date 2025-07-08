@@ -82,26 +82,62 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   // Handle paste events to preserve formatting
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    
+
     const clipboardData = e.clipboardData;
     const htmlData = clipboardData.getData('text/html');
     const textData = clipboardData.getData('text/plain');
-    
+
     // If HTML data is available, use it (preserves formatting)
     if (htmlData) {
-      // Basic sanitization - remove script tags and dangerous attributes
-      const sanitized = htmlData
+      // Enhanced sanitization and formatting preservation
+      let sanitized = htmlData
         .replace(/<script[^>]*>.*?<\/script>/gi, '')
         .replace(/<style[^>]*>.*?<\/style>/gi, '')
         .replace(/on\w+="[^"]*"/gi, '')
-        .replace(/javascript:/gi, '');
-      
+        .replace(/javascript:/gi, '')
+        // Preserve indentation by converting margin/padding to CSS classes
+        .replace(/style="[^"]*margin-left:\s*(\d+)px[^"]*"/gi, 'class="indent-$1"')
+        .replace(/style="[^"]*padding-left:\s*(\d+)px[^"]*"/gi, 'class="indent-$1"')
+        // Convert common indentation patterns
+        .replace(/<p[^>]*>\s*•\s*/gi, '<p class="bullet-item">• ')
+        .replace(/<p[^>]*>\s*\d+\.\s*/gi, '<p class="numbered-item">$&')
+        // Preserve line breaks and spacing
+        .replace(/\n\s+/g, '\n')
+        .replace(/\s{2,}/g, ' ');
+
       document.execCommand('insertHTML', false, sanitized);
     } else {
-      // Fallback to plain text
-      document.execCommand('insertText', false, textData);
+      // Fallback to plain text with basic formatting
+      const formattedText = textData
+        .split('\n')
+        .map(line => {
+          const trimmed = line.trim();
+          if (!trimmed) return '<br>';
+
+          // Handle bullet points
+          if (trimmed.startsWith('•') || trimmed.startsWith('-')) {
+            return `<p class="bullet-item">${trimmed}</p>`;
+          }
+
+          // Handle numbered items
+          if (/^\d+\./.test(trimmed)) {
+            return `<p class="numbered-item">${trimmed}</p>`;
+          }
+
+          // Handle indented items (detect leading spaces)
+          const leadingSpaces = line.length - line.trimStart().length;
+          if (leadingSpaces > 0) {
+            const indentClass = leadingSpaces > 4 ? 'indent-deep' : 'indent-normal';
+            return `<p class="${indentClass}">${trimmed}</p>`;
+          }
+
+          return `<p>${trimmed}</p>`;
+        })
+        .join('');
+
+      document.execCommand('insertHTML', false, formattedText);
     }
-    
+
     handleInput();
   };
 
@@ -257,11 +293,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         }
 
         .rich-text-editor [contenteditable] {
-          line-height: 1.5;
+          line-height: 1.6;
+          white-space: pre-wrap;
         }
 
         .rich-text-editor [contenteditable] p {
           margin: 0.5em 0;
+          line-height: 1.6;
         }
 
         .rich-text-editor [contenteditable] ul,
@@ -272,6 +310,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
         .rich-text-editor [contenteditable] li {
           margin: 0.25em 0;
+          line-height: 1.6;
         }
 
         .rich-text-editor [contenteditable] a {
@@ -292,6 +331,31 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         .rich-text-editor [contenteditable] u {
           text-decoration: underline;
         }
+
+        /* Custom indentation classes */
+        .rich-text-editor [contenteditable] .indent-normal {
+          margin-left: 1.5em;
+        }
+
+        .rich-text-editor [contenteditable] .indent-deep {
+          margin-left: 3em;
+        }
+
+        .rich-text-editor [contenteditable] .bullet-item {
+          margin-left: 0;
+          padding-left: 0;
+        }
+
+        .rich-text-editor [contenteditable] .numbered-item {
+          margin-left: 0;
+          padding-left: 0;
+        }
+
+        /* Dynamic indentation based on pixel values */
+        .rich-text-editor [contenteditable] .indent-20 { margin-left: 1.25em; }
+        .rich-text-editor [contenteditable] .indent-40 { margin-left: 2.5em; }
+        .rich-text-editor [contenteditable] .indent-60 { margin-left: 3.75em; }
+        .rich-text-editor [contenteditable] .indent-80 { margin-left: 5em; }
       `}</style>
     </div>
   );
