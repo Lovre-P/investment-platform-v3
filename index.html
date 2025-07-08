@@ -129,13 +129,30 @@
               ]
             },
             animation: {
-              'hero-zoom': 'hero-zoom 20s ease-in-out infinite'
+              'hero-zoom': 'hero-zoom 20s ease-in-out infinite',
+              'svg-float': 'svg-float 6s ease-in-out infinite',
+              'svg-pulse': 'svg-pulse 4s ease-in-out infinite'
             },
             keyframes: {
               'hero-zoom': {
                 '0%, 100%': { transform: 'scale(1)' },
                 '50%': { transform: 'scale(1.1)' }
+              },
+              'svg-float': {
+                '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+                '50%': { transform: 'translateY(-10px) rotate(2deg)' }
+              },
+              'svg-pulse': {
+                '0%, 100%': { opacity: '0.05' },
+                '50%': { opacity: '0.15' }
               }
+            },
+            backdropBlur: {
+              'xs': '2px'
+            },
+            zIndex: {
+              '-1': '-1',
+              '-10': '-10'
             }
           }
         }

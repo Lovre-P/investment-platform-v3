@@ -1,0 +1,149 @@
+/* SVG Background Utilities */
+
+/* Base classes for SVG backgrounds */
+.svg-background-base {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Opacity variations for different contexts */
+.svg-background-subtle {
+  opacity: 0.03;
+}
+
+.svg-background-light {
+  opacity: 0.06;
+}
+
+.svg-background-medium {
+  opacity: 0.12;
+}
+
+.svg-background-visible {
+  opacity: 0.20;
+}
+
+/* Responsive opacity adjustments */
+@media (max-width: 768px) {
+  .svg-background-responsive {
+    opacity: 0.04;
+  }
+}
+
+@media (min-width: 769px) {
+  .svg-background-responsive {
+    opacity: 0.08;
+  }
+}
+
+@media (min-width: 1024px) {
+  .svg-background-responsive {
+    opacity: 0.12;
+  }
+}
+
+/* Animation classes for subtle movement */
+.svg-background-animated {
+  animation: svg-float 8s ease-in-out infinite;
+}
+
+.svg-background-pulse {
+  animation: svg-pulse 6s ease-in-out infinite;
+}
+
+/* Blend modes for better integration */
+.svg-background-multiply {
+  mix-blend-mode: multiply;
+}
+
+.svg-background-overlay {
+  mix-blend-mode: overlay;
+}
+
+.svg-background-soft-light {
+  mix-blend-mode: soft-light;
+}
+
+/* Container classes for sections with SVG backgrounds */
+.section-with-svg {
+  position: relative;
+  overflow: hidden;
+}
+
+.section-with-svg > .content {
+  position: relative;
+  z-index: 10;
+}
+
+/* Specific positioning for different layout contexts */
+.svg-background-hero {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -10;
+}
+
+.svg-background-section {
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  right: -20px;
+  bottom: -20px;
+  z-index: -1;
+}
+
+.svg-background-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  border-radius: inherit;
+}
+
+/* Performance optimizations */
+.svg-background-optimized {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .svg-background-dark-mode {
+    opacity: 0.15;
+    filter: brightness(0.8) contrast(1.2);
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .svg-background-high-contrast {
+    opacity: 0.02;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .svg-background-animated,
+  .svg-background-pulse {
+    animation: none;
+  }
+}
+
+/* Print styles - hide SVG backgrounds */
+@media print {
+  .svg-background-base,
+  .svg-background-hero,
+  .svg-background-section,
+  .svg-background-card {
+    display: none;
+  }
+}

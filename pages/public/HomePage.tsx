@@ -9,6 +9,7 @@ import Button from '../../components/Button';
 import SEOHead from '../../components/SEO/SEOHead';
 import { organizationSchema, websiteSchema } from '../../utils/structuredData';
 import { ArrowRightIcon, PresentationChartLineIcon, LightBulbIcon, UserGroupIcon } from '@heroicons/react/24/outline';
+import BackgroundSVG from '../../components/BackgroundSVG';
 
 const HomePage: React.FC = () => {
   const [featuredInvestments, setFeaturedInvestments] = useState<Investment[]>([]);
@@ -109,11 +110,24 @@ const HomePage: React.FC = () => {
       <div className="container mx-auto px-8 space-y-16 py-16">
 
       {/* How It Works Section */}
-      <section>
-        <h2 className="text-3xl font-bold text-center text-primary-800 mb-12">
-          How <span className="text-primary-500">MegaInvest</span> Works
-        </h2>
-        <div className="grid md:grid-cols-3 gap-8">
+      <section className="relative">
+        {/* Subtle background pattern for this section */}
+        <BackgroundSVG
+          variant="lines"
+          opacity={0.2}
+          colors={{
+            primary: '#589ff1', // Bright Sky
+            secondary: '#0693a9', // Deep Teal
+            accent: '#214b8b'     // Royal Blue
+          }}
+          className="absolute inset-0 rounded-xl"
+        />
+
+        <div className="relative z-10">
+          <h2 className="text-3xl font-bold text-center text-primary-800 mb-12">
+            How <span className="text-primary-500">MegaInvest</span> Works
+          </h2>
+          <div className="grid md:grid-cols-3 gap-8">
           <div className="relative bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow bg-cover bg-center min-h-[280px] overflow-hidden"
                style={{
                  backgroundImage: 'url(/images/hero/ChatGPT-Image-1.Div.jpg)'
@@ -148,16 +162,31 @@ const HomePage: React.FC = () => {
             </div>
           </div>
         </div>
+        </div>
       </section>
 
       {/* Featured Investments Section */}
-      <section>
-        <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-primary-800">Featured Investments</h2>
-            <Link to="/investments" className="text-primary-500 hover:text-teal-600 font-medium flex items-center group">
-                View All <ArrowRightIcon className="h-5 w-5 ml-1 transition-transform group-hover:translate-x-1" />
-            </Link>
-        </div>
+      <section className="relative">
+        {/* Subtle dots pattern for featured investments */}
+        <BackgroundSVG
+          variant="dots"
+          opacity={0.15}
+          density="medium"
+          colors={{
+            primary: '#214b8b', // Royal Blue
+            secondary: '#0693a9', // Deep Teal
+            accent: '#589ff1'     // Bright Sky
+          }}
+          className="absolute inset-0 rounded-xl"
+        />
+
+        <div className="relative z-10">
+          <div className="flex justify-between items-center mb-8">
+              <h2 className="text-3xl font-bold text-primary-800">Featured Investments</h2>
+              <Link to="/investments" className="text-primary-500 hover:text-teal-600 font-medium flex items-center group">
+                  View All <ArrowRightIcon className="h-5 w-5 ml-1 transition-transform group-hover:translate-x-1" />
+              </Link>
+          </div>
         {isLoading ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[1, 2, 3].map(i => <InvestmentCardSkeleton key={i} />)}
@@ -171,22 +200,37 @@ const HomePage: React.FC = () => {
         ) : (
           <p className="text-center text-secondary-500 py-8">No featured investments available at the moment. Check back soon!</p>
         )}
+        </div>
       </section>
 
       {/* Call to Action - Submit Project */}
-      <section className="bg-white py-16 px-6 rounded-xl shadow-xl text-center">
-        <h2 className="text-3xl font-bold text-primary-800 mb-4">Have a Groundbreaking Project?</h2>
-        <p className="text-lg text-primary-500 mb-8 max-w-2xl mx-auto">
-          MegaInvest is always looking for innovative projects and promising businesses seeking funding. If you have a vision, we want to hear about it.
-        </p>
-        <Button
-          size="lg"
-          className="!px-10 !py-4 mx-auto"
-          onClick={() => (window.location.hash = "/submit-investment")}
-        >
-          Submit Your Investment Idea
-          <LightBulbIcon className="h-5 w-5 ml-2" />
-        </Button>
+      <section className="relative bg-white py-16 px-6 rounded-xl shadow-xl text-center overflow-hidden">
+        {/* Subtle geometric shapes background */}
+        <BackgroundSVG
+          variant="shapes"
+          opacity={0.12}
+          colors={{
+            primary: '#589ff1', // Bright Sky
+            secondary: '#214b8b', // Royal Blue
+            accent: '#0693a9'     // Deep Teal
+          }}
+          className="absolute inset-0"
+        />
+
+        <div className="relative z-10">
+          <h2 className="text-3xl font-bold text-primary-800 mb-4">Have a Groundbreaking Project?</h2>
+          <p className="text-lg text-primary-500 mb-8 max-w-2xl mx-auto">
+            MegaInvest is always looking for innovative projects and promising businesses seeking funding. If you have a vision, we want to hear about it.
+          </p>
+          <Button
+            size="lg"
+            className="!px-10 !py-4 mx-auto"
+            onClick={() => (window.location.hash = "/submit-investment")}
+          >
+            Submit Your Investment Idea
+            <LightBulbIcon className="h-5 w-5 ml-2" />
+          </Button>
+        </div>
       </section>
       </div>
     </>

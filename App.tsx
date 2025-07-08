@@ -20,6 +20,7 @@ import InvestmentDetailPage from './pages/public/InvestmentDetailPage';
 import SubmitInvestmentPage from './pages/public/SubmitInvestmentPage';
 import TermsOfServicePage from './pages/public/TermsOfServicePage';
 import PrivacyPolicyPage from './pages/public/PrivacyPolicyPage';
+import SVGTestPage from './pages/public/SVGTestPage';
 
 // Admin Pages
 import AdminLoginPage from './pages/admin/AdminLoginPage';
@@ -65,6 +66,7 @@ const App: React.FC = () => {
           <Route path="submit-investment" element={<SubmitInvestmentPage />} />
           <Route path="terms" element={<TermsOfServicePage />} />
           <Route path="privacy" element={<PrivacyPolicyPage />} />
+          <Route path="svg-test" element={<SVGTestPage />} />
         </Route>
 
         {/* Admin Routes */}
