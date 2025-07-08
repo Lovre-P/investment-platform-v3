@@ -7,6 +7,7 @@ import Button from '../../components/Button';
 import Modal from '../../components/Modal';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import FileUpload from '../../components/FileUpload';
+import RichTextEditor from '../../components/RichTextEditor';
 import { PencilIcon, TrashIcon, PlusCircleIcon, EyeIcon, FunnelIcon, MagnifyingGlassIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import { Link, useSearchParams } from 'react-router-dom';
 import { PUBLIC_ROUTES } from '../../constants';
@@ -507,13 +508,25 @@ const AdminInvestmentsPage: React.FC = () => {
                     </div>
 
                     <div>
-                        <label htmlFor="description-modal">Short Description</label>
-                        <textarea name="description" id="description-modal" value={currentInvestment.description} onChange={handleChange} rows={2} className="form-textarea" placeholder="Brief description of the investment opportunity"></textarea>
+                        <RichTextEditor
+                            label="Short Description"
+                            value={currentInvestment.description}
+                            onChange={(value) => setCurrentInvestment(prev => ({ ...prev, description: value }))}
+                            placeholder="Brief description of the investment opportunity..."
+                            rows={2}
+                            maxLength={150}
+                            showCharCount={true}
+                        />
                     </div>
 
                     <div>
-                        <label htmlFor="longDescription-modal">Detailed Description</label>
-                        <textarea name="longDescription" id="longDescription-modal" value={currentInvestment.longDescription} onChange={handleChange} rows={4} className="form-textarea" placeholder="Comprehensive description including business model, market opportunity, and growth strategy"></textarea>
+                        <RichTextEditor
+                            label="Detailed Description"
+                            value={currentInvestment.longDescription}
+                            onChange={(value) => setCurrentInvestment(prev => ({ ...prev, longDescription: value }))}
+                            placeholder="Comprehensive description including business model, market opportunity, and growth strategy..."
+                            rows={6}
+                        />
                     </div>
                 </div>
             </div>

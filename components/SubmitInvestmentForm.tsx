@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Button from './Button';
 import FileUpload from './FileUpload';
+import RichTextEditor from './RichTextEditor';
 import { Investment, InvestmentCategory } from '../types';
 import { createInvestment, createInvestmentWithFiles } from '../services/investmentService';
 import { getCategories } from '../services/categoryService';
@@ -240,16 +241,25 @@ const SubmitInvestmentForm: React.FC = () => {
         </h3>
         <div className="space-y-6">
           <div>
-            <label htmlFor="description" className="block text-sm font-semibold text-secondary-700 mb-2">Short Description (Max 150 chars) *</label>
-            <textarea name="description" id="description" value={formData.description} onChange={handleChange} rows={3} maxLength={150} className="form-textarea" placeholder="Brief overview of the investment opportunity..."></textarea>
-            <div className="flex justify-between items-center mt-1">
-              {renderError('description')}
-              <span className="text-xs text-secondary-500">{formData.description.length}/150</span>
-            </div>
+            <RichTextEditor
+              label="Short Description (Max 150 chars) *"
+              value={formData.description}
+              onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
+              placeholder="Brief overview of the investment opportunity..."
+              rows={3}
+              maxLength={150}
+              showCharCount={true}
+            />
+            {renderError('description')}
           </div>
           <div>
-            <label htmlFor="longDescription" className="block text-sm font-semibold text-secondary-700 mb-2">Detailed Description *</label>
-            <textarea name="longDescription" id="longDescription" value={formData.longDescription} onChange={handleChange} rows={6} className="form-textarea" placeholder="Provide comprehensive details including business plan, team background, market analysis, financial projections, and growth strategy..."></textarea>
+            <RichTextEditor
+              label="Detailed Description *"
+              value={formData.longDescription}
+              onChange={(value) => setFormData(prev => ({ ...prev, longDescription: value }))}
+              placeholder="Provide comprehensive details including business plan, team background, market analysis, financial projections, and growth strategy..."
+              rows={6}
+            />
             {renderError('longDescription')}
           </div>
         </div>

@@ -8,6 +8,7 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import InvestmentModal from '../../components/InvestmentModal';
 import SEOHead from '../../components/SEO/SEOHead';
 import { createInvestmentSchema, createBreadcrumbSchema } from '../../utils/structuredData';
+import { sanitizeHtml, textToHtml } from '../../utils/htmlSanitizer';
 import { DEFAULT_CURRENCY } from '../../constants';
 import {
   CalendarDaysIcon, BanknotesIcon, ArrowTrendingUpIcon, TagIcon, UserCircleIcon, InformationCircleIcon, ClockIcon
@@ -192,9 +193,12 @@ const InvestmentDetailPage: React.FC = () => {
       <section>
         <h2 className="text-2xl font-semibold text-secondary-800 mb-4">About this Investment</h2>
         <div className="prose prose-lg max-w-none text-secondary-600">
-          <div className="whitespace-pre-wrap break-words leading-relaxed text-base">
-            {longDescription}
-          </div>
+          <div
+            className="leading-relaxed text-base"
+            dangerouslySetInnerHTML={{
+              __html: sanitizeHtml(textToHtml(longDescription))
+            }}
+          />
         </div>
       </section>
 

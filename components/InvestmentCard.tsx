@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Investment, InvestmentStatus } from '../types';
+import { htmlToText } from '../utils/htmlSanitizer';
 import { PLACEHOLDER_IMAGE_URL, DEFAULT_CURRENCY } from '../constants';
 import { ArrowTrendingUpIcon, TagIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
 
@@ -46,7 +47,10 @@ const InvestmentCard: React.FC<InvestmentCardProps> = ({ investment }) => {
             </span>
           </div>
           <p className="text-xs sm:text-sm text-primary-700 mb-3 sm:mb-4 h-12 sm:h-16 overflow-hidden leading-relaxed">
-            {description.substring(0, 80)}{description.length > 80 ? '...' : ''}
+            {(() => {
+              const plainText = htmlToText(description);
+              return plainText.substring(0, 80) + (plainText.length > 80 ? '...' : '');
+            })()}
           </p>
 
           <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm text-primary-700 mb-3 sm:mb-4">
