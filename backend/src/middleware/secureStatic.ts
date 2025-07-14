@@ -25,19 +25,20 @@ const fileAccessLimiter = rateLimit({
 
 // Security middleware for path traversal protection
 const validateFilePath = (uploadDir: string) => {
-  return async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const requestedPath = req.path;
 
       // Check if path starts with '/' before using substring
       if (!requestedPath || !requestedPath.startsWith('/')) {
-        return res.status(400).json({
+        res.status(400).json({
           success: false,
           error: {
             message: 'Access denied: Invalid path format',
             code: 'INVALID_PATH_FORMAT'
           }
         });
+        return;
       }
 
       // Decode URI component to handle encoded characters
@@ -53,13 +54,14 @@ const validateFilePath = (uploadDir: string) => {
           normalizedPath.includes('%2e%2e') ||
           normalizedPath.includes('%2f%2e%2e') ||
           normalizedPath.includes('%5c')) {
-        return res.status(403).json({
+        res.status(403).json({
           success: false,
           error: {
             message: 'Access denied: Invalid file path',
             code: 'INVALID_FILE_PATH'
           }
         });
+        return;
       }
 
       // Resolve the full path and ensure it's within the upload directory
@@ -68,13 +70,14 @@ const validateFilePath = (uploadDir: string) => {
       const uploadDirResolved = path.resolve(uploadDir);
 
       if (!fullPath.startsWith(uploadDirResolved)) {
-        return res.status(403).json({
+        res.status(403).json({
           success: false,
           error: {
             message: 'Access denied: Path outside allowed directory',
             code: 'PATH_OUTSIDE_DIRECTORY'
           }
         });
+        return;
       }
 
       // Use async file system calls to prevent blocking the event loop
@@ -83,13 +86,14 @@ const validateFilePath = (uploadDir: string) => {
         const stats = await fsPromises.stat(fullPath);
 
         if (!stats.isFile()) {
-          return res.status(403).json({
+          res.status(403).json({
             success: false,
             error: {
               message: 'Access denied: Not a file',
               code: 'NOT_A_FILE'
             }
           });
+          return;
         }
       } catch (fileError) {
         // File doesn't exist or can't be accessed - let express.static handle it
@@ -99,13 +103,14 @@ const validateFilePath = (uploadDir: string) => {
       next();
     } catch (error) {
       console.error('File path validation error:', error);
-      return res.status(500).json({
+      res.status(500).json({
         success: false,
         error: {
           message: 'Internal server error during file validation',
           code: 'FILE_VALIDATION_ERROR'
         }
       });
+      return;
     }
   };
 };
@@ -132,7 +137,7 @@ const setSecurityHeaders = (req: Request, res: Response, next: NextFunction): vo
 };
 
 // File type validation middleware
-const validateFileType = (req: Request, res: Response, next: NextFunction): void | Response => {
+const validateFileType = (req: Request, res: Response, next: NextFunction): void => {
   const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
   const allowedMimeTypes = [
     'image/jpeg',
@@ -147,19 +152,21 @@ const validateFileType = (req: Request, res: Response, next: NextFunction): void
   
   // Check file extension
   if (!allowedExtensions.includes(fileExtension)) {
-    return res.status(403).json({
+    res.status(403).json({
       success: false,
       error: {
         message: 'Access denied: File type not allowed',
         code: 'INVALID_FILE_TYPE'
       }
     });
+    return;
   }
 
   // For additional security, we could check MIME type from file content
   // but for now, extension check is sufficient for uploaded images
-  
+
   next();
+  return;
 };
 
 // Main secure static files middleware
