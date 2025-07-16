@@ -21,6 +21,7 @@ import SubmitInvestmentPage from './pages/public/SubmitInvestmentPage';
 import TermsOfServicePage from './pages/public/TermsOfServicePage';
 import PrivacyPolicyPage from './pages/public/PrivacyPolicyPage';
 import SVGTestPage from './pages/public/SVGTestPage';
+import NotFoundPage from './pages/public/NotFoundPage';
 
 // Admin Pages
 import AdminLoginPage from './pages/admin/AdminLoginPage';
@@ -88,8 +89,8 @@ const App: React.FC = () => {
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
         
-        {/* Fallback for any other route */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* 404 Page for any other route */}
+        <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </HashRouter>
     </>

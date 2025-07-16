@@ -11,6 +11,7 @@ export const PUBLIC_ROUTES = {
   SUBMIT_INVESTMENT: '/submit-investment',
   TERMS: '/terms',
   PRIVACY: '/privacy',
+  NOT_FOUND: '/404',
 };
 
 export const ADMIN_ROUTES = {
