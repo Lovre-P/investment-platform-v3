@@ -175,10 +175,18 @@ const AdminSettingsPage: React.FC = () => {
     setCategoryError(null);
 
     try {
+      // Ensure correct types before sending
+      const payload = {
+        name: categoryForm.name.trim(),
+        description: categoryForm.description,
+        isActive: !!categoryForm.isActive,
+        sortOrder: Number(categoryForm.sortOrder) || 0
+      };
+
       if (editingCategory) {
-        await updateCategory(editingCategory.id, categoryForm);
+        await updateCategory(editingCategory.id, payload);
       } else {
-        await createCategory(categoryForm);
+        await createCategory(payload);
       }
 
       await loadData(); // Reload categories
@@ -226,8 +234,8 @@ const AdminSettingsPage: React.FC = () => {
       setCategoryForm({
         name: category.name,
         description: category.description || '',
-        isActive: category.isActive,
-        sortOrder: category.sortOrder
+        isActive: !!category.isActive,
+        sortOrder: Number(category.sortOrder) || 0
       });
       setEditingCategory(category);
     } else {

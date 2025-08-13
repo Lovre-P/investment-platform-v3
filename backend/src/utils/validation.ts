@@ -1,6 +1,18 @@
 import { z } from 'zod';
 import { InvestmentStatus, UserRole } from '../types/index.js';
 
+// Accept booleans as true/false, '1'/'0', 'yes'/'no', 'on'/'off', or 1/0
+export const booleanish = z.preprocess((val) => {
+  if (typeof val === 'string') {
+    const v = val.toLowerCase().trim();
+    if (v === 'true' || v === '1' || v === 'yes' || v === 'on') return true;
+    if (v === 'false' || v === '0' || v === 'no' || v === 'off') return false;
+  }
+  if (typeof val === 'number') return val === 1;
+  return val;
+}, z.boolean());
+
+
 // User validation schemas
 export const loginSchema = z.object({
   email: z.string().email().optional(),
@@ -104,14 +116,14 @@ export const investmentFiltersSchema = z.object({
 export const createInvestmentCategorySchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().optional(),
-  isActive: z.boolean().default(true).optional(),
+  isActive: booleanish.default(true).optional(),
   sortOrder: z.number().int().min(0).default(0).optional()
 });
 
 export const updateInvestmentCategorySchema = z.object({
   name: z.string().min(1).max(100).optional(),
   description: z.string().optional(),
-  isActive: z.boolean().optional(),
+  isActive: booleanish.optional(),
   sortOrder: z.number().int().min(0).optional()
 });
 
@@ -121,14 +133,14 @@ export const createPlatformSettingSchema = z.object({
   settingValue: z.string(),
   settingType: z.enum(['string', 'number', 'boolean', 'json']).default('string').optional(),
   description: z.string().optional(),
-  isPublic: z.boolean().default(false).optional()
+  isPublic: booleanish.default(false).optional()
 });
 
 export const updatePlatformSettingSchema = z.object({
   settingValue: z.string().optional(),
   settingType: z.enum(['string', 'number', 'boolean', 'json']).optional(),
   description: z.string().optional(),
-  isPublic: z.boolean().optional()
+  isPublic: booleanish.optional()
 });
 
 export const updateSettingValueSchema = z.object({

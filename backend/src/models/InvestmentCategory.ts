@@ -69,10 +69,11 @@ export class InvestmentCategoryModel {
         ORDER BY sort_order ASC, name ASC
       `);
 
-      // Convert id to string for consistency with the interface
+      // Convert id to string and ensure boolean types for consistency with the interface
       const categories = (rows as any[]).map(row => ({
         ...row,
-        id: row.id.toString()
+        id: row.id.toString(),
+        isActive: typeof row.isActive === 'number' ? row.isActive === 1 : !!row.isActive
       }));
 
       return categories as InvestmentCategory[];
@@ -100,6 +101,8 @@ export class InvestmentCategoryModel {
       if (row) {
         // Convert id back to string for consistency with the interface
         row.id = row.id.toString();
+        // Ensure boolean type for isActive
+        row.isActive = typeof row.isActive === 'number' ? row.isActive === 1 : !!row.isActive;
       }
       return row || null;
     } catch (error) {
@@ -123,6 +126,9 @@ export class InvestmentCategoryModel {
       `, [name]);
 
       const row = (rows as any[])[0];
+      if (row) {
+        row.isActive = typeof row.isActive === 'number' ? row.isActive === 1 : !!row.isActive;
+      }
       return row || null;
     } catch (error) {
       console.error('InvestmentCategory.findByName error:', error);
