@@ -104,6 +104,15 @@ export const updateLeadStatusSchema = z.object({
   status: z.enum(['New', 'Contacted', 'Converted', 'Rejected'])
 });
 
+
+// Bulk delete leads schema
+export const bulkDeleteLeadsSchema = z.object({
+  ids: z.array(z.string().uuid())
+    .min(1, 'At least one lead id is required')
+    .max(100, 'Too many lead ids; please delete in smaller batches')
+    .refine((arr) => new Set(arr).size === arr.length, 'Duplicate ids are not allowed')
+});
+
 // Query parameter validation
 export const investmentFiltersSchema = z.object({
   status: z.nativeEnum(InvestmentStatus).optional(),

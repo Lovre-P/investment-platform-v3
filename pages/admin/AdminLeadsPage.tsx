@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { Lead, Investment } from '../../types';
-import { getLeads, updateLeadStatus } from '../../services/leadService';
+import { getLeads, updateLeadStatus, bulkDeleteLeads } from '../../services/leadService';
 import { getInvestments } from '../../services/investmentService'; // To display investment title
 import { logError, getUserFriendlyErrorMessage, withRetry } from '../../utils/errorHandling';
 import Button from '../../components/Button';
@@ -38,6 +38,47 @@ const AdminLeadsPage: React.FC = () => {
   const [isEditStatusModalOpen, setIsEditStatusModalOpen] = useState(false);
   const [currentLeadForStatusEdit, setCurrentLeadForStatusEdit] = useState<Lead | null>(null);
   const [newStatus, setNewStatus] = useState<Lead['status'] | ''>('');
+
+  // Selection state for visible rows only (pagination-friendly)
+  const [selectedIds, setSelectedIds] = useState<Record<string, boolean>>({});
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const clearSelection = () => setSelectedIds({});
+
+  const selectedCount = Object.values(selectedIds).filter(Boolean).length;
+
+  const handleBulkDelete = async () => {
+    if (selectedCount === 0) return;
+    const ids = Object.keys(selectedIds).filter(id => selectedIds[id]);
+    const confirmed = window.confirm(`Are you sure you want to delete ${ids.length} selected lead${ids.length > 1 ? 's' : ''}?`);
+    if (!confirmed) return;
+
+    setIsLoading(true);
+    try {
+      await bulkDeleteLeads(ids);
+      clearSelection();
+      await fetchAllData();
+    } catch (err) {
+      logError(err, 'AdminLeadsPage bulkDeleteLeads', { component: 'AdminLeadsPage', action: 'bulkDeleteLeads', ids });
+      setError(getUserFriendlyErrorMessage(err));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  // Keep selection limited to currently visible leads (supports pagination)
+  useEffect(() => {
+    setSelectedIds(prev => {
+      const visible = new Set(leads.map(l => l.id));
+      const next: Record<string, boolean> = {};
+      for (const id of Object.keys(prev)) {
+        if (visible.has(id)) next[id] = prev[id];
+      }
+      return next;
+    });
+  }, [leads]);
 
 
   const fetchAllData = useCallback(async () => {
@@ -79,7 +120,7 @@ const AdminLeadsPage: React.FC = () => {
     setSelectedLead(lead);
     setIsViewModalOpen(true);
   };
-  
+
   const handleOpenEditStatusModal = (lead: Lead) => {
     setCurrentLeadForStatusEdit(lead);
     setNewStatus(lead.status);
@@ -90,15 +131,20 @@ const AdminLeadsPage: React.FC = () => {
     if (!currentLeadForStatusEdit || !newStatus) return;
     setIsLoading(true); // Or a specific loading state for this action
     try {
-        await updateLeadStatus(currentLeadForStatusEdit.id, newStatus as Lead['status']);
-        fetchAllData(); // Refresh leads
-        setIsEditStatusModalOpen(false);
-        setCurrentLeadForStatusEdit(null);
-    } catch (err) {
-        console.error("Failed to update lead status:", err);
-        setError("Failed to update lead status.");
+      await updateLeadStatus(currentLeadForStatusEdit.id, newStatus as Lead['status']);
+      fetchAllData(); // Refresh leads
+      setIsEditStatusModalOpen(false);
+      setCurrentLeadForStatusEdit(null);
+    } catch (err: any) {
+      logError(err, 'AdminLeadsPage updateLeadStatus', {
+        component: 'AdminLeadsPage',
+        action: 'updateLeadStatus',
+        leadId: currentLeadForStatusEdit?.id,
+        status: newStatus
+      });
+      setError(getUserFriendlyErrorMessage(err));
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -110,7 +156,7 @@ const AdminLeadsPage: React.FC = () => {
   if (error && leads.length === 0) {
     return <div className="text-center text-red-500 p-4">{error}</div>;
   }
-  
+
   const leadStatusOptions: Lead['status'][] = ['New', 'Contacted', 'Converted', 'Rejected'];
 
 
@@ -120,9 +166,24 @@ const AdminLeadsPage: React.FC = () => {
       {error && <p className="text-red-500 bg-red-100 p-3 rounded-md">{error}</p>}
 
       <div className="bg-white shadow-xl rounded-lg overflow-x-auto">
+        {/* Bulk actions */}
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="text-sm text-secondary-600">
+            {selectedCount > 0 ? `${selectedCount} selected` : 'Select rows to enable bulk actions'}
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="danger" size="sm" onClick={handleBulkDelete} disabled={selectedCount === 0}>
+              Delete Selected
+            </Button>
+          </div>
+        </div>
+
         <table className="min-w-full divide-y divide-secondary-200">
           <thead className="bg-secondary-50">
             <tr>
+              <th className="px-4 py-3">
+                {/* Reserved for potential select-all for current page in future */}
+              </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-secondary-700 uppercase tracking-wider">Name</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-secondary-700 uppercase tracking-wider">Email</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-secondary-700 uppercase tracking-wider">Investment Interest</th>
@@ -134,6 +195,15 @@ const AdminLeadsPage: React.FC = () => {
           <tbody className="bg-white divide-y divide-secondary-200">
             {leads.map((lead) => (
               <tr key={lead.id} className="hover:bg-secondary-50 transition-colors">
+                <td className="px-4 py-4 whitespace-nowrap text-sm">
+                  <input
+                    type="checkbox"
+                    checked={!!selectedIds[lead.id]}
+                    onChange={() => toggleSelect(lead.id)}
+                    className="h-4 w-4 text-primary-600 border-secondary-300 rounded focus:ring-primary-500"
+                    aria-label={`Select lead ${lead.name}`}
+                  />
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-secondary-900">{lead.name}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-600">{lead.email}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-600">
@@ -159,7 +229,7 @@ const AdminLeadsPage: React.FC = () => {
             ))}
              {leads.length === 0 && !isLoading && (
                 <tr>
-                    <td colSpan={6} className="text-center py-10 text-secondary-500">
+                    <td colSpan={7} className="text-center py-10 text-secondary-500">
                         No leads found.
                     </td>
                 </tr>
@@ -229,23 +299,23 @@ const AdminLeadsPage: React.FC = () => {
           </div>
         </Modal>
       )}
-      
+
       {/* Edit Lead Status Modal */}
       {currentLeadForStatusEdit && (
         <Modal isOpen={isEditStatusModalOpen} onClose={() => setIsEditStatusModalOpen(false)} title={`Update Status for ${currentLeadForStatusEdit.name}`} size="md">
             <div className="modal-form space-y-6">
                 {/* Status Update Section */}
-                <div className="form-section">
-                    <h3>Status Update</h3>
+                <div className="bg-slate-50 p-6 rounded-xl border border-slate-200 mb-4">
+                    <h3 className="text-slate-900 font-semibold mb-4">Status Update</h3>
                     <div className="space-y-4">
                         <div>
-                            <label htmlFor="leadStatus">New Status *</label>
+                            <label htmlFor="leadStatus" className="block text-sm font-semibold text-slate-700 mb-2">New Status *</label>
                             <select
                                 id="leadStatus"
                                 name="leadStatus"
                                 value={newStatus}
                                 onChange={(e) => setNewStatus(e.target.value as Lead['status'])}
-                                className="form-select"
+                                className="w-full mt-1 px-4 py-3 bg-white text-slate-700 border border-slate-300 rounded-lg shadow-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-slate-500 appearance-none pr-10"
                             >
                                 <option value="" disabled>Select new status</option>
                                 {leadStatusOptions.map(statusOpt => (
@@ -261,80 +331,7 @@ const AdminLeadsPage: React.FC = () => {
                     </div>
                 </div>
 
-                <style dangerouslySetInnerHTML={{ __html: `
-                    .form-input, .form-textarea, .form-select {
-                      width: 100% !important;
-                      max-width: 100% !important;
-                      margin-top: 0.25rem !important;
-                      padding: 0.75rem 1rem !important;
-                      background-color: white !important;
-                      color: #374151 !important;
-                      border: 1px solid #d1d5db !important;
-                      border-radius: 0.5rem !important;
-                      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
-                      transition: all 0.2s ease-in-out !important;
-                      font-weight: 400 !important;
-                      font-size: 0.875rem !important;
-                      line-height: 1.25rem !important;
-                      box-sizing: border-box !important;
-                    }
-                    .form-select {
-                      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
-                      background-position: right 0.5rem center !important;
-                      background-repeat: no-repeat !important;
-                      background-size: 1.5em 1.5em !important;
-                      padding-right: 2.5rem !important;
-                      appearance: none !important;
-                    }
-                    .form-select:hover {
-                      border-color: #6b7280 !important;
-                      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
-                      transform: translateY(-1px) !important;
-                    }
-                    .form-select:focus {
-                      outline: none !important;
-                      border-color: #3b82f6 !important;
-                      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
-                      transform: translateY(-1px) !important;
-                    }
 
-                    /* Enhanced label styling */
-                    .modal-form label {
-                      display: block !important;
-                      font-size: 0.875rem !important;
-                      font-weight: 600 !important;
-                      color: #374151 !important;
-                      margin-bottom: 0.5rem !important;
-                      line-height: 1.25rem !important;
-                    }
-
-                    /* Section styling */
-                    .form-section {
-                      background-color: #f8fafc !important;
-                      padding: 1.5rem !important;
-                      border-radius: 0.75rem !important;
-                      border: 1px solid #e2e8f0 !important;
-                      margin-bottom: 1rem !important;
-                    }
-
-                    .form-section h3 {
-                      font-size: 1rem !important;
-                      font-weight: 600 !important;
-                      color: #1e293b !important;
-                      margin-bottom: 1rem !important;
-                      display: flex !important;
-                      align-items: center !important;
-                    }
-
-                    .form-section h3::before {
-                      content: '' !important;
-                      width: 0.5rem !important;
-                      height: 0.5rem !important;
-                      background-color: #3b82f6 !important;
-                      border-radius: 50% !important;
-                      margin-right: 0.75rem !important;
-                    }
-                `}} />
 
                 {/* Form Actions */}
                 <div className="pt-6 border-t border-secondary-200">

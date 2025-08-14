@@ -21,3 +21,8 @@ export const createLead = async (leadData: Omit<Lead, 'id' | 'submissionDate' | 
 export const updateLeadStatus = async (id: string, status: Lead['status']): Promise<Lead | null> => {
   return apiClient.put<Lead>(`/leads/${id}/status`, { status });
 };
+
+
+export const bulkDeleteLeads = async (ids: string[]): Promise<{ deletedCount: number }> => {
+  return apiClient.post<{ deletedCount: number }>(`/leads/bulk-delete`, { ids });
+};

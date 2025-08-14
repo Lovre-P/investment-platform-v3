@@ -2,6 +2,7 @@ import { pool, isMockMode } from '../database/config.js';
 import { mockDb } from '../database/mock.js';
 import { Lead, CreateLeadData } from '../types/index.js';
 import { NotFoundError, DatabaseError } from '../utils/errors.js';
+import { v4 as uuidv4 } from 'uuid';
 
 export class LeadModel {
   static async findAll(): Promise<Lead[]> {
@@ -49,10 +50,12 @@ export class LeadModel {
     }
 
     try {
+      const newId = uuidv4();
       await pool.execute(`
         INSERT INTO leads (id, name, email, phone, message, investment_id, status)
-        VALUES (UUID(), ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
       `, [
+        newId,
         leadData.name,
         leadData.email,
         leadData.phone || null,
@@ -61,18 +64,8 @@ export class LeadModel {
         'New' // Default status
       ]);
 
-      // Get the inserted lead
-      const [rows] = await pool.execute(`
-        SELECT
-          id, name, email, phone, message, investment_id as investmentId,
-          submission_date as submissionDate, status
-        FROM leads
-        WHERE name = ? AND email = ?
-        ORDER BY created_at DESC
-        LIMIT 1
-      `, [leadData.name, leadData.email]);
-
-      return (rows as any[])[0];
+      const created = await this.findById(newId);
+      return created as Lead;
     } catch (error) {
       throw new DatabaseError('Failed to create lead');
     }
@@ -130,6 +123,30 @@ export class LeadModel {
     }
   }
 
+  // Bulk delete leads by IDs. Returns number of deleted rows.
+  static async bulkDelete(ids: string[]): Promise<number> {
+    if (ids.length === 0) return 0;
+
+    if (isMockMode()) {
+      let deletedCount = 0;
+      for (const id of ids) {
+        const deleted = mockDb.leads.delete(id);
+        if (deleted) deletedCount++;
+      }
+      return deletedCount;
+    }
+
+    try {
+      // Generate placeholders for prepared statement; mysql2 execute won't expand arrays
+      const placeholders = ids.map(() => '?').join(',');
+      const sql = `DELETE FROM leads WHERE id IN (${placeholders})`;
+      const [result] = await pool.execute(sql, ids);
+      return (result as any).affectedRows || 0;
+    } catch (error) {
+      throw new DatabaseError('Failed to bulk delete leads');
+    }
+  }
+
   static async count(): Promise<number> {
     if (isMockMode()) {
       return mockDb.leads.findAll().length;
@@ -137,13 +154,16 @@ export class LeadModel {
 
     try {
       const [rows] = await pool.execute('SELECT COUNT(*) as count FROM leads');
-      return parseInt((rows as any[])[0].count);
+      return Number((rows as any[])[0].count);
     } catch (error) {
       throw new DatabaseError('Failed to count leads');
     }
   }
 
   static async findByInvestmentId(investmentId: string): Promise<Lead[]> {
+    if (isMockMode()) {
+      return (mockDb.leads.findAll() as Lead[]).filter(l => l.investmentId === investmentId);
+    }
     try {
       const [rows] = await pool.execute(
         `SELECT

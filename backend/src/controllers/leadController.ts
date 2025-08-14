@@ -108,4 +108,18 @@ export class LeadController {
       next(error);
     }
   }
+
+  static async bulkDeleteLeads(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { ids } = req.body as { ids: string[] };
+      const deletedCount = await LeadModel.bulkDelete(ids);
+
+      res.status(200).json({
+        success: true,
+        data: { deletedCount }
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

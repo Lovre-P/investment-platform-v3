@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { LeadController } from '../controllers/leadController.js';
 import { authenticate, requireAdmin } from '../middleware/auth.js';
 import { validateBody } from '../middleware/validation.js';
-import { createLeadSchema, updateLeadStatusSchema } from '../utils/validation.js';
+import { createLeadSchema, updateLeadStatusSchema, bulkDeleteLeadsSchema } from '../utils/validation.js';
 
 const router = Router();
 
@@ -39,6 +39,14 @@ router.delete('/:id',
   authenticate,
   requireAdmin,
   LeadController.deleteLead
+);
+
+// POST /api/leads/bulk-delete - Admin only
+router.post('/bulk-delete',
+  authenticate,
+  requireAdmin,
+  validateBody(bulkDeleteLeadsSchema),
+  LeadController.bulkDeleteLeads
 );
 
 export default router;
