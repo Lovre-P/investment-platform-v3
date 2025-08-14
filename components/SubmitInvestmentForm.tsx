@@ -71,19 +71,19 @@ const SubmitInvestmentForm: React.FC = () => {
 
   const validateForm = (): boolean => {
     const errors: Partial<Record<keyof InvestmentFormData, string>> = {};
-    if (!formData.submitterName.trim()) errors.submitterName = "Submitter name is required.";
+    if (!formData.submitterName.trim()) errors.submitterName = t('form.v_name_required');
     if (!formData.submitterEmail.trim()) {
-        errors.submitterEmail = "Submitter email is required.";
+        errors.submitterEmail = t('form.v_email_required');
     } else if (!/\S+@\S+\.\S+/.test(formData.submitterEmail)) {
-        errors.submitterEmail = "Email address is invalid.";
+        errors.submitterEmail = t('form.v_email_invalid');
     }
-    if (!formData.title.trim()) errors.title = "Investment title is required.";
-    if (!formData.category) errors.category = "Category is required.";
-    if (formData.amountGoal <= 0) errors.amountGoal = "Funding goal must be a positive number.";
-    if (!formData.description.trim()) errors.description = "Short description is required.";
-    if (!formData.longDescription.trim()) errors.longDescription = "Detailed description is required.";
+    if (!formData.title.trim()) errors.title = t('form.v_title_required');
+    if (!formData.category) errors.category = t('form.v_category_required');
+    if (formData.amountGoal <= 0) errors.amountGoal = t('form.v_amount_positive');
+    if (!formData.description.trim()) errors.description = t('form.v_short_required');
+    if (!formData.longDescription.trim()) errors.longDescription = t('form.v_long_required');
 
-    if (!formData.agreeToTerms) errors.agreeToTerms = "You must agree to the terms of service.";
+    if (!formData.agreeToTerms) errors.agreeToTerms = t('form.v_terms_required');
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -278,15 +278,15 @@ const SubmitInvestmentForm: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label htmlFor="amountGoal" className="block text-sm font-semibold text-secondary-700 mb-2">{t('form.fundingGoal', { currency: formData.currency })}</label>
-              <input type="number" name="amountGoal" id="amountGoal" value={formData.amountGoal} onChange={handleChange} min="1000" className="form-input" placeholder="50000"/>
+              <input type="number" name="amountGoal" id="amountGoal" value={formData.amountGoal} onChange={handleChange} min="1000" className="form-input" placeholder={t('form.fundingGoalPlaceholder','50000')}/>
               {renderError('amountGoal')}
             </div>
             <div>
               <label htmlFor="currency" className="block text-sm font-semibold text-secondary-700 mb-2">{t('form.currency')}</label>
               <select name="currency" id="currency" value={formData.currency} onChange={handleChange} className="form-select">
-                <option value="USD">USD - US Dollar</option>
-                <option value="EUR">EUR - Euro</option>
-                <option value="GBP">GBP - British Pound</option>
+                <option value="USD">{t('form.currency_USD')}</option>
+                <option value="EUR">{t('form.currency_EUR')}</option>
+                <option value="GBP">{t('form.currency_GBP')}</option>
               </select>
             </div>
           </div>
@@ -294,15 +294,15 @@ const SubmitInvestmentForm: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
                 <label htmlFor="apyRange" className="block text-sm font-semibold text-secondary-700 mb-2">{t('form.apyRange')}</label>
-                <input type="text" name="apyRange" id="apyRange" value={formData.apyRange} onChange={handleChange} className="form-input" placeholder="5-8%"/>
+                <input type="text" name="apyRange" id="apyRange" value={formData.apyRange} onChange={handleChange} className="form-input" placeholder={t('form.apyPlaceholder','5-8%')}/>
             </div>
             <div>
                 <label htmlFor="minInvestment" className="block text-sm font-semibold text-secondary-700 mb-2">{t('form.minInvestment', { currency: formData.currency })}</label>
-                <input type="number" name="minInvestment" id="minInvestment" value={formData.minInvestment} onChange={handleChange} min="100" className="form-input" placeholder="1000"/>
+                <input type="number" name="minInvestment" id="minInvestment" value={formData.minInvestment} onChange={handleChange} min="100" className="form-input" placeholder={t('form.minInvestmentPlaceholder','1000')}/>
             </div>
             <div>
                 <label htmlFor="term" className="block text-sm font-semibold text-secondary-700 mb-2">{t('form.term')}</label>
-                <input type="text" name="term" id="term" value={formData.term} onChange={handleChange} className="form-input" placeholder="E.g., 3 Years, 12 Months"/>
+                <input type="text" name="term" id="term" value={formData.term} onChange={handleChange} className="form-input" placeholder={t('form.termPlaceholder','E.g., 3 Years, 12 Months')}/>
             </div>
           </div>
         </div>
@@ -410,10 +410,10 @@ const SubmitInvestmentForm: React.FC = () => {
           isLoading={isSubmitting}
           className="w-full !py-4 !text-lg font-bold shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-200"
         >
-          {isSubmitting ? 'Submitting...' : 'Submit Investment Proposal'}
+          {isSubmitting ? t('form.submitting') : t('form.submitBtn')}
         </Button>
         <p className="text-center text-sm text-secondary-500 mt-3">
-          Your proposal will be reviewed by our team within 2-3 business days
+          {t('form.reviewTime')}
         </p>
       </div>
 

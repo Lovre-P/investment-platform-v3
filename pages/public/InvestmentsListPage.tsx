@@ -42,11 +42,11 @@ const InvestmentsListPage: React.FC = () => {
         } else {
           console.error('InvestmentsListPage: Data is not an array:', typeof data, data);
           setInvestments([]);
-          setError("Invalid data format received from server.");
+          setError(t('investList.invalidDataFormat'));
         }
       } catch (err) {
         console.error("Failed to fetch investments:", err);
-        setError("Could not load investments. Please try again later.");
+        setError(t('investList.errorBody'));
         setInvestments([]);
       } finally {
         setIsLoading(false);
