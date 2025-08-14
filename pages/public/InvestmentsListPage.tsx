@@ -9,6 +9,9 @@ import { createBreadcrumbSchema } from '../../utils/structuredData';
 import { FunnelIcon, MagnifyingGlassIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import BackgroundSVG from '../../components/BackgroundSVG';
 
+// Feature flag: toggle to true to re-enable section SVG backgrounds
+const ENABLE_SVG_BG = false;
+
 const InvestmentsListPage: React.FC = () => {
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -130,17 +133,19 @@ const InvestmentsListPage: React.FC = () => {
 
       {/* Filters and Search Section */}
       <section className="relative bg-white p-6 rounded-xl shadow-lg space-y-4 md:space-y-0 md:flex md:flex-wrap md:items-center md:justify-between gap-4 overflow-hidden">
-        {/* Subtle grid pattern background for filters */}
-        <BackgroundSVG
-          variant="lines"
-          opacity={0.08}
-          colors={{
-            primary: '#0693a9', // Deep Teal
-            secondary: '#589ff1', // Bright Sky
-            accent: '#214b8b'     // Royal Blue
-          }}
-          className="absolute inset-0"
-        />
+        {/* Subtle grid pattern background for filters (feature-flagged) */}
+        {ENABLE_SVG_BG && (
+          <BackgroundSVG
+            variant="lines"
+            opacity={0.08}
+            colors={{
+              primary: '#0693a9', // Deep Teal
+              secondary: '#589ff1', // Bright Sky
+              accent: '#214b8b'     // Royal Blue
+            }}
+            className="absolute inset-0"
+          />
+        )}
 
         <div className="relative z-10 w-full flex flex-col md:flex-row md:flex-wrap md:items-center md:justify-between gap-4">
         <div className="relative flex-grow md:max-w-xs">
@@ -219,18 +224,20 @@ const InvestmentsListPage: React.FC = () => {
         </div>
       ) : filteredAndSortedInvestments.length > 0 ? (
         <div className="relative">
-          {/* Subtle dots pattern for investment grid */}
-          <BackgroundSVG
-            variant="dots"
-            opacity={0.1}
-            density="medium"
-            colors={{
-              primary: '#589ff1', // Bright Sky
-              secondary: '#214b8b', // Royal Blue
-              accent: '#0693a9'     // Deep Teal
-            }}
-            className="absolute inset-0 rounded-xl"
-          />
+          {/* Subtle dots pattern for investment grid (feature-flagged) */}
+          {ENABLE_SVG_BG && (
+            <BackgroundSVG
+              variant="dots"
+              opacity={0.1}
+              density="medium"
+              colors={{
+                primary: '#589ff1', // Bright Sky
+                secondary: '#214b8b', // Royal Blue
+                accent: '#0693a9'     // Deep Teal
+              }}
+              className="absolute inset-0 rounded-xl"
+            />
+          )}
 
           <div className="relative z-10 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredAndSortedInvestments.map(investment => (

@@ -7,6 +7,9 @@ import CookieConsentBanner from './CookieConsentBanner';
 import Breadcrumbs from './Breadcrumbs';
 import BackgroundSVG from './BackgroundSVG';
 
+// Feature flag: toggle to true to re-enable subtle SVG backgrounds globally
+const ENABLE_SVG_BG = false;
+
 const Layout: React.FC = () => {
   const location = useLocation();
   // Check if we're on the homepage (index route)
@@ -14,18 +17,20 @@ const Layout: React.FC = () => {
 
   return (
     <div className="relative flex flex-col min-h-screen font-body bg-secondary-50 text-primary-800">
-      {/* Subtle background SVG elements */}
-      <BackgroundSVG
-        variant="mixed"
-        opacity={0.15}
-        density="medium"
-        colors={{
-          primary: '#0693a9',   // Deep Teal
-          secondary: '#589ff1', // Bright Sky
-          accent: '#214b8b'     // Royal Blue
-        }}
-        className="fixed inset-0 z-0"
-      />
+      {/* Subtle background SVG elements (feature-flagged) */}
+      {ENABLE_SVG_BG && (
+        <BackgroundSVG
+          variant="mixed"
+          opacity={0.15}
+          density="medium"
+          colors={{
+            primary: '#0693a9',   // Deep Teal
+            secondary: '#589ff1', // Bright Sky
+            accent: '#214b8b'     // Royal Blue
+          }}
+          className="fixed inset-0 z-0"
+        />
+      )}
 
       {/* Main content with proper z-index */}
       <div className="relative z-10 flex flex-col min-h-screen">

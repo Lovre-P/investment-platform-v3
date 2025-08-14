@@ -11,6 +11,9 @@ import { organizationSchema, websiteSchema } from '../../utils/structuredData';
 import { ArrowRightIcon, PresentationChartLineIcon, LightBulbIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import BackgroundSVG from '../../components/BackgroundSVG';
 
+// Feature flag: toggle to true to re-enable section SVG backgrounds
+const ENABLE_SVG_BG = false;
+
 const HomePage: React.FC = () => {
   const [featuredInvestments, setFeaturedInvestments] = useState<Investment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -111,17 +114,19 @@ const HomePage: React.FC = () => {
 
       {/* How It Works Section */}
       <section className="relative">
-        {/* Subtle background pattern for this section */}
-        <BackgroundSVG
-          variant="lines"
-          opacity={0.2}
-          colors={{
-            primary: '#589ff1', // Bright Sky
-            secondary: '#0693a9', // Deep Teal
-            accent: '#214b8b'     // Royal Blue
-          }}
-          className="absolute inset-0 rounded-xl"
-        />
+        {/* Subtle background pattern for this section (feature-flagged) */}
+        {ENABLE_SVG_BG && (
+          <BackgroundSVG
+            variant="lines"
+            opacity={0.2}
+            colors={{
+              primary: '#589ff1', // Bright Sky
+              secondary: '#0693a9', // Deep Teal
+              accent: '#214b8b'     // Royal Blue
+            }}
+            className="absolute inset-0 rounded-xl"
+          />
+        )}
 
         <div className="relative z-10">
           <h2 className="text-3xl font-bold text-center text-primary-800 mb-12">
@@ -167,18 +172,20 @@ const HomePage: React.FC = () => {
 
       {/* Featured Investments Section */}
       <section className="relative">
-        {/* Subtle dots pattern for featured investments */}
-        <BackgroundSVG
-          variant="dots"
-          opacity={0.15}
-          density="medium"
-          colors={{
-            primary: '#214b8b', // Royal Blue
-            secondary: '#0693a9', // Deep Teal
-            accent: '#589ff1'     // Bright Sky
-          }}
-          className="absolute inset-0 rounded-xl"
-        />
+        {/* Subtle dots pattern for featured investments (feature-flagged) */}
+        {ENABLE_SVG_BG && (
+          <BackgroundSVG
+            variant="dots"
+            opacity={0.15}
+            density="medium"
+            colors={{
+              primary: '#214b8b', // Royal Blue
+              secondary: '#0693a9', // Deep Teal
+              accent: '#589ff1'     // Bright Sky
+            }}
+            className="absolute inset-0 rounded-xl"
+          />
+        )}
 
         <div className="relative z-10">
           <div className="flex justify-between items-center mb-8">
@@ -205,17 +212,19 @@ const HomePage: React.FC = () => {
 
       {/* Call to Action - Submit Project */}
       <section className="relative bg-white py-16 px-6 rounded-xl shadow-xl text-center overflow-hidden">
-        {/* Subtle geometric shapes background */}
-        <BackgroundSVG
-          variant="shapes"
-          opacity={0.12}
-          colors={{
-            primary: '#589ff1', // Bright Sky
-            secondary: '#214b8b', // Royal Blue
-            accent: '#0693a9'     // Deep Teal
-          }}
-          className="absolute inset-0"
-        />
+        {/* Subtle geometric shapes background (feature-flagged) */}
+        {ENABLE_SVG_BG && (
+          <BackgroundSVG
+            variant="shapes"
+            opacity={0.12}
+            colors={{
+              primary: '#589ff1', // Bright Sky
+              secondary: '#214b8b', // Royal Blue
+              accent: '#0693a9'     // Deep Teal
+            }}
+            className="absolute inset-0"
+          />
+        )}
 
         <div className="relative z-10">
           <h2 className="text-3xl font-bold text-primary-800 mb-4">Have a Groundbreaking Project?</h2>
