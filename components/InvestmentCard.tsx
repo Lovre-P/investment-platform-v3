@@ -5,6 +5,7 @@ import { Investment, InvestmentStatus } from '../types';
 import { htmlToText } from '../utils/htmlSanitizer';
 import { PLACEHOLDER_IMAGE_URL, DEFAULT_CURRENCY } from '../constants';
 import { ArrowTrendingUpIcon, TagIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
+import { useTranslation } from 'react-i18next';
 
 interface InvestmentCardProps {
   investment: Investment;
@@ -12,6 +13,7 @@ interface InvestmentCardProps {
 
 const InvestmentCard: React.FC<InvestmentCardProps> = ({ investment }) => {
   const { id, title, description, amountGoal, amountRaised, currency, images, category, status, apyRange, term } = investment;
+  const { t } = useTranslation();
   const progress = (amountRaised / amountGoal) * 100;
   const displayCurrency = currency || DEFAULT_CURRENCY;
 
@@ -57,18 +59,18 @@ const InvestmentCard: React.FC<InvestmentCardProps> = ({ investment }) => {
             {apyRange && (
               <div className="flex items-center">
                 <ArrowTrendingUpIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2 text-accent-500 flex-shrink-0" />
-                <span className="truncate">APY Range: <span className="font-semibold">{apyRange}</span></span>
+                <span className="truncate">{t('investCard.apyRange')}: <span className="font-semibold">{apyRange}</span></span>
               </div>
             )}
             {term && (
               <div className="flex items-center">
                 <CalendarDaysIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2 text-accent-500 flex-shrink-0" />
-                <span className="truncate">Term: <span className="font-semibold">{term}</span></span>
+                <span className="truncate">{t('investCard.term')}: <span className="font-semibold">{term}</span></span>
               </div>
             )}
              <div className="flex items-center">
                 <TagIcon className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2 text-accent-500 flex-shrink-0" />
-                <span className="truncate">Category: <span className="font-semibold">{category}</span></span>
+                <span className="truncate">{t('investCard.category')}: <span className="font-semibold">{category}</span></span>
               </div>
           </div>
         </div>
@@ -76,8 +78,8 @@ const InvestmentCard: React.FC<InvestmentCardProps> = ({ investment }) => {
         <div>
           <div className="mb-3">
             <div className="flex justify-between text-xs sm:text-sm font-medium text-primary-700 mb-1 gap-2">
-              <span className="truncate">Raised: {displayCurrency} {amountRaised.toLocaleString()}</span>
-              <span className="truncate">Goal: {displayCurrency} {amountGoal.toLocaleString()}</span>
+              <span className="truncate">{t('investCard.raised')}: {displayCurrency} {amountRaised.toLocaleString()}</span>
+              <span className="truncate">{t('investCard.goal')}: {displayCurrency} {amountGoal.toLocaleString()}</span>
             </div>
             <div className="w-full bg-secondary-200 rounded-full h-2 sm:h-2.5">
               <div
@@ -85,14 +87,14 @@ const InvestmentCard: React.FC<InvestmentCardProps> = ({ investment }) => {
                 style={{ width: `${Math.min(progress, 100)}%` }}
               ></div>
             </div>
-            <p className="text-right text-xs text-secondary-500 mt-1">{progress.toFixed(0)}% Funded</p>
+            <p className="text-right text-xs text-secondary-500 mt-1">{progress.toFixed(0)}{t('investCard.funded')}</p>
           </div>
 
           <Link
             to={`/investments/${id}`}
             className="block w-full text-center bg-primary-500 text-white font-semibold py-2 sm:py-3 px-3 sm:px-4 rounded-lg hover:bg-primary-600 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-opacity-50 text-sm sm:text-base"
           >
-            View Details
+            {t('investCard.viewDetails')}
           </Link>
         </div>
       </div>

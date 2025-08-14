@@ -2,17 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { APP_NAME, PUBLIC_ROUTES, ADMIN_ROUTES } from '../constants';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcherDropdown from './LanguageSwitcherDropdown';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
+  const { t } = useTranslation();
+
   const navLinks = [
-    { name: 'Home', path: PUBLIC_ROUTES.HOME },
-    { name: 'Investments', path: PUBLIC_ROUTES.INVESTMENTS },
-    { name: 'Submit Investment', path: PUBLIC_ROUTES.SUBMIT_INVESTMENT },
-    { name: 'About Us', path: PUBLIC_ROUTES.ABOUT },
-    { name: 'Contact', path: PUBLIC_ROUTES.CONTACT },
+    { name: t('nav.home'), path: PUBLIC_ROUTES.HOME },
+    { name: t('nav.investments'), path: PUBLIC_ROUTES.INVESTMENTS },
+    { name: t('nav.submitInvestment'), path: PUBLIC_ROUTES.SUBMIT_INVESTMENT },
+    { name: t('nav.about'), path: PUBLIC_ROUTES.ABOUT },
+    { name: t('nav.contact'), path: PUBLIC_ROUTES.CONTACT },
   ];
 
   // Handle scroll effect for enhanced backdrop blur
@@ -138,6 +142,10 @@ const Navbar: React.FC = () => {
                   )}
                 </NavLink>
               ))}
+              {/* Language Switcher (right side after links) */}
+              <div className="ml-2">
+                <LanguageSwitcherDropdown />
+              </div>
               <Link
                 to={ADMIN_ROUTES.LOGIN}
                 className="relative ml-2 lg:ml-4 px-3 lg:px-5 py-2.5 rounded-2xl text-xs lg:text-sm font-semibold text-white transition-all duration-500 group overflow-hidden shadow-2xl hover:shadow-emerald-500/25 transform hover:scale-105 hover:-translate-y-1"
@@ -156,7 +164,8 @@ const Navbar: React.FC = () => {
             </div>
 
             {/* Mobile Menu Button with enhanced glass effect */}
-            <div className="lg:hidden flex items-center">
+            <div className="lg:hidden flex items-center gap-2">
+              <LanguageSwitcherDropdown />
               <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="relative inline-flex items-center justify-center p-3 rounded-2xl text-primary-800 hover:text-teal-600 transition-all duration-500 group transform hover:scale-110"
@@ -167,7 +176,7 @@ const Navbar: React.FC = () => {
                   boxShadow: '0 4px 20px rgba(88,159,241,0.2), inset 0 1px 0 rgba(255,255,255,0.3)'
                 }}
               >
-                <span className="sr-only">Open main menu</span>
+                <span className="sr-only">{t('nav.openMenu')}</span>
                 <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-violet-100/10 to-blue-100/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl" />
                 <div className="absolute -inset-1 bg-gradient-to-r from-violet-400 to-blue-500 opacity-0 group-hover:opacity-20 transition-opacity duration-500 rounded-2xl blur-lg" />
                 {isOpen ? (
@@ -238,6 +247,9 @@ const Navbar: React.FC = () => {
                   )}
                 </NavLink>
               ))}
+              <div className="flex justify-end px-4 pt-2 pb-4">
+                <LanguageSwitcherDropdown />
+              </div>
               <Link
                 to={ADMIN_ROUTES.LOGIN}
                 onClick={() => setIsOpen(false)}

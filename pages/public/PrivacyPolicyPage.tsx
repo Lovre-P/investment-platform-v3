@@ -2,19 +2,21 @@ import React from 'react';
 import { ShieldCheckIcon, EyeIcon, LockClosedIcon, UserGroupIcon, BookOpenIcon, ExclamationCircleIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import SEOHead from '../../components/SEO/SEOHead';
 import { createBreadcrumbSchema } from '../../utils/structuredData';
+import { useTranslation } from 'react-i18next';
 
 const PrivacyPolicyPage: React.FC = () => {
+  const { t } = useTranslation();
   // Generate SEO data
   const breadcrumbSchema = createBreadcrumbSchema([
-    { name: 'Home', url: '/' },
-    { name: 'Privacy Policy', url: '/privacy' }
+    { name: t('nav.home'), url: '/' },
+    { name: t('nav.privacy'), url: '/privacy' }
   ]);
 
   return (
     <>
       <SEOHead
-        title="Privacy Policy - MegaInvest | Data Protection & Privacy Rights"
-        description="Learn how MegaInvest protects your privacy and personal data. Comprehensive privacy policy covering data collection, usage, rights, and GDPR compliance."
+        title={t('seo.privacy_title')}
+        description={t('seo.privacy_desc')}
         keywords={['privacy policy', 'data protection', 'GDPR compliance', 'personal data', 'privacy rights', 'MegaInvest privacy', 'data security']}
         url="/privacy"
         structuredData={breadcrumbSchema}

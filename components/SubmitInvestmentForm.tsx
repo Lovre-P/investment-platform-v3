@@ -6,6 +6,7 @@ import RichTextEditor from './RichTextEditor';
 import { Investment, InvestmentCategory } from '../types';
 import { createInvestment, createInvestmentWithFiles } from '../services/investmentService';
 import { getCategories } from '../services/categoryService';
+import { useTranslation, Trans } from 'react-i18next';
 
 // Updated form data type
 type InvestmentFormData = Omit<Investment, 'id' | 'status' | 'submissionDate' | 'amountRaised' | 'images' | 'submittedBy' | 'submitterEmail' | 'tags'> & {
@@ -34,6 +35,7 @@ const initialFormData: InvestmentFormData = {
 };
 
 const SubmitInvestmentForm: React.FC = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<InvestmentFormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -46,6 +48,7 @@ const SubmitInvestmentForm: React.FC = () => {
     const loadCategories = async () => {
       try {
         const categoriesData = await getCategories(false); // Only active categories
+        // NOTE: Category names are dynamic; if you add localized names later, render based on current lang.
         setCategories(categoriesData);
       } catch (error) {
         console.error('Failed to load categories:', error);
@@ -117,7 +120,7 @@ const SubmitInvestmentForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validateForm()) {
-        setSubmitStatus({ type: 'error', message: 'Please correct the errors in the form.' });
+        setSubmitStatus({ type: 'error', message: t('form.fixFormErrors') });
         return;
     }
     setIsSubmitting(true);
@@ -153,11 +156,11 @@ const SubmitInvestmentForm: React.FC = () => {
       } else {
         await createInvestment(jsonPayload);
       }
-      setSubmitStatus({ type: 'success', message: 'Investment submitted successfully! It will be reviewed by our team.' });
+      setSubmitStatus({ type: 'success', message: t('form.success') });
       setFormData(initialFormData);
     } catch (error) {
       console.error("Investment submission error:", error);
-      setSubmitStatus({ type: 'error', message: 'Failed to submit investment. Please try again.' });
+      setSubmitStatus({ type: 'error', message: t('form.failure') });
     } finally {
       setIsSubmitting(false);
     }
@@ -170,25 +173,25 @@ const SubmitInvestmentForm: React.FC = () => {
   return (
     <form onSubmit={handleSubmit} className="space-y-8 bg-white p-10 rounded-2xl shadow-2xl border border-secondary-100">
       <div className="text-center border-b border-secondary-100 pb-6 mb-8">
-        <h2 className="text-3xl font-bold text-primary-800 mb-2">Propose a New Investment</h2>
-        <p className="text-secondary-600">Share your innovative project with potential investors</p>
+        <h2 className="text-3xl font-bold text-primary-800 mb-2">{t('form.proposeTitle')}</h2>
+        <p className="text-secondary-600">{t('form.proposeSubtitle')}</p>
       </div>
       
       {/* Personal Information Section */}
       <div className="bg-secondary-50 p-6 rounded-xl">
         <h3 className="text-lg font-semibold text-primary-800 mb-4 flex items-center">
           <span className="w-2 h-2 bg-primary-500 rounded-full mr-3"></span>
-          Personal Information
+          {t('form.personalInfo')}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="submitterName" className="block text-sm font-semibold text-secondary-700 mb-2">Your Full Name *</label>
-            <input type="text" name="submitterName" id="submitterName" value={formData.submitterName} onChange={handleChange} className="form-input" placeholder="E.g., Jane Doe"/>
+            <label htmlFor="submitterName" className="block text-sm font-semibold text-secondary-700 mb-2">{t('form.yourFullName')}</label>
+            <input type="text" name="submitterName" id="submitterName" value={formData.submitterName} onChange={handleChange} className="form-input" placeholder={t('form.namePlaceholder')}/>
             {renderError('submitterName')}
           </div>
           <div>
-            <label htmlFor="submitterEmail" className="block text-sm font-semibold text-secondary-700 mb-2">Your Email Address *</label>
-            <input type="email" name="submitterEmail" id="submitterEmail" value={formData.submitterEmail} onChange={handleChange} className="form-input" placeholder="E.g., jane.doe@example.com"/>
+            <label htmlFor="submitterEmail" className="block text-sm font-semibold text-secondary-700 mb-2">{t('form.yourEmail')}</label>
+            <input type="email" name="submitterEmail" id="submitterEmail" value={formData.submitterEmail} onChange={handleChange} className="form-input" placeholder={t('form.emailPlaceholder')}/>
             {renderError('submitterEmail')}
           </div>
         </div>
@@ -198,16 +201,16 @@ const SubmitInvestmentForm: React.FC = () => {
       <div className="bg-primary-50 p-6 rounded-xl">
         <h3 className="text-lg font-semibold text-primary-800 mb-4 flex items-center">
           <span className="w-2 h-2 bg-primary-500 rounded-full mr-3"></span>
-          Investment Details
+          {t('form.investDetails')}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="title" className="block text-sm font-semibold text-secondary-700 mb-2">Investment Title *</label>
-            <input type="text" name="title" id="title" value={formData.title} onChange={handleChange} className="form-input" placeholder="E.g., Eco-Friendly Housing Project"/>
+            <label htmlFor="title" className="block text-sm font-semibold text-secondary-700 mb-2">{t('form.investTitle')}</label>
+            <input type="text" name="title" id="title" value={formData.title} onChange={handleChange} className="form-input" placeholder=""/>
             {renderError('title')}
           </div>
           <div>
-            <label htmlFor="category" className="block text-sm font-semibold text-secondary-700 mb-2">Category *</label>
+            <label htmlFor="category" className="block text-sm font-semibold text-secondary-700 mb-2">{t('form.category')}</label>
             <select
               name="category"
               id="category"
@@ -217,7 +220,7 @@ const SubmitInvestmentForm: React.FC = () => {
               disabled={categoriesLoading}
             >
               <option value="">
-                {categoriesLoading ? 'Loading categories...' : 'Select Category'}
+                {categoriesLoading ? t('form.loadingCategories') : t('form.selectCategory')}
               </option>
               {categories
                 .sort((a, b) => a.sortOrder - b.sortOrder)
@@ -237,15 +240,15 @@ const SubmitInvestmentForm: React.FC = () => {
       <div className="bg-accent-50 p-6 rounded-xl">
         <h3 className="text-lg font-semibold text-primary-800 mb-4 flex items-center">
           <span className="w-2 h-2 bg-accent-500 rounded-full mr-3"></span>
-          Project Description
+          {t('form.projectDesc')}
         </h3>
         <div className="space-y-6">
           <div>
             <RichTextEditor
-              label="Short Description (Max 150 chars) *"
+              label={t('form.shortDesc')}
               value={formData.description}
               onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
-              placeholder="Brief overview of the investment opportunity..."
+              placeholder={t('form.shortPlaceholder')}
               rows={3}
               maxLength={150}
               showCharCount={true}
@@ -254,10 +257,10 @@ const SubmitInvestmentForm: React.FC = () => {
           </div>
           <div>
             <RichTextEditor
-              label="Detailed Description *"
+              label={t('form.longDesc')}
               value={formData.longDescription}
               onChange={(value) => setFormData(prev => ({ ...prev, longDescription: value }))}
-              placeholder="Provide comprehensive details including business plan, team background, market analysis, financial projections, and growth strategy..."
+              placeholder={t('form.longPlaceholder')}
               rows={6}
             />
             {renderError('longDescription')}
@@ -269,17 +272,17 @@ const SubmitInvestmentForm: React.FC = () => {
       <div className="bg-teal-50 p-6 rounded-xl">
         <h3 className="text-lg font-semibold text-primary-800 mb-4 flex items-center">
           <span className="w-2 h-2 bg-teal-500 rounded-full mr-3"></span>
-          Financial Details
+          {t('form.financialDetails')}
         </h3>
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="amountGoal" className="block text-sm font-semibold text-secondary-700 mb-2">Funding Goal ({formData.currency}) *</label>
+              <label htmlFor="amountGoal" className="block text-sm font-semibold text-secondary-700 mb-2">{t('form.fundingGoal', { currency: formData.currency })}</label>
               <input type="number" name="amountGoal" id="amountGoal" value={formData.amountGoal} onChange={handleChange} min="1000" className="form-input" placeholder="50000"/>
               {renderError('amountGoal')}
             </div>
             <div>
-              <label htmlFor="currency" className="block text-sm font-semibold text-secondary-700 mb-2">Currency *</label>
+              <label htmlFor="currency" className="block text-sm font-semibold text-secondary-700 mb-2">{t('form.currency')}</label>
               <select name="currency" id="currency" value={formData.currency} onChange={handleChange} className="form-select">
                 <option value="USD">USD - US Dollar</option>
                 <option value="EUR">EUR - Euro</option>
@@ -290,15 +293,15 @@ const SubmitInvestmentForm: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-                <label htmlFor="apyRange" className="block text-sm font-semibold text-secondary-700 mb-2">Expected APY Range</label>
+                <label htmlFor="apyRange" className="block text-sm font-semibold text-secondary-700 mb-2">{t('form.apyRange')}</label>
                 <input type="text" name="apyRange" id="apyRange" value={formData.apyRange} onChange={handleChange} className="form-input" placeholder="5-8%"/>
             </div>
             <div>
-                <label htmlFor="minInvestment" className="block text-sm font-semibold text-secondary-700 mb-2">Minimum Investment ({formData.currency})</label>
+                <label htmlFor="minInvestment" className="block text-sm font-semibold text-secondary-700 mb-2">{t('form.minInvestment', { currency: formData.currency })}</label>
                 <input type="number" name="minInvestment" id="minInvestment" value={formData.minInvestment} onChange={handleChange} min="100" className="form-input" placeholder="1000"/>
             </div>
             <div>
-                <label htmlFor="term" className="block text-sm font-semibold text-secondary-700 mb-2">Investment Term</label>
+                <label htmlFor="term" className="block text-sm font-semibold text-secondary-700 mb-2">{t('form.term')}</label>
                 <input type="text" name="term" id="term" value={formData.term} onChange={handleChange} className="form-input" placeholder="E.g., 3 Years, 12 Months"/>
             </div>
           </div>
@@ -309,20 +312,20 @@ const SubmitInvestmentForm: React.FC = () => {
       <div className="bg-secondary-50 p-6 rounded-xl">
         <h3 className="text-lg font-semibold text-primary-800 mb-4 flex items-center">
           <span className="w-2 h-2 bg-secondary-500 rounded-full mr-3"></span>
-          Additional Information
+          {t('form.additionalInfo')}
         </h3>
         <div className="space-y-6">
           <div>
-            <label htmlFor="tags" className="block text-sm font-semibold text-secondary-700 mb-2">Tags (comma-separated)</label>
-            <input type="text" name="tags" id="tags" value={typeof formData.tags === 'string' ? formData.tags : (Array.isArray(formData.tags) ? formData.tags.join(', ') : '')} onChange={handleChange} className="form-input" placeholder="e.g., startup, green tech, high growth, sustainable"/>
-            <p className="text-xs text-secondary-500 mt-1">Add relevant keywords to help investors find your project</p>
+            <label htmlFor="tags" className="block text-sm font-semibold text-secondary-700 mb-2">{t('form.tags')}</label>
+            <input type="text" name="tags" id="tags" value={typeof formData.tags === 'string' ? formData.tags : (Array.isArray(formData.tags) ? formData.tags.join(', ') : '')} onChange={handleChange} className="form-input" placeholder=""/>
+            <p className="text-xs text-secondary-500 mt-1">{t('form.tagsHelp')}</p>
           </div>
 
           <div>
             <FileUpload
               id="imageFiles"
               name="imageFiles"
-              label="Upload Images (Optional)"
+              label={t('form.uploadImages')}
               accept="image/*"
               multiple={true}
               maxFiles={5}
@@ -349,7 +352,9 @@ const SubmitInvestmentForm: React.FC = () => {
           </div>
           <div className="ml-4 text-sm">
               <label htmlFor="agreeToTerms" className="font-medium text-secondary-700 leading-relaxed">
+                <Trans i18nKey="form.termsAgree">
                   I agree to the <a href="#/terms" target="_blank" className="text-primary-600 hover:text-primary-700 underline font-semibold">Terms of Service</a> and <a href="#/privacy" target="_blank" className="text-primary-600 hover:text-primary-700 underline font-semibold">Privacy Policy</a>, and confirm that all information provided is accurate and complete.
+                </Trans>
               </label>
               {renderError('agreeToTerms')}
           </div>

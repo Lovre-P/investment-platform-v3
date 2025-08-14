@@ -2,19 +2,21 @@ import React from 'react';
 import { DocumentTextIcon, ScaleIcon, ShieldCheckIcon, BookOpenIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import SEOHead from '../../components/SEO/SEOHead';
 import { createBreadcrumbSchema } from '../../utils/structuredData';
+import { useTranslation } from 'react-i18next';
 
 const TermsOfServicePage: React.FC = () => {
+  const { t } = useTranslation();
   // Generate SEO data
   const breadcrumbSchema = createBreadcrumbSchema([
-    { name: 'Home', url: '/' },
-    { name: 'Terms of Service', url: '/terms' }
+    { name: t('nav.home'), url: '/' },
+    { name: t('nav.terms'), url: '/terms' }
   ]);
 
   return (
     <>
       <SEOHead
-        title="Terms of Service - MegaInvest | Investment Platform Legal Terms"
-        description="Read MegaInvest's Terms of Service covering platform usage, user responsibilities, investment risks, and legal compliance for our investment platform."
+        title={t('seo.terms_title')}
+        description={t('seo.terms_desc')}
         keywords={['terms of service', 'MegaInvest legal', 'investment platform terms', 'user agreement', 'legal compliance', 'investment risks', 'platform usage']}
         url="/terms"
         structuredData={breadcrumbSchema}

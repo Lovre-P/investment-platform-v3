@@ -30,3 +30,4 @@ RENDER_DEPLOYMENT_GUIDE.md
 # YoYo AI version control directory
 .yoyo/
 .augment/rules/basic-rules.md
+backups/

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Button from './Button';
 import { Lead } from '../types'; // For potential use with leadService
 import { createLead } from '../services/leadService'; // Mock service
+import { useTranslation } from 'react-i18next';
 
 interface ContactFormState {
   name: string;
@@ -20,6 +21,7 @@ const initialFormState: ContactFormState = {
 
 const ContactForm: React.FC = () => {
   const [formData, setFormData] = useState<ContactFormState>(initialFormState);
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
@@ -40,11 +42,11 @@ const ContactForm: React.FC = () => {
     try {
       // Simulate API call
       await createLead(newLeadData); // Assuming createLead handles full Lead object creation
-      setSubmitStatus({ type: 'success', message: 'Your message has been sent successfully! We will get back to you soon.' });
+      setSubmitStatus({ type: 'success', message: t('common.messageSent','Your message has been sent successfully! We will get back to you soon.') });
       setFormData(initialFormState);
     } catch (error) {
       console.error("Contact form submission error:", error);
-      setSubmitStatus({ type: 'error', message: 'Failed to send message. Please try again later.' });
+      setSubmitStatus({ type: 'error', message: t('common.messageFailed','Failed to send message. Please try again later.') });
     } finally {
       setIsSubmitting(false);
     }
@@ -53,7 +55,7 @@ const ContactForm: React.FC = () => {
   return (
     <form onSubmit={handleSubmit} className="space-y-6 bg-white p-8 rounded-xl shadow-xl">
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-secondary-700 mb-1">Full Name</label>
+        <label htmlFor="name" className="block text-sm font-medium text-secondary-700 mb-1">{t('form.yourFullName')}</label>
         <input
           type="text"
           name="name"
@@ -62,11 +64,11 @@ const ContactForm: React.FC = () => {
           onChange={handleChange}
           required
           className="w-full px-4 py-2 bg-white text-secondary-700 border border-secondary-300 rounded-lg shadow-sm focus:ring-primary-500 focus:border-primary-500 transition-colors placeholder-secondary-400"
-          placeholder="John Doe"
+          placeholder={t('form.namePlaceholder')}
         />
       </div>
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-secondary-700 mb-1">Email Address</label>
+        <label htmlFor="email" className="block text-sm font-medium text-secondary-700 mb-1">{t('form.yourEmail')}</label>
         <input
           type="email"
           name="email"
@@ -75,11 +77,11 @@ const ContactForm: React.FC = () => {
           onChange={handleChange}
           required
           className="w-full px-4 py-2 bg-white text-secondary-700 border border-secondary-300 rounded-lg shadow-sm focus:ring-primary-500 focus:border-primary-500 transition-colors placeholder-secondary-400"
-          placeholder="you@example.com"
+          placeholder={t('form.emailPlaceholder')}
         />
       </div>
       <div>
-        <label htmlFor="phone" className="block text-sm font-medium text-secondary-700 mb-1">Phone Number (Optional)</label>
+        <label htmlFor="phone" className="block text-sm font-medium text-secondary-700 mb-1">{t('common.phoneOptional','Phone Number (Optional)')}</label>
         <input
           type="tel"
           name="phone"
@@ -87,11 +89,11 @@ const ContactForm: React.FC = () => {
           value={formData.phone}
           onChange={handleChange}
           className="w-full px-4 py-2 bg-white text-secondary-700 border border-secondary-300 rounded-lg shadow-sm focus:ring-primary-500 focus:border-primary-500 transition-colors placeholder-secondary-400"
-          placeholder="(123) 456-7890"
+          placeholder={t('common.phonePlaceholder','(123) 456-7890')}
         />
       </div>
       <div>
-        <label htmlFor="message" className="block text-sm font-medium text-secondary-700 mb-1">Message</label>
+        <label htmlFor="message" className="block text-sm font-medium text-secondary-700 mb-1">{t('common.message','Message')}</label>
         <textarea
           name="message"
           id="message"
@@ -100,12 +102,12 @@ const ContactForm: React.FC = () => {
           onChange={handleChange}
           required
           className="w-full px-4 py-2 bg-white text-secondary-700 border border-secondary-300 rounded-lg shadow-sm focus:ring-primary-500 focus:border-primary-500 transition-colors placeholder-secondary-400"
-          placeholder="Your inquiry or message..."
+          placeholder={t('common.messagePlaceholder','Your inquiry or message...')}
         />
       </div>
       <div>
         <Button type="submit" variant="primary" size="lg" isLoading={isSubmitting} className="w-full">
-          Send Message
+          {t('common.sendMessage','Send Message')}
         </Button>
       </div>
       {submitStatus && (

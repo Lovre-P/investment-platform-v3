@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg';
@@ -18,12 +19,13 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
     lg: 'w-16 h-16 border-4',
   };
 
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col items-center justify-center p-4" role="status" aria-live="polite">
-      <div 
+      <div
         className={`animate-spin rounded-full ${sizeClasses[size]} ${color} border-t-transparent`}
       >
-        <span className="sr-only">Loading...</span>
+        <span className="sr-only">{t('common.loading')}</span>
       </div>
       {text && <p className={`mt-3 text-sm ${color}`}>{text}</p>}
     </div>

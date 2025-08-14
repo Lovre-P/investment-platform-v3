@@ -3,6 +3,7 @@ import Modal from './Modal';
 import Button from './Button';
 import { Investment, Lead } from '../types';
 import { createLead } from '../services/leadService';
+import { useTranslation } from 'react-i18next';
 
 // Declare Calendly global for TypeScript
 declare global {
@@ -38,6 +39,7 @@ const initialFormData: InvestmentFormData = {
 };
 
 const InvestmentModal: React.FC<InvestmentModalProps> = ({ isOpen, onClose, investment }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<InvestmentFormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -82,23 +84,23 @@ const InvestmentModal: React.FC<InvestmentModalProps> = ({ isOpen, onClose, inve
     const errors: Partial<Record<keyof InvestmentFormData, string>> = {};
 
     if (!formData.name.trim()) {
-      errors.name = 'Full name is required';
+      errors.name = t('form.v_name_required');
     }
 
     if (!formData.email.trim()) {
-      errors.email = 'Email is required';
+      errors.email = t('form.v_email_required');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = 'Please enter a valid email address';
+      errors.email = t('form.v_email_invalid');
     }
 
     if (!formData.phone.trim()) {
-      errors.phone = 'Phone number is required';
+      errors.phone = t('common.error');
     }
 
     if (!formData.investmentAmount.trim()) {
-      errors.investmentAmount = 'Investment amount is required';
+      errors.investmentAmount = t('common.error');
     } else if (isNaN(Number(formData.investmentAmount)) || Number(formData.investmentAmount) <= 0) {
-      errors.investmentAmount = 'Please enter a valid investment amount';
+      errors.investmentAmount = t('common.error');
     }
 
     setFormErrors(errors);
@@ -119,7 +121,7 @@ const InvestmentModal: React.FC<InvestmentModalProps> = ({ isOpen, onClose, inve
     e.preventDefault();
     
     if (!validateForm()) {
-      setSubmitStatus({ type: 'error', message: 'Please correct the errors in the form.' });
+      setSubmitStatus({ type: 'error', message: t('form.fixFormErrors') });
       return;
     }
 
@@ -163,14 +165,14 @@ ${investment.term ? `- Term: ${investment.term}` : ''}`;
       await createLead(leadData);
       setSubmitStatus({ 
         type: 'success', 
-        message: 'Your investment interest has been submitted successfully! We will contact you within 24 hours to discuss next steps.' 
+        message: t('common.save')
       });
       setFormData(initialFormData);
     } catch (error) {
       console.error("Investment lead submission error:", error);
       setSubmitStatus({ 
         type: 'error', 
-        message: 'Failed to submit your investment interest. Please try again or contact us directly.' 
+        message: t('common.error')
       });
     } finally {
       setIsSubmitting(false);
@@ -187,31 +189,31 @@ ${investment.term ? `- Term: ${investment.term}` : ''}`;
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`Invest in ${investment.title}`}
+      title={`${t('common.investNow')} ${investment.title}`}
       size="xl"
     >
       <div className="space-y-6">
         {/* Investment Summary */}
         <div className="bg-primary-50 p-4 rounded-lg border border-primary-200">
-          <h3 className="text-lg font-semibold text-primary-800 mb-2">Investment Summary</h3>
+          <h3 className="text-lg font-semibold text-primary-800 mb-2">{t('investCard.viewDetails')}</h3>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="font-medium text-primary-700">Category:</span>
+              <span className="font-medium text-primary-700">{t('investCard.category')}:</span>
               <span className="ml-2 text-primary-600">{investment.category}</span>
             </div>
             <div>
-              <span className="font-medium text-primary-700">Goal:</span>
+              <span className="font-medium text-primary-700">{t('investCard.goal')}:</span>
               <span className="ml-2 text-primary-600">{investment.currency} {investment.amountGoal.toLocaleString()}</span>
             </div>
             {investment.apyRange && (
               <div>
-                <span className="font-medium text-primary-700">APY Range:</span>
+                <span className="font-medium text-primary-700">{t('investCard.apyRange')}:</span>
                 <span className="ml-2 text-primary-600">{investment.apyRange}</span>
               </div>
             )}
             {investment.minInvestment && (
               <div>
-                <span className="font-medium text-primary-700">Min. Investment:</span>
+                <span className="font-medium text-primary-700">{t('invDetail.minInvestment')}:</span>
                 <span className="ml-2 text-primary-600">{investment.currency} {investment.minInvestment.toLocaleString()}</span>
               </div>
             )}
@@ -233,7 +235,7 @@ ${investment.term ? `- Term: ${investment.term}` : ''}`;
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Contact Information Section */}
           <div>
-            <h3 className="text-lg font-semibold text-secondary-800 mb-3">Contact Information</h3>
+            <h3 className="text-lg font-semibold text-secondary-800 mb-3">{t('contact.info','Contact Information')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-secondary-700 mb-1">
@@ -302,7 +304,7 @@ ${investment.term ? `- Term: ${investment.term}` : ''}`;
 
           {/* Investment Details Section */}
           <div>
-            <h3 className="text-lg font-semibold text-secondary-800 mb-3">Investment Details</h3>
+            <h3 className="text-lg font-semibold text-secondary-800 mb-3">{t('invDetail.keyInfo')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="investmentAmount" className="block text-sm font-medium text-secondary-700 mb-1">
@@ -333,15 +335,15 @@ ${investment.term ? `- Term: ${investment.term}` : ''}`;
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 >
-                  <option value="Private">Private Investment</option>
-                  <option value="Business">Business Investment</option>
+                  <option value="Private">{t('common.private','Private Investment')}</option>
+                  <option value="Business">{t('common.business','Business Investment')}</option>
                 </select>
               </div>
             </div>
 
             <div className="mt-4">
               <label htmlFor="additionalMessage" className="block text-sm font-medium text-secondary-700 mb-1">
-                Additional Message (Optional)
+                {t('common.additionalMessage','Additional Message (Optional)')}
               </label>
               <textarea
                 id="additionalMessage"
@@ -350,7 +352,7 @@ ${investment.term ? `- Term: ${investment.term}` : ''}`;
                 onChange={handleInputChange}
                 rows={3}
                 className="w-full px-3 py-2 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                placeholder="Any additional questions or comments about this investment opportunity..."
+                placeholder={t('common.additionalMessagePlaceholder','Any additional questions or comments...')}
               />
             </div>
           </div>
@@ -364,19 +366,19 @@ ${investment.term ? `- Term: ${investment.term}` : ''}`;
               isLoading={isSubmitting}
               className="w-full !py-3 !text-lg font-bold shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-200"
             >
-              {isSubmitting ? 'Submitting Investment Interest...' : 'Submit Investment Interest'}
+              {isSubmitting ? t('common.submitting','Submitting...') : t('common.submit','Submit')}
             </Button>
             <p className="text-center text-sm text-secondary-500 mt-3">
-              We'll contact you within 24 hours to discuss next steps
+              {t('common.contactSoon','We\'ll contact you within 24 hours to discuss next steps')}
             </p>
           </div>
         </form>
 
         {/* Calendly Widget Section */}
         <div className="pt-6 border-t border-secondary-200">
-          <h3 className="text-lg font-semibold text-secondary-800 mb-3">Schedule a Consultation</h3>
+          <h3 className="text-lg font-semibold text-secondary-800 mb-3">{t('common.scheduleConsult','Schedule a Consultation')}</h3>
           <p className="text-sm text-secondary-600 mb-4">
-            Prefer to speak directly? Schedule a 30-minute consultation with our investment team.
+            {t('common.scheduleConsultDesc','Prefer to speak directly? Schedule a 30-minute consultation with our investment team.')}
           </p>
 
           {/* Calendly inline widget */}
@@ -396,7 +398,7 @@ ${investment.term ? `- Term: ${investment.term}` : ''}`;
               <div className="flex items-center justify-center h-full bg-white rounded border">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2"></div>
-                  <p className="text-sm text-gray-600">Loading calendar...</p>
+                  <p className="text-sm text-gray-600">{t('common.loading','Loading...')}</p>
                 </div>
               </div>
             </div>
@@ -409,7 +411,7 @@ ${investment.term ? `- Term: ${investment.term}` : ''}`;
                 rel="noopener noreferrer"
                 className="text-primary-600 hover:text-primary-700 underline text-sm"
               >
-                Open scheduling in new window →
+                {t('common.openInNewWindow','Open scheduling in new window →')}
               </a>
             </div>
           </div>

@@ -60,7 +60,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
     setMetaTag('description', description);
     setMetaTag('keywords', keywords.join(', '));
     setMetaTag('author', 'MegaInvest');
-    setMetaTag('language', 'English');
+    setMetaTag('language', (document.documentElement.getAttribute('lang') || 'en') === 'en' ? 'English' : document.documentElement.getAttribute('lang') || 'en');
     setMetaTag('revisit-after', '7 days');
 
     // Robots
@@ -76,7 +76,13 @@ const SEOHead: React.FC<SEOHeadProps> = ({
     setMetaTag('og:url', canonicalUrl, true);
     setMetaTag('og:type', type, true);
     setMetaTag('og:site_name', 'MegaInvest', true);
-    setMetaTag('og:locale', 'en_US', true);
+    // Derive locale for OG from current <html lang>
+    const lang = document.documentElement.getAttribute('lang') || 'en';
+    const ogLocale = lang === 'hr' ? 'hr_HR' :
+                     lang === 'de' ? 'de_DE' :
+                     lang === 'fr' ? 'fr_FR' :
+                     lang === 'it' ? 'it_IT' : 'en_US';
+    setMetaTag('og:locale', ogLocale, true);
 
     // Twitter Card Tags
     setMetaTag('twitter:card', 'summary_large_image');
