@@ -114,18 +114,25 @@ export class InvestmentCategoryController {
       const { id } = req.params;
       const updates: UpdateInvestmentCategoryData = req.body;
 
-      // If updating name, check for duplicates
+      // If updating name, check for duplicates only when the name actually changes
       if (updates.name) {
-        const existingCategory = await InvestmentCategoryModel.findByName(updates.name);
-        if (existingCategory && existingCategory.id !== id) {
-          res.status(400).json({
-            success: false,
-            error: {
-              message: 'Category name already exists',
-              code: 'DUPLICATE_CATEGORY_NAME'
-            }
-          });
-          return;
+        const current = await InvestmentCategoryModel.findById(id);
+        if (!current) {
+          throw new NotFoundError('Investment category not found');
+        }
+        const proposedName = updates.name.trim();
+        if (proposedName.toLowerCase() !== current.name.toLowerCase()) {
+          const existingCategory = await InvestmentCategoryModel.findByName(proposedName);
+          if (existingCategory && existingCategory.id !== String(id)) {
+            res.status(400).json({
+              success: false,
+              error: {
+                message: 'Category name already exists',
+                code: 'DUPLICATE_CATEGORY_NAME'
+              }
+            });
+            return;
+          }
         }
       }
 

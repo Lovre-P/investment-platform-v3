@@ -1,4 +1,5 @@
 import { pool, isMockMode } from '../database/config.js';
+import { mockDb } from '../database/mock.js';
 import { InvestmentCategory, CreateInvestmentCategoryData, UpdateInvestmentCategoryData } from '../types/index.js';
 import { DatabaseError, NotFoundError } from '../utils/errors.js';
 import { v4 as uuidv4 } from 'uuid';
@@ -186,11 +187,21 @@ export class InvestmentCategoryModel {
       if (index === -1) {
         throw new NotFoundError('Investment category not found');
       }
+      const oldName = mockCategories[index].name;
       mockCategories[index] = {
         ...mockCategories[index],
         ...updates,
         updatedAt: new Date().toISOString()
       };
+      // Cascade rename in mock investments if name changed
+      if (updates.name && updates.name !== oldName) {
+        const investments = mockDb.investments.findAll({});
+        for (const inv of investments) {
+          if (inv.category === oldName) {
+            mockDb.investments.update(inv.id, { category: updates.name });
+          }
+        }
+      }
       return mockCategories[index];
     }
 
@@ -200,37 +211,55 @@ export class InvestmentCategoryModel {
         throw new NotFoundError('Investment category not found');
       }
 
-      const updateFields = [];
-      const updateValues = [];
+      // Use a transaction to update category and cascade rename in investments
+      const connection = await pool.getConnection();
+      try {
+        await connection.beginTransaction();
 
-      if (updates.name !== undefined) {
-        updateFields.push('name = ?');
-        updateValues.push(updates.name);
-      }
-      if (updates.description !== undefined) {
-        updateFields.push('description = ?');
-        updateValues.push(updates.description);
-      }
-      if (updates.isActive !== undefined) {
-        updateFields.push('is_active = ?');
-        updateValues.push(updates.isActive);
-      }
-      if (updates.sortOrder !== undefined) {
-        updateFields.push('sort_order = ?');
-        updateValues.push(updates.sortOrder);
-      }
+        const updateFields: string[] = [];
+        const updateValues: any[] = [];
 
-      if (updateFields.length === 0) {
-        return existing;
+        if (updates.name !== undefined) {
+          updateFields.push('name = ?');
+          updateValues.push(updates.name);
+        }
+        if (updates.description !== undefined) {
+          updateFields.push('description = ?');
+          updateValues.push(updates.description);
+        }
+        if (updates.isActive !== undefined) {
+          updateFields.push('is_active = ?');
+          updateValues.push(updates.isActive);
+        }
+        if (updates.sortOrder !== undefined) {
+          updateFields.push('sort_order = ?');
+          updateValues.push(updates.sortOrder);
+        }
+
+        if (updateFields.length > 0) {
+          updateValues.push(parseInt(id));
+          await connection.execute(`
+            UPDATE investment_categories
+            SET ${updateFields.join(', ')}, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+          `, updateValues);
+        }
+
+        // Cascade rename if name changed
+        if (updates.name && updates.name !== existing.name) {
+          await connection.execute(
+            'UPDATE investments SET category = ? WHERE category = ?',
+            [updates.name, existing.name]
+          );
+        }
+
+        await connection.commit();
+      } catch (txErr) {
+        await connection.rollback();
+        throw txErr;
+      } finally {
+        connection.release();
       }
-
-      updateValues.push(parseInt(id));
-
-      await pool.execute(`
-        UPDATE investment_categories
-        SET ${updateFields.join(', ')}, updated_at = CURRENT_TIMESTAMP
-        WHERE id = ?
-      `, updateValues);
 
       const updated = await this.findById(id);
       if (!updated) {
