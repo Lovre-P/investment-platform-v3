@@ -15,7 +15,8 @@ export class InvestmentController {
         status: req.query.status as any,
         category: req.query.category as string,
         page: req.query.page ? parseInt(req.query.page as string) : 1,
-        limit: req.query.limit ? Math.min(parseInt(req.query.limit as string), 100) : 10
+        limit: req.query.limit ? Math.min(parseInt(req.query.limit as string), 100) : 10,
+        lang: req.query.lang as string // Add language parameter support
       };
 
       const investments = await InvestmentModel.findAll(filters);
@@ -39,7 +40,8 @@ export class InvestmentController {
   static async getInvestmentById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
-      const investment = await InvestmentModel.findById(id);
+      const lang = req.query.lang as string; // Add language parameter support
+      const investment = await InvestmentModel.findById(id, lang);
 
       if (!investment) {
         throw new NotFoundError('Investment not found');

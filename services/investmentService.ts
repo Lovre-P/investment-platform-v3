@@ -1,18 +1,29 @@
 import { Investment, InvestmentStatus } from '../types';
 import { apiClient } from '../utils/apiClient';
 
-export const getInvestments = async (filters?: { status?: InvestmentStatus, category?: string }): Promise<Investment[]> => {
+export interface InvestmentFilters {
+  status?: InvestmentStatus;
+  category?: string;
+  lang?: string; // Add language parameter
+}
+
+export const getInvestments = async (filters?: InvestmentFilters): Promise<Investment[]> => {
   const queryParams = new URLSearchParams();
   if (filters?.status) queryParams.append('status', filters.status);
   if (filters?.category) queryParams.append('category', filters.category);
+  if (filters?.lang) queryParams.append('lang', filters.lang);
 
   const endpoint = queryParams.toString() ? `/investments?${queryParams.toString()}` : '/investments';
   return apiClient.get<Investment[]>(endpoint);
 };
 
-export const getInvestmentById = async (id: string): Promise<Investment | undefined> => {
+export const getInvestmentById = async (id: string, lang?: string): Promise<Investment | undefined> => {
   try {
-    return await apiClient.get<Investment>(`/investments/${id}`);
+    const queryParams = new URLSearchParams();
+    if (lang) queryParams.append('lang', lang);
+
+    const endpoint = queryParams.toString() ? `/investments/${id}?${queryParams.toString()}` : `/investments/${id}`;
+    return await apiClient.get<Investment>(endpoint);
   } catch (error: any) {
     if (error.status === 404) return undefined;
     throw error;

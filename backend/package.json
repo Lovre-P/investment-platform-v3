@@ -10,6 +10,8 @@
     "start": "node dist/server.js",
     "db:test": "tsx src/database/test-connection.ts",
     "db:setup": "tsx src/database/setup.ts",
+    "translations:migrate": "tsx src/scripts/migrateInvestmentTranslations.ts",
+    "translations:test": "tsx src/scripts/testTranslationSystem.ts",
     "db:migrate": "tsx src/database/migrate.ts",
     "db:seed": "tsx src/database/seed.ts",
     "db:init": "npm run db:setup && npm run db:migrate && npm run db:seed",
@@ -27,6 +29,7 @@
     "morgan": "^1.10.0",
     "multer": "^2.0.1",
     "mysql2": "^3.14.1",
+    "node-fetch": "^3.3.2",
     "nodemailer": "^6.9.13",
     "uuid": "^11.0.3",
     "zod": "^3.24.1"

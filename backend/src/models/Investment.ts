@@ -2,12 +2,14 @@ import { pool, isMockMode } from '../database/config.js';
 import { mockDb } from '../database/mock.js';
 import { Investment, InvestmentStatus, CreateInvestmentData } from '../types/index.js';
 import { NotFoundError, DatabaseError } from '../utils/errors.js';
+import { TranslationService } from '../services/translationService.js';
 
 export interface InvestmentFilters {
   status?: InvestmentStatus;
   category?: string;
   page?: number;
   limit?: number;
+  lang?: string; // Add language parameter
 }
 
 export class InvestmentModel {
@@ -17,39 +19,81 @@ export class InvestmentModel {
     }
 
     try {
-      let query = `
-        SELECT
-          id, title, description, long_description as longDescription,
-          amount_goal as amountGoal, amount_raised as amountRaised,
-          currency, images, category, status, submitted_by as submittedBy,
-          submitter_email as submitterEmail, submission_date as submissionDate,
-          apy_range as apyRange, min_investment as minInvestment,
-          term, tags
-        FROM investments
-      `;
+      const { lang, ...otherFilters } = filters;
+      const useTranslations = lang && lang !== 'en';
+
+      let query: string;
+
+      if (useTranslations) {
+        // Query with LEFT JOIN to get translations, fallback to English
+        query = `
+          SELECT
+            i.id,
+            COALESCE(t.title, i.title) as title,
+            COALESCE(t.description, i.description) as description,
+            COALESCE(t.long_description, i.long_description) as longDescription,
+            i.amount_goal as amountGoal,
+            i.amount_raised as amountRaised,
+            i.currency,
+            i.images,
+            COALESCE(t.category, i.category) as category,
+            i.status,
+            i.submitted_by as submittedBy,
+            i.submitter_email as submitterEmail,
+            i.submission_date as submissionDate,
+            i.apy_range as apyRange,
+            i.min_investment as minInvestment,
+            i.term,
+            COALESCE(t.tags, i.tags) as tags
+          FROM investments i
+          LEFT JOIN investment_translations t ON i.id = t.investment_id AND t.lang = ?
+        `;
+      } else {
+        // Standard query for English or when no language specified
+        query = `
+          SELECT
+            id, title, description, long_description as longDescription,
+            amount_goal as amountGoal, amount_raised as amountRaised,
+            currency, images, category, status, submitted_by as submittedBy,
+            submitter_email as submitterEmail, submission_date as submissionDate,
+            apy_range as apyRange, min_investment as minInvestment,
+            term, tags
+          FROM investments
+        `;
+      }
 
       const conditions = [];
       const values = [];
 
-      if (filters.status) {
-        conditions.push(`status = ?`);
-        values.push(filters.status);
+      // Add language parameter if using translations
+      if (useTranslations) {
+        values.push(lang);
       }
 
-      if (filters.category) {
-        conditions.push(`category = ?`);
-        values.push(filters.category);
+      if (otherFilters.status) {
+        conditions.push(`${useTranslations ? 'i.' : ''}status = ?`);
+        values.push(otherFilters.status);
+      }
+
+      if (otherFilters.category) {
+        // For category filtering with translations, we need to check both original and translated
+        if (useTranslations) {
+          conditions.push(`(COALESCE(t.category, i.category) = ?)`);
+        } else {
+          conditions.push(`category = ?`);
+        }
+        values.push(otherFilters.category);
       }
 
       if (conditions.length > 0) {
         query += ` WHERE ${conditions.join(' AND ')}`;
       }
 
-      query += ` ORDER BY submission_date DESC`;
+      query += ` ORDER BY ${useTranslations ? 'i.' : ''}submission_date DESC`;
 
       // Add pagination
-      const limit = parseInt(String(filters.limit || 10));
-      const page = parseInt(String(filters.page || 1));
+      const limit = parseInt(String(otherFilters.limit || 10));
+      const page = parseInt(String(otherFilters.page || 1));
       const offset = (page - 1) * limit;
 
       query += ` LIMIT ${limit} OFFSET ${offset}`;
@@ -71,23 +115,58 @@ export class InvestmentModel {
     }
   }
 
-  static async findById(id: string): Promise<Investment | null> {
+  static async findById(id: string, lang?: string): Promise<Investment | null> {
     if (isMockMode()) {
       return mockDb.investments.findById(id);
     }
 
     try {
-      const [rows] = await pool.execute(`
-        SELECT
-          id, title, description, long_description as longDescription,
-          amount_goal as amountGoal, amount_raised as amountRaised,
-          currency, images, category, status, submitted_by as submittedBy,
-          submitter_email as submitterEmail, submission_date as submissionDate,
-          apy_range as apyRange, min_investment as minInvestment,
-          term, tags
-        FROM investments
-        WHERE id = ?
-      `, [id]);
+      const useTranslations = lang && lang !== 'en';
+      let query: string;
+      const values = [id];
+
+      if (useTranslations) {
+        // Query with LEFT JOIN to get translations, fallback to English
+        query = `
+          SELECT
+            i.id,
+            COALESCE(t.title, i.title) as title,
+            COALESCE(t.description, i.description) as description,
+            COALESCE(t.long_description, i.long_description) as longDescription,
+            i.amount_goal as amountGoal,
+            i.amount_raised as amountRaised,
+            i.currency,
+            i.images,
+            COALESCE(t.category, i.category) as category,
+            i.status,
+            i.submitted_by as submittedBy,
+            i.submitter_email as submitterEmail,
+            i.submission_date as submissionDate,
+            i.apy_range as apyRange,
+            i.min_investment as minInvestment,
+            i.term,
+            COALESCE(t.tags, i.tags) as tags
+          FROM investments i
+          LEFT JOIN investment_translations t ON i.id = t.investment_id AND t.lang = ?
+          WHERE i.id = ?
+        `;
+        values.unshift(lang); // Add language parameter first
+      } else {
+        // Standard query for English or when no language specified
+        query = `
+          SELECT
+            id, title, description, long_description as longDescription,
+            amount_goal as amountGoal, amount_raised as amountRaised,
+            currency, images, category, status, submitted_by as submittedBy,
+            submitter_email as submitterEmail, submission_date as submissionDate,
+            apy_range as apyRange, min_investment as minInvestment,
+            term, tags
+          FROM investments
+          WHERE id = ?
+        `;
+      }
+
+      const [rows] = await pool.execute(query, values);
 
       const row = (rows as any[])[0];
       if (!row) return null;
@@ -152,7 +231,7 @@ export class InvestmentModel {
       `, [investmentData.title, investmentData.submittedBy]);
 
       const row = (rows as any[])[0];
-      return {
+      const investment = {
         ...row,
         amountGoal: parseFloat(row.amountGoal) || 0,
         amountRaised: parseFloat(row.amountRaised) || 0,
@@ -160,6 +239,24 @@ export class InvestmentModel {
         images: typeof row.images === 'string' ? JSON.parse(row.images) : row.images,
         tags: typeof row.tags === 'string' ? JSON.parse(row.tags) : row.tags
       };
+
+      // Generate translations asynchronously (don't wait for completion)
+      setImmediate(async () => {
+        try {
+          await TranslationService.createTranslationsForInvestment(investment.id, {
+            title: investment.title,
+            description: investment.description,
+            longDescription: investment.longDescription,
+            category: investment.category,
+            tags: investment.tags || []
+          });
+          console.log(`🌐 Generated translations for investment: ${investment.title} (ID: ${investment.id})`);
+        } catch (translationError) {
+          console.error(`❌ Failed to generate translations for investment ${investment.id}:`, translationError);
+        }
+      });
+
+      return investment;
     } catch (error) {
       throw new DatabaseError('Failed to create investment');
     }
@@ -235,7 +332,7 @@ export class InvestmentModel {
       );
 
       const updatedRow = (rows as any[])[0];
-      return {
+      const updatedInvestment = {
         ...updatedRow,
         amountGoal: parseFloat(updatedRow.amountGoal) || 0,
         amountRaised: parseFloat(updatedRow.amountRaised) || 0,
@@ -243,6 +340,32 @@ export class InvestmentModel {
         images: typeof updatedRow.images === 'string' ? JSON.parse(updatedRow.images) : updatedRow.images,
         tags: typeof updatedRow.tags === 'string' ? JSON.parse(updatedRow.tags) : updatedRow.tags
       };
+
+      // Check if translatable content was updated
+      const translatableFields = ['title', 'description', 'longDescription', 'category', 'tags'];
+      const hasTranslatableUpdates = translatableFields.some(field =>
+        updates[field as keyof Investment] !== undefined
+      );
+
+      if (hasTranslatableUpdates) {
+        // Update translations asynchronously (don't wait for completion)
+        setImmediate(async () => {
+          try {
+            await TranslationService.updateTranslationsIfNeeded(updatedInvestment.id, {
+              title: updatedInvestment.title,
+              description: updatedInvestment.description,
+              longDescription: updatedInvestment.longDescription,
+              category: updatedInvestment.category,
+              tags: updatedInvestment.tags || []
+            });
+            console.log(`🔄 Updated translations for investment: ${updatedInvestment.title} (ID: ${updatedInvestment.id})`);
+          } catch (translationError) {
+            console.error(`❌ Failed to update translations for investment ${updatedInvestment.id}:`, translationError);
+          }
+        });
+      }
+
+      return updatedInvestment;
     } catch (error) {
       if (error instanceof NotFoundError) {
         throw error;
@@ -271,18 +394,36 @@ export class InvestmentModel {
     }
 
     try {
-      let query = 'SELECT COUNT(*) as count FROM investments';
+      const { lang, ...otherFilters } = filters;
+      const useTranslations = lang && lang !== 'en';
+
+      let query: string;
       const conditions: string[] = [];
       const values: any[] = [];
 
-      if (filters.status) {
-        conditions.push('status = ?');
-        values.push(filters.status);
+      if (useTranslations) {
+        query = `
+          SELECT COUNT(*) as count
+          FROM investments i
+          LEFT JOIN investment_translations t ON i.id = t.investment_id AND t.lang = ?
+        `;
+        values.push(lang);
+      } else {
+        query = 'SELECT COUNT(*) as count FROM investments';
       }
 
-      if (filters.category) {
-        conditions.push('category = ?');
-        values.push(filters.category);
+      if (otherFilters.status) {
+        conditions.push(`${useTranslations ? 'i.' : ''}status = ?`);
+        values.push(otherFilters.status);
+      }
+
+      if (otherFilters.category) {
+        if (useTranslations) {
+          conditions.push(`(COALESCE(t.category, i.category) = ?)`);
+        } else {
+          conditions.push('category = ?');
+        }
+        values.push(otherFilters.category);
       }
 
       if (conditions.length > 0) {

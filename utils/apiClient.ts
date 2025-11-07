@@ -14,10 +14,10 @@ const getRequestKey = (endpoint: string, options: RequestInit): string => {
   return `${options.method || 'GET'}:${endpoint}:${JSON.stringify(options.body || '')}`;
 };
 
-// Use backend service URL in production, proxy in development
+// Use backend service URL in production, direct backend URL in development
 const API_BASE_URL = import.meta.env.PROD
   ? 'https://mega-invest-backend-production.up.railway.app/api'
-  : '/api';
+  : 'http://localhost:3001/api';
 
 interface ApiError extends Error {
   status?: number;
