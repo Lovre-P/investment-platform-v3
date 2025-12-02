@@ -42,7 +42,7 @@ const Footer: React.FC = () => {
           </div>
         </div>
         <div className="mt-10 border-t border-primary-700 pt-8 text-center text-sm">
-          <p className="text-accent-200">&copy; {new Date().getFullYear()} {APP_NAME}. All rights reserved.</p>
+          <p className="text-accent-200">&copy; {new Date().getFullYear()} {APP_NAME}. All rights reserved. | Designed & developed by <a href="https://aistech.hr">AIS Tech</a></p>
           <p className="mt-1">
             <Link to="/terms" className="text-accent-300 hover:text-accent-400 transition-colors">Terms of Service</Link> |
             <Link to="/privacy" className="text-accent-300 hover:text-accent-400 transition-colors ml-2">Privacy Policy</Link> |
