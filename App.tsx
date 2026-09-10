@@ -20,6 +20,7 @@ import InvestmentDetailPage from './pages/public/InvestmentDetailPage';
 import SubmitInvestmentPage from './pages/public/SubmitInvestmentPage';
 import TermsOfServicePage from './pages/public/TermsOfServicePage';
 import PrivacyPolicyPage from './pages/public/PrivacyPolicyPage';
+import ImpressumPage from './pages/public/ImpressumPage';
 
 import NotFoundPage from './pages/public/NotFoundPage';
 
@@ -67,6 +68,7 @@ const App: React.FC = () => {
           <Route path="submit-investment" element={<SubmitInvestmentPage />} />
           <Route path="terms" element={<TermsOfServicePage />} />
           <Route path="privacy" element={<PrivacyPolicyPage />} />
+          <Route path="impressum" element={<ImpressumPage />} />
         </Route>
 
         {/* Admin Routes */}
@@ -97,4 +99,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-    

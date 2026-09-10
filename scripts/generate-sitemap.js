@@ -54,6 +54,12 @@ const staticPages = [
     changefreq: 'yearly',
     priority: '0.3',
     lastmod: new Date().toISOString().split('T')[0]
+  },
+  {
+    url: '/impressum',
+    changefreq: 'yearly',
+    priority: '0.3',
+    lastmod: new Date().toISOString().split('T')[0]
   }
 ];
 

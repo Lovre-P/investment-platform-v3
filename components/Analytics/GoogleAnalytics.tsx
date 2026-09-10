@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { SITE_CONFIG } from '../../config/siteConfig';
+import { cookieConsentService } from '../../services/cookieConsentService';
 
 interface GoogleAnalyticsProps {
   measurementId?: string;
@@ -20,67 +21,65 @@ const GoogleAnalytics: React.FC<GoogleAnalyticsProps> = ({
   const location = useLocation();
 
   useEffect(() => {
-    // Skip loading in development mode
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Google Analytics: Skipping in development mode');
-      return;
-    }
+    const isValidMeasurementId = Boolean(
+      measurementId && measurementId !== 'G-XXXXXXXXXX' && measurementId.startsWith('G-')
+    );
 
-    // Skip if measurement ID is placeholder or invalid
-    if (!measurementId || measurementId === 'G-XXXXXXXXXX' || !measurementId.startsWith('G-')) {
-      if (import.meta.env.PROD) {
-        console.error('🚨 Google Analytics: Invalid measurement ID in production!');
-      } else {
-        console.warn('Google Analytics: Invalid measurement ID');
+    const removeAnalytics = () => {
+      const existingScript = document.querySelector(`script[src*="${measurementId}"]`);
+      existingScript?.remove();
+      window.__GA_INITIALIZED__ = false;
+      window.dataLayer = [];
+    };
+
+    const loadAnalytics = () => {
+      if (process.env.NODE_ENV === 'development' || !isValidMeasurementId) {
+        return;
       }
-      return;
-    }
 
-    // Prevent multiple initializations
-    if (window.__GA_INITIALIZED__) {
-      return;
-    }
+      if (!cookieConsentService.isCategoryEnabled('analytics') || window.__GA_INITIALIZED__) {
+        return;
+      }
 
-    // Load Google Analytics script
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+      document.head.appendChild(script);
 
-    script.onload = () => {
-      console.log('Google Analytics script loaded successfully');
-    };
-
-    script.onerror = () => {
-      console.error('Failed to load Google Analytics script');
-    };
-
-    document.head.appendChild(script);
-
-    // Initialize dataLayer and gtag only if not already defined
-    window.dataLayer = window.dataLayer || [];
-    if (!window.gtag) {
+      window.dataLayer = window.dataLayer || [];
       window.gtag = function gtag() {
         window.dataLayer.push(arguments);
       };
+
+      window.gtag('js', new Date());
+      window.gtag('config', measurementId, {
+        page_title: document.title,
+        page_location: window.location.href,
+        send_page_view: true
+      });
+
+      window.__GA_INITIALIZED__ = true;
+    };
+
+    const handleConsentChange = (event: Event) => {
+      const preferences = (event as CustomEvent<{ preferences?: { analytics?: boolean } }>).detail?.preferences;
+      if (preferences?.analytics) {
+        loadAnalytics();
+      } else {
+        removeAnalytics();
+      }
+    };
+
+    if (!isValidMeasurementId && import.meta.env.PROD) {
+      console.warn('Google Analytics is not configured with a valid measurement ID');
     }
 
-    // Configure Google Analytics
-    window.gtag('js', new Date());
-    window.gtag('config', measurementId, {
-      page_title: document.title,
-      page_location: window.location.href,
-      send_page_view: true
-    });
-
-    window.__GA_INITIALIZED__ = true;
+    window.addEventListener('cookieConsentChange', handleConsentChange);
+    loadAnalytics();
 
     return () => {
-      // Cleanup script on unmount
-      const existingScript = document.querySelector(`script[src*="${measurementId}"]`);
-      if (existingScript) {
-        existingScript.remove();
-      }
-      window.__GA_INITIALIZED__ = false;
+      window.removeEventListener('cookieConsentChange', handleConsentChange);
+      removeAnalytics();
     };
   }, [measurementId]);
 
@@ -94,7 +93,7 @@ const GoogleAnalytics: React.FC<GoogleAnalyticsProps> = ({
       return;
     }
 
-    if (typeof window.gtag === 'function') {
+    if (window.__GA_INITIALIZED__ && typeof window.gtag === 'function') {
       window.gtag('config', measurementId, {
         page_title: document.title,
         page_location: window.location.href,

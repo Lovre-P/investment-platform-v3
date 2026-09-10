@@ -1,6 +1,7 @@
 import React from 'react';
 import { DocumentTextIcon, ScaleIcon, ShieldCheckIcon, BookOpenIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import SEOHead from '../../components/SEO/SEOHead';
+import CompanyLegalDetails from '../../components/CompanyLegalDetails';
 import { createBreadcrumbSchema } from '../../utils/structuredData';
 
 const TermsOfServicePage: React.FC = () => {
@@ -30,7 +31,7 @@ const TermsOfServicePage: React.FC = () => {
           Please read these Terms of Service carefully before using the MegaInvest platform.
         </p>
         <p className="text-sm text-secondary-500 mt-4">
-          Last updated: {new Date().toLocaleDateString()}
+          Last updated: 10 September 2026
         </p>
 
         {/* Quick Navigation */}
@@ -58,6 +59,8 @@ const TermsOfServicePage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      <CompanyLegalDetails />
 
       {/* Introduction */}
       <section className="prose prose-lg max-w-none text-secondary-700">
@@ -116,6 +119,10 @@ const TermsOfServicePage: React.FC = () => {
           MegaInvest is an investment platform that connects project owners and entrepreneurs with potential investors. 
           We facilitate the presentation and discovery of investment opportunities but do not provide investment advice 
           or guarantee the success of any investment.
+        </p>
+        <p>
+          The Platform is currently operated as a pro forma presentation and connection service. It has no current clients,
+          and it does not process investments, payments, or hold investor funds.
         </p>
         <ul className="list-disc pl-6 space-y-2">
           <li>We provide a platform for showcasing investment opportunities</li>

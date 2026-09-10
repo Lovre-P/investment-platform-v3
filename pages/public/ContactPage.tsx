@@ -35,7 +35,7 @@ const ContactPage: React.FC = () => {
     },
     {
       question: "Can I request to delete my account and data?",
-      answer: "Yes, you have the right to request account deletion under GDPR. However, some data may be retained for legal compliance (typically 7-10 years for financial records), transaction records may be preserved for regulatory requirements, and you can request data portability before deletion. Contact privacy@megainvest.com to initiate the process.",
+      answer: "Yes, you have the right to request account deletion under GDPR. However, some data may be retained where a legal obligation or another lawful basis applies, and you can request data portability where applicable. Contact info@mega-invest.hr to initiate the process.",
       type: "info"
     },
     {
@@ -45,7 +45,7 @@ const ContactPage: React.FC = () => {
     },
     {
       question: "How long is my data stored on the platform?",
-      answer: "Data retention varies: Account information until deletion request plus 7 years for compliance, transaction records for 10 years as required by financial regulations, communication data for 3 years for customer service, and marketing data until consent is withdrawn.",
+      answer: "Retention depends on the type of data: account data is kept while the account is active and as long as necessary after closure, records required by law for the applicable legal period, contact communications for as long as needed to handle the request, and marketing data until consent is withdrawn.",
       type: "standard"
     },
     {
@@ -55,7 +55,7 @@ const ContactPage: React.FC = () => {
     },
     {
       question: "Do you transfer my data outside the EU?",
-      answer: "Yes, some data may be transferred internationally with appropriate safeguards. We use EU-based cloud hosting when possible, but third-party services may involve international transfers using standard contractual clauses or adequacy decisions. You have the right to be informed about and object to certain transfers.",
+      answer: "Service providers may process data outside Croatia. Where a transfer outside the EEA applies, it must use a lawful GDPR transfer mechanism and appropriate safeguards. See the Privacy Policy for the applicable rights and criteria.",
       type: "standard"
     },
     {
@@ -133,7 +133,7 @@ const ContactPage: React.FC = () => {
                 <div>
                   <h3 className="text-lg font-medium text-secondary-700">Call Us</h3>
                   <p className="text-secondary-600">
-                    <a href="tel:+38591310151" className="text-primary-500 hover:text-primary-700 hover:underline">+385 91 310 15 12</a>
+                    <a href="tel:+385913101512" className="text-primary-500 hover:text-primary-700 hover:underline">+385 91 310 15 12</a>
                   </p>
                   <p className="text-sm text-secondary-500">Mon - Fri, 8:00 AM - 3:00 PM (CET)</p>
                 </div>
@@ -152,8 +152,11 @@ const ContactPage: React.FC = () => {
             <div className="space-y-1 text-sm text-secondary-600">
               <p><span className="font-medium">MB:</span> 05728711</p>
               <p><span className="font-medium">OIB:</span> 94198216157</p>
-              <p><span className="font-medium">SWIFT:</span> HAABHR22</p>
-              <p><span className="font-medium">IBAN:</span> HR58 2500 0091 1015 5216 2</p>
+              <p><span className="font-medium">VAT ID:</span> HR94198216157</p>
+              <p><span className="font-medium">Bank:</span> RAIFFEISENBANK AUSTRIA d.d.</p>
+              <p><span className="font-medium">Bank address:</span> Magazinska cesta 69, 10000 Zagreb, Croatia</p>
+              <p><span className="font-medium">BIC/SWIFT:</span> RZBHHR2X</p>
+              <p><span className="font-medium">IBAN:</span> HR72 2484 0081 1354 5631 8</p>
             </div>
           </div>
         </div>
@@ -233,4 +236,3 @@ const ContactPage: React.FC = () => {
 };
 
 export default ContactPage;
-    

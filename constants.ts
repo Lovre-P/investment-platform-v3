@@ -11,6 +11,7 @@ export const PUBLIC_ROUTES = {
   SUBMIT_INVESTMENT: '/submit-investment',
   TERMS: '/terms',
   PRIVACY: '/privacy',
+  IMPRESSUM: '/impressum',
   NOT_FOUND: '/404',
 };
 
@@ -39,4 +40,3 @@ export const COOKIE_CONSENT = {
     FUNCTIONAL: 'functional'
   }
 } as const;
-    

@@ -46,6 +46,12 @@
     <priority>0.3</priority>
   </url>
   <url>
+    <loc>https://www.mega-invest.hr/impressum</loc>
+    <lastmod>2026-09-10</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
     <loc>https://www.mega-invest.hr/investments/1</loc>
     <lastmod>2025-08-14</lastmod>
     <changefreq>weekly</changefreq>

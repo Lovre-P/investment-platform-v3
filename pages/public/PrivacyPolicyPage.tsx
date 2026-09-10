@@ -1,6 +1,7 @@
 import React from 'react';
 import { ShieldCheckIcon, EyeIcon, LockClosedIcon, UserGroupIcon, BookOpenIcon, ExclamationCircleIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import SEOHead from '../../components/SEO/SEOHead';
+import CompanyLegalDetails from '../../components/CompanyLegalDetails';
 import { createBreadcrumbSchema } from '../../utils/structuredData';
 
 const PrivacyPolicyPage: React.FC = () => {
@@ -30,7 +31,7 @@ const PrivacyPolicyPage: React.FC = () => {
           Your privacy is important to us. This policy explains how we collect, use, and protect your personal information.
         </p>
         <p className="text-sm text-secondary-500 mt-4">
-          Last updated: {new Date().toLocaleDateString()}
+          Last updated: 10 September 2026
         </p>
 
         {/* GDPR Compliance Notice */}
@@ -97,6 +98,8 @@ const PrivacyPolicyPage: React.FC = () => {
         </div>
       </section>
 
+      <CompanyLegalDetails />
+
       {/* Introduction */}
       <section className="prose prose-lg max-w-none text-secondary-700">
         <div className="bg-primary-50 p-6 rounded-lg border-l-4 border-primary-500">
@@ -113,7 +116,7 @@ const PrivacyPolicyPage: React.FC = () => {
             <ul className="text-sm text-primary-700 space-y-1">
               <li><strong>Consent:</strong> When you explicitly agree to data processing</li>
               <li><strong>Contract:</strong> To provide our investment platform services</li>
-              <li><strong>Legal Obligation:</strong> To comply with financial regulations</li>
+              <li><strong>Legal Obligation:</strong> Where processing is required by applicable law</li>
               <li><strong>Legitimate Interest:</strong> For platform security and fraud prevention</li>
             </ul>
           </div>
@@ -129,7 +132,7 @@ const PrivacyPolicyPage: React.FC = () => {
         
         <h3 className="text-xl font-medium text-secondary-800 mb-3">Personal Information You Provide:</h3>
         <ul className="list-disc pl-6 space-y-2 mb-6">
-          <li><strong>Account Information:</strong> Name, email address, phone number, and password</li>
+          <li><strong>Account Information:</strong> Name, email address, phone number, and account credentials</li>
           <li><strong>Profile Information:</strong> Professional background, investment preferences, company details</li>
           <li><strong>Investment Data:</strong> Investment history, portfolio information, financial capacity</li>
           <li><strong>Project Information:</strong> Business plans, financial projections, company documentation</li>
@@ -252,12 +255,11 @@ const PrivacyPolicyPage: React.FC = () => {
       {/* Cookies and Tracking */}
       <section id="cookies" className="prose prose-lg max-w-none text-secondary-700">
         <h2 className="text-2xl font-semibold text-secondary-800 mb-4">6. Cookies and Tracking Technologies</h2>
-        <p className="mb-4">We use cookies and similar technologies to enhance your experience:</p>
+        <p className="mb-4">We use strictly necessary storage and, where enabled and accepted, optional analytics:</p>
         <ul className="list-disc pl-6 space-y-2">
-          <li><strong>Essential Cookies:</strong> Required for platform functionality and security</li>
-          <li><strong>Performance Cookies:</strong> Help us understand how users interact with our platform</li>
-          <li><strong>Functional Cookies:</strong> Remember your preferences and settings</li>
-          <li><strong>Analytics:</strong> Provide insights into platform usage and performance</li>
+          <li><strong>Strictly Necessary Storage:</strong> Stores cookie-consent preferences and supports platform functionality</li>
+          <li><strong>Optional Analytics:</strong> Google Analytics is loaded only when it is configured in production and analytics consent has been given</li>
+          <li><strong>Functional and Marketing Categories:</strong> Available in the preference interface but no corresponding service is enabled by this frontend build</li>
         </ul>
         <div className="mt-6 bg-yellow-50 p-6 rounded-lg border border-yellow-200">
           <h3 className="text-lg font-medium text-yellow-800 mb-3">Cookie Management:</h3>
@@ -265,8 +267,8 @@ const PrivacyPolicyPage: React.FC = () => {
             You can control cookie settings through your browser preferences, but disabling certain cookies may affect platform functionality.
           </p>
           <div className="text-sm text-yellow-700">
-            <p className="mb-2"><strong>EU Users:</strong> We respect your cookie preferences and provide clear consent mechanisms for non-essential cookies.</p>
-            <p><strong>Browser Controls:</strong> Most browsers allow you to view, manage, and delete cookies through their settings menu.</p>
+            <p className="mb-2"><strong>Consent:</strong> Non-essential analytics is disabled until you give consent, and you can change your choice using Cookie Preferences.</p>
+            <p><strong>Browser Controls:</strong> Most browsers allow you to view, manage, and delete cookies or local storage through their settings menu.</p>
           </div>
         </div>
       </section>
@@ -276,13 +278,13 @@ const PrivacyPolicyPage: React.FC = () => {
         <h2 className="text-2xl font-semibold text-secondary-800 mb-4">7. Data Retention</h2>
         <p>
           We retain your personal information only as long as necessary for the purposes outlined in this policy or as required by law. 
-          Retention periods vary based on the type of information and legal requirements:
+          We use the following criteria rather than a single retention period for every user:
         </p>
         <ul className="list-disc pl-6 space-y-2 mt-4">
-          <li><strong>Account Information:</strong> Until account deletion plus 7 years for legal compliance</li>
-          <li><strong>Transaction Records:</strong> 10 years as required by financial regulations</li>
-          <li><strong>Communication Data:</strong> 3 years for customer service purposes</li>
-          <li><strong>Marketing Data:</strong> Until consent is withdrawn</li>
+          <li><strong>Account Information:</strong> While the account is active and for as long as necessary after closure to handle legal claims or applicable obligations</li>
+          <li><strong>Records required by law:</strong> For the period required by the applicable legal obligation</li>
+          <li><strong>Contact and support communications:</strong> For as long as necessary to handle the request and protect our legal interests</li>
+          <li><strong>Marketing data:</strong> Until consent is withdrawn or the data is no longer needed</li>
         </ul>
       </section>
 
@@ -291,25 +293,24 @@ const PrivacyPolicyPage: React.FC = () => {
         <h2 className="text-2xl font-semibold text-secondary-800 mb-4">8. International Data Transfers</h2>
         <div className="bg-orange-50 p-6 rounded-lg border-l-4 border-orange-500 mb-6">
           <p className="mb-4">
-            Your information may be transferred to and processed in countries other than Croatia.
-            We ensure appropriate safeguards are in place for international transfers, including:
+            Service providers may process information outside Croatia. Where a transfer outside the EEA applies, it must use a lawful GDPR transfer mechanism and appropriate safeguards.
+            Details about a specific transfer and its safeguard can be requested from us.
           </p>
           <ul className="list-disc pl-6 space-y-2 mb-4">
-            <li>Adequacy decisions by the European Commission</li>
-            <li>Standard contractual clauses (SCCs)</li>
-            <li>Binding corporate rules</li>
-            <li>Certification schemes</li>
+            <li>An adequacy decision by the European Commission, where available</li>
+            <li>Standard contractual clauses or another lawful transfer mechanism, where required</li>
+            <li>Additional safeguards appropriate to the transfer</li>
           </ul>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
           <div className="bg-blue-50 p-6 rounded-lg">
-            <h3 className="text-lg font-medium text-blue-800 mb-3">Current Third-Party Services:</h3>
+            <h3 className="text-lg font-medium text-blue-800 mb-3">Services visible in this build:</h3>
             <ul className="text-sm text-blue-700 space-y-2">
-              <li><strong>Cloud Hosting:</strong> EU-based servers (GDPR compliant)</li>
-              <li><strong>Analytics:</strong> Google Analytics (with data processing agreement)</li>
-              <li><strong>Email Services:</strong> EU-based email providers</li>
-              <li><strong>Payment Processing:</strong> PCI DSS compliant processors</li>
+              <li><strong>Cloud Hosting:</strong> Railway hosts the application; any applicable transfer is subject to the safeguards required by GDPR</li>
+              <li><strong>Analytics:</strong> Google Analytics can be enabled by production configuration and is gated by analytics consent</li>
+              <li><strong>Email Services:</strong> MyDataKnox is used for the mega-invest.hr domain email service; specific processing details depend on the configured mailbox and SMTP service</li>
+              <li><strong>Payments:</strong> MegaInvest does not process payments or hold investor funds according to the platform description</li>
             </ul>
           </div>
           <div className="bg-purple-50 p-6 rounded-lg">
